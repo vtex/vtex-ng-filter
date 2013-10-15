@@ -1,0 +1,12 @@
+{
+	"name": "ng-filter",
+	"version": "1.0.0",
+	"main": [
+		"build/vtex-ng-pagination.js",
+		"build/vtex-ng-pagination.css",
+		"build/vtex-ng-pagination.html"
+	],
+	"dependencies": {
+		"bootstrap": "2.3.2"
+	}
+}
