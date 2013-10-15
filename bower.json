@@ -2,9 +2,9 @@
 	"name": "ng-filter",
 	"version": "1.0.0",
 	"main": [
-		"build/vtex-ng-pagination.js",
-		"build/vtex-ng-pagination.css",
-		"build/vtex-ng-pagination.html"
+		"dist/ng-filter-with-template.min.js",
+		"dist/ng-filter.js",
+		"dist/ng-filter.html"
 	],
 	"dependencies": {
 		"bootstrap": "2.3.2"
