@@ -4,20 +4,68 @@
         <accordion-group is-open="openFilters[filter.rangeUrlTemplate]"
                          heading="{{ 'filters.' + filter.rangeUrlTemplate | translate }} {{ filter.selectedCountLabel }}"
                          ng-repeat="filter in filters">
-            <ul class="filter-list nav nav-pills nav-stacked">
-                <li ng-repeat="item in filter.items" ng-show="$index < 5 || moreOptionsShowFilters[filter.rangeUrlTemplate]" >
-                    <label class="checkbox inline">
-                        <input type="checkbox" ng-model="item.selected">
-                        <span class="">{{ item.name }} ({{ item.quantity }})</span>
-                    </label>
-                </li>
-            </ul>
-            <a href="javascript:void(0)" ng-click="moreOptionsShowFilters[filter.rangeUrlTemplate] = true"
-               ng-show="filter.items.length > 5 && !moreOptionsShowFilters[filter.rangeUrlTemplate]"
-               class="muted">{{ 'filters.moreOptionsShow' | translate}} ({{ filter.items.length }})</a>
-            <a href="javascript:void(0)" ng-click="moreOptionsShowFilters[filter.rangeUrlTemplate] = false"
-               ng-show="filter.items.length > 5 && moreOptionsShowFilters[filter.rangeUrlTemplate]"
-               class="muted">{{ 'filters.moreOptionsHide' | translate}}</a>
+
+            <div ng-switch on="filter.type">
+                <div ng-switch-when="date">
+                    <div class="input-append">
+                        <input type="text"
+                               ng-click="openFilters[filter.rangeUrlTemplate + 'Selector'] = !openFilters[filter.rangeUrlTemplate + 'Selector']"
+                               value="{{filter.dateRangeLabel()}}"
+                               readonly/>
+
+                        <a href="javascript:void(0);" class="add-on" ng-click="openFilters[filter.rangeUrlTemplate + 'Selector'] = !openFilters[filter.rangeUrlTemplate + 'Selector']"><i class="icon-calendar"></i></a>
+                    </div>
+                    <div class="date-selectors" ng-show="openFilters[filter.rangeUrlTemplate + 'Selector']">
+                        <div class="controls">
+                            <p translate>listing.dates.from</p>
+                            <div class="well well-small pull-left"
+                                 ng-model="filter.date.from">
+                                <datepicker show-weeks="false"></datepicker>
+                            </div>
+                        </div>
+
+                        <div class="controls">
+                            <p translate>listing.dates.to</p>
+                            <div class="well well-small pull-left"
+                                 ng-model="filter.date.to">
+                                <datepicker show-weeks="false"></datepicker>
+                            </div>
+                        </div>
+                    </div>
+                    <p>
+                        <a href="javascript: void(0)" ng-click="filter.setDates(0)" translate>listing.dates.today</a>
+                    </p>
+                    <p>
+                        <a href="javascript: void(0)" ng-click="filter.setDates(-1)" translate>listing.dates.yesterday</a>
+                    </p>
+                    <p>
+                        <a href="javascript: void(0)" ng-click="filter.setDates(-7)" translate>listing.dates.thisWeek</a>
+                    </p>
+                    <p>
+                        <a href="javascript: void(0)" ng-click="filter.setDates(-30)" translate>listing.dates.thisMonth</a>
+                    </p>
+                    <p>
+                        <a href="javascript: void(0)" ng-click="filter.clearSelection()" translate>listing.dates.clearFilter</a>
+                    </p>
+
+                </div>
+                <div ng-switch-default>
+                    <ul class="filter-list nav nav-pills nav-stacked">
+                        <li ng-repeat="item in filter.items" ng-show="$index < 5 || moreOptionsShowFilters[filter.rangeUrlTemplate]" >
+                            <label class="checkbox inline">
+                                <input type="checkbox" ng-model="item.selected">
+                                <span class="">{{ item.name }} ({{ item.quantity }})</span>
+                            </label>
+                        </li>
+                    </ul>
+                    <a href="javascript:void(0)" ng-click="moreOptionsShowFilters[filter.rangeUrlTemplate] = true"
+                       ng-show="filter.items.length > 5 && !moreOptionsShowFilters[filter.rangeUrlTemplate]"
+                       class="muted">{{ 'filters.moreOptionsShow' | translate}} ({{ filter.items.length }})</a>
+                    <a href="javascript:void(0)" ng-click="moreOptionsShowFilters[filter.rangeUrlTemplate] = false"
+                       ng-show="filter.items.length > 5 && moreOptionsShowFilters[filter.rangeUrlTemplate]"
+                       class="muted">{{ 'filters.moreOptionsHide' | translate}}</a>
+                </div>
+            </div>
         </accordion-group>
     </accordion>
 

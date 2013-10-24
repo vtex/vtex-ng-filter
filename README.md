@@ -11,6 +11,8 @@ Requires [node](http://nodejs.org/), [grunt](http://gruntjs.com/) (`npm i -g gru
 
 The compiled files can be found in the `/dist` folder.
 
+** Depends on moment.js and angular-translate!**
+
 ------
 
 VTEX - 2013
