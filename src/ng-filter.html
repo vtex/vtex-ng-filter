@@ -1,8 +1,8 @@
 <div class="filters-block">
 
     <accordion close-others="false" template-url="window.versionDirectory + 'lib/angular-ui/accordion.html'">
-        <accordion-group is-open="openFilters[filter.rangeUrlTemplate]" 
-                         heading="{{ 'filters.' + filter.rangeUrlTemplate | translate }} {{ filter.selectedCountLabel }}" 
+        <accordion-group is-open="openFilters[filter.rangeUrlTemplate]"
+                         heading="{{ 'filters.' + filter.rangeUrlTemplate | translate }} {{ filter.selectedCountLabel }}"
                          ng-repeat="filter in filters">
             <ul class="filter-list nav nav-pills nav-stacked">
                 <li ng-repeat="item in filter.items" ng-show="$index < 5 || moreOptionsShowFilters[filter.rangeUrlTemplate]" >

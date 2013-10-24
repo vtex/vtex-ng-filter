@@ -12,6 +12,11 @@ module.exports = (grunt) ->
 			main:
 				src: 'src/ng-filter.html'
 				dest: 'dist/ng-filter.html'
+			oms:
+				cwd: 'dist/'
+				src: 'ng-filter-with-template.min.js'
+				dest: '../vcs.order-management-ui/src/lib/ng-filter/'
+				expand: true
 
 		coffee:
 			main:
@@ -35,6 +40,12 @@ module.exports = (grunt) ->
 				options:
 					mangle: false
 
+		watch:
+			oms:
+				files: ['src/**']
+				tasks: ['default', 'copy:oms']
+
 	grunt.loadNpmTasks name for name of pkg.dependencies when name[0..5] is 'grunt-'
 
-	grunt.registerTask 'default', ['copy', 'coffee', 'ngtemplates', 'uglify']
+	grunt.registerTask 'default', ['copy:main', 'coffee', 'ngtemplates', 'uglify']
+	grunt.registerTask 'oms', ['default', 'watch:oms']
