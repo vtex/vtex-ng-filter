@@ -70,7 +70,7 @@
             to: new Date(items[1])
           };
           this.date = date;
-        } else {
+        } else if (this.type === 'multiple') {
           this.selectedCount = 0;
           _ref = this.items;
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -78,8 +78,13 @@
             if (_ref1 = item.url, __indexOf.call(itemsAsSearchParameter.split(','), _ref1) >= 0) {
               item.selected = true;
               this.selectedCount++;
+            } else {
+              item.selected = false;
             }
           }
+        } else if (this.type === 'single') {
+          this.selectedCount = 1;
+          this.selected = itemsAsSearchParameter;
         }
         return this.selectedCountLabel = "(" + this.selectedCount + ")";
       };
@@ -92,7 +97,7 @@
           } else {
             return [];
           }
-        } else {
+        } else if (this.type === 'multiple') {
           _ref = this.items;
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -102,6 +107,8 @@
             }
           }
           return _results;
+        } else if (this.type === 'single') {
+          return [this.selected];
         }
       };
 

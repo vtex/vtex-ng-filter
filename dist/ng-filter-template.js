@@ -42,14 +42,21 @@ angular.module("ngFilter").run(function($templateCache) {
     "                    <p>\n" +
     "                        <a href=\"javascript: void(0)\" ng-click=\"filter.clearSelection()\" translate=\"\">listing.dates.clearFilter</a>\n" +
     "                    </p>\n" +
-    "\n" +
     "                </div>\n" +
     "                <div ng-switch-default=\"\">\n" +
     "                    <ul class=\"filter-list nav nav-pills nav-stacked\">\n" +
     "                        <li ng-repeat=\"item in filter.items\" ng-show=\"$index < 5 || moreOptionsShowFilters[filter.rangeUrlTemplate]\">\n" +
-    "                            <label class=\"checkbox inline\">\n" +
-    "                                <input type=\"checkbox\" ng-model=\"item.selected\">\n" +
-    "                                <span class=\"\">{{ item.name }} ({{ item.quantity }})</span>\n" +
+    "                            <label class=\"checkbox\" ng-if=\"filter.type == 'multiple'\">\n" +
+    "                                <input type=\"checkbox\" name=\"{{filter.name}}\" ng-model=\"item.selected\">\n" +
+    "                                <span>\n" +
+    "                                    {{ item.name }} ({{ item.quantity }})\n" +
+    "                                </span>\n" +
+    "                            </label>\n" +
+    "                            <label class=\"radio\" ng-if=\"filter.type == 'single'\">\n" +
+    "                                <input type=\"radio\" name=\"{{filter.name}}\" ng-model=\"filter.selected\" ng-value=\"item.url\">\n" +
+    "                                <span>\n" +
+    "                                    {{ item.name }} ({{ item.quantity }})\n" +
+    "                                </span>\n" +
     "                            </label>\n" +
     "                        </li>\n" +
     "                    </ul>\n" +

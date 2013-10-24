@@ -45,12 +45,17 @@ angular.module('ngFilter', ["ui.bootstrap.accordion"])
             from: new Date(items[0])
             to: new Date(items[1])
           @date = date
-        else
+        else if @type is 'multiple'
           @selectedCount = 0
           for item in @items
             if item.url in itemsAsSearchParameter.split(',')
               item.selected = true
               @selectedCount++
+            else
+              item.selected = false
+        else if @type is 'single'
+          @selectedCount = 1
+          @selected = itemsAsSearchParameter
 
         @selectedCountLabel = "(#{@selectedCount})"
 
@@ -60,8 +65,10 @@ angular.module('ngFilter', ["ui.bootstrap.accordion"])
             [@name + ":[#{moment(@date.from).startOf('day').toISOString()} TO #{moment(@date.to).endOf('day').toISOString()}]"]
           else
             []
-        else
+        else if @type is 'multiple'
           item.url for item in @items when item.selected
+        else if @type is 'single'
+          [@selected]
 
       clearSelection: =>
         @selectedCount = 0
