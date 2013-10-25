@@ -116,7 +116,11 @@
           }
           return _results;
         } else if (this.type === 'single') {
-          return [this.selectedItem];
+          if (this.selectedItem) {
+            return [this.selectedItem];
+          } else {
+            return [];
+          }
         }
       };
 

@@ -75,7 +75,7 @@ angular.module('ngFilter', ["ui.bootstrap.accordion"])
         else if @type is 'multiple'
           item for item in @items when item.selected
         else if @type is 'single'
-          [@selectedItem]
+          if @selectedItem then [@selectedItem] else []
 
       getSelectedItemsURL: =>
         selectedArray = _.map @getSelectedItems(), (i) -> i.url
