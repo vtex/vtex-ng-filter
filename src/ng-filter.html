@@ -61,6 +61,8 @@
                     <a href="javascript:void(0)" ng-click="moreOptionsShowFilters[filter.rangeUrlTemplate] = false"
                        ng-show="filter.items.length > 5 && moreOptionsShowFilters[filter.rangeUrlTemplate]"
                        class="muted">{{ 'filters.moreOptionsHide' | translate}}</a>
+
+                    <button translate class="btn" ng-click="filter.clearSelection()" ng-show="filter.type === 'single' && filter.selectedItem">search.clear</button>
                 </div>
             </div>
         </accordion-group>
