@@ -14,6 +14,7 @@ angular.module('ngFilter', ["ui.bootstrap.accordion"])
         @selectedCount = 0
 
         if @type is 'date'
+          @dateObjectCache = {}
           @date = {}
 
           @setDates = (offset) =>
@@ -32,51 +33,70 @@ angular.module('ngFilter', ["ui.bootstrap.accordion"])
                 "#{moment(@date.from).add('hours', moment().hours()).fromNow()} #{$translate('listing.dates.until')} #{moment(@date.to).add('hours', moment().hours()).fromNow()}"
             else
               $translate('listing.dates.noRangeSelected')
-        else
-          @selectedCount++ for item in @items when item.selected
 
+        @updateSelectedCount()
+
+      updateSelectedCount: =>
+        if @type is 'date'
+          @selectedCount = if @date.from and @date.to then 1 else 0
+        else if @type is 'multiple'
+          @selectedCount = (_.filter @items, (i) -> i.selected).length
+        else if @type is 'single'
+          @selectedCount = if @selectedItem then 1 else 0
+
+        openFilters[@rangeUrlTemplate] = if @selectedCount is 0 then false else true
         @selectedCountLabel = if @selectedCount then "(#{@selectedCount})" else ""
 
       setSelectedItems: (itemsAsSearchParameter) =>
         if @type is 'date'
-          @selectedCount = 1
           items = itemsAsSearchParameter.replace(@name + ':[', '').replace(']', '').split(' TO ')
           date =
             from: new Date(items[0])
             to: new Date(items[1])
           @date = date
         else if @type is 'multiple'
-          @selectedCount = 0
           for item in @items
-            if item.url in itemsAsSearchParameter.split(',')
-              item.selected = true
-              @selectedCount++
-            else
-              item.selected = false
+            item.selected = item.url in itemsAsSearchParameter.split(',')
         else if @type is 'single'
-          @selectedCount = 1
-          @selected = itemsAsSearchParameter
+          @selectedItem = _.find @items, (i) -> i.url is itemsAsSearchParameter
 
-        @selectedCountLabel = "(#{@selectedCount})"
+        @updateSelectedCount()
 
       getSelectedItems: =>
         if @type is 'date'
           if @date.from and @date.to
-            [@name + ":[#{moment(@date.from).startOf('day').toISOString()} TO #{moment(@date.to).endOf('day').toISOString()}]"]
+            url = "#{@name}:[#{moment(@date.from).startOf('day').toISOString()} TO #{moment(@date.to).endOf('day').toISOString()}]"
+            @dateObjectCache[url] or=
+              name: @dateRangeLabel()
+              url: url
+            [@dateObjectCache[url]]
           else
             []
         else if @type is 'multiple'
-          item.url for item in @items when item.selected
+          item for item in @items when item.selected
         else if @type is 'single'
-          [@selected]
+          [@selectedItem]
+
+      getSelectedItemsURL: =>
+        selectedArray = _.map @getSelectedItems(), (i) -> i.url
+        if selectedArray.length > 0 then selectedArray.join(',') else null
+
+      clearItem: (itemObject) ->
+        if @type in ['date', 'single']
+          @clearSelection()
+        else if @type is 'multiple'
+          item.selected = false for item in @items when itemObject.url is item.url
+          @updateSelectedCount()
 
       clearSelection: =>
-        @selectedCount = 0
-        @selectedCountLabel = ""
         if @type is 'date'
           @date = {}
-        else
+        else if @type is 'multiple'
           item.selected = false for item in @items
+        else if @type is 'single'
+          @selectedItem = null
+
+        @updateSelectedCount()
 
 	.directive "filter", ->
 		restrict: 'E'

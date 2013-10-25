@@ -16,9 +16,11 @@
     return Filter = (function() {
       function Filter(filter) {
         this.clearSelection = __bind(this.clearSelection, this);
+        this.getSelectedItemsURL = __bind(this.getSelectedItemsURL, this);
         this.getSelectedItems = __bind(this.getSelectedItems, this);
         this.setSelectedItems = __bind(this.setSelectedItems, this);
-        var item, k, v, _i, _len, _ref,
+        this.updateSelectedCount = __bind(this.updateSelectedCount, this);
+        var k, v,
           _this = this;
         for (k in filter) {
           v = filter[k];
@@ -26,6 +28,7 @@
         }
         this.selectedCount = 0;
         if (this.type === 'date') {
+          this.dateObjectCache = {};
           this.date = {};
           this.setDates = function(offset) {
             var date;
@@ -48,22 +51,27 @@
               return $translate('listing.dates.noRangeSelected');
             }
           };
-        } else {
-          _ref = this.items;
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            item = _ref[_i];
-            if (item.selected) {
-              this.selectedCount++;
-            }
-          }
         }
-        this.selectedCountLabel = this.selectedCount ? "(" + this.selectedCount + ")" : "";
+        this.updateSelectedCount();
       }
+
+      Filter.prototype.updateSelectedCount = function() {
+        if (this.type === 'date') {
+          this.selectedCount = this.date.from && this.date.to ? 1 : 0;
+        } else if (this.type === 'multiple') {
+          this.selectedCount = (_.filter(this.items, function(i) {
+            return i.selected;
+          })).length;
+        } else if (this.type === 'single') {
+          this.selectedCount = this.selectedItem ? 1 : 0;
+        }
+        openFilters[this.rangeUrlTemplate] = this.selectedCount === 0 ? false : true;
+        return this.selectedCountLabel = this.selectedCount ? "(" + this.selectedCount + ")" : "";
+      };
 
       Filter.prototype.setSelectedItems = function(itemsAsSearchParameter) {
         var date, item, items, _i, _len, _ref, _ref1;
         if (this.type === 'date') {
-          this.selectedCount = 1;
           items = itemsAsSearchParameter.replace(this.name + ':[', '').replace(']', '').split(' TO ');
           date = {
             from: new Date(items[0]),
@@ -71,29 +79,29 @@
           };
           this.date = date;
         } else if (this.type === 'multiple') {
-          this.selectedCount = 0;
           _ref = this.items;
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             item = _ref[_i];
-            if (_ref1 = item.url, __indexOf.call(itemsAsSearchParameter.split(','), _ref1) >= 0) {
-              item.selected = true;
-              this.selectedCount++;
-            } else {
-              item.selected = false;
-            }
+            item.selected = (_ref1 = item.url, __indexOf.call(itemsAsSearchParameter.split(','), _ref1) >= 0);
           }
         } else if (this.type === 'single') {
-          this.selectedCount = 1;
-          this.selected = itemsAsSearchParameter;
+          this.selectedItem = _.find(this.items, function(i) {
+            return i.url === itemsAsSearchParameter;
+          });
         }
-        return this.selectedCountLabel = "(" + this.selectedCount + ")";
+        return this.updateSelectedCount();
       };
 
       Filter.prototype.getSelectedItems = function() {
-        var item, _i, _len, _ref, _results;
+        var item, url, _base, _i, _len, _ref, _results;
         if (this.type === 'date') {
           if (this.date.from && this.date.to) {
-            return [this.name + (":[" + (moment(this.date.from).startOf('day').toISOString()) + " TO " + (moment(this.date.to).endOf('day').toISOString()) + "]")];
+            url = "" + this.name + ":[" + (moment(this.date.from).startOf('day').toISOString()) + " TO " + (moment(this.date.to).endOf('day').toISOString()) + "]";
+            (_base = this.dateObjectCache)[url] || (_base[url] = {
+              name: this.dateRangeLabel(),
+              url: url
+            });
+            return [this.dateObjectCache[url]];
           } else {
             return [];
           }
@@ -103,30 +111,57 @@
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             item = _ref[_i];
             if (item.selected) {
-              _results.push(item.url);
+              _results.push(item);
             }
           }
           return _results;
         } else if (this.type === 'single') {
-          return [this.selected];
+          return [this.selectedItem];
+        }
+      };
+
+      Filter.prototype.getSelectedItemsURL = function() {
+        var selectedArray;
+        selectedArray = _.map(this.getSelectedItems(), function(i) {
+          return i.url;
+        });
+        if (selectedArray.length > 0) {
+          return selectedArray.join(',');
+        } else {
+          return null;
+        }
+      };
+
+      Filter.prototype.clearItem = function(itemObject) {
+        var item, _i, _len, _ref, _ref1;
+        if ((_ref = this.type) === 'date' || _ref === 'single') {
+          return this.clearSelection();
+        } else if (this.type === 'multiple') {
+          _ref1 = this.items;
+          for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+            item = _ref1[_i];
+            if (itemObject.url === item.url) {
+              item.selected = false;
+            }
+          }
+          return this.updateSelectedCount();
         }
       };
 
       Filter.prototype.clearSelection = function() {
-        var item, _i, _len, _ref, _results;
-        this.selectedCount = 0;
-        this.selectedCountLabel = "";
+        var item, _i, _len, _ref;
         if (this.type === 'date') {
-          return this.date = {};
-        } else {
+          this.date = {};
+        } else if (this.type === 'multiple') {
           _ref = this.items;
-          _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             item = _ref[_i];
-            _results.push(item.selected = false);
+            item.selected = false;
           }
-          return _results;
+        } else if (this.type === 'single') {
+          this.selectedItem = null;
         }
+        return this.updateSelectedCount();
       };
 
       return Filter;

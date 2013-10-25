@@ -7,6 +7,11 @@ angular.module("ngFilter").run(function($templateCache) {
     "\n" +
     "            <div ng-switch=\"\" on=\"filter.type\">\n" +
     "                <div ng-switch-when=\"date\">\n" +
+    "                    <p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates(0)\" translate=\"\">listing.dates.today</a></p>\n" +
+    "                    <p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates(-1)\" translate=\"\">listing.dates.yesterday</a></p>\n" +
+    "                    <p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates(-7)\" translate=\"\">listing.dates.thisWeek</a></p>\n" +
+    "                    <p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates(-30)\" translate=\"\">listing.dates.thisMonth</a></p>\n" +
+    "                    <p><a href=\"javascript: void(0)\" ng-click=\"filter.clearSelection()\" translate=\"\">listing.dates.clearFilter</a></p>\n" +
     "                    <div class=\"input-append\">\n" +
     "                        <input type=\"text\" ng-click=\"openFilters[filter.rangeUrlTemplate + 'Selector'] = !openFilters[filter.rangeUrlTemplate + 'Selector']\" value=\"{{filter.dateRangeLabel()}}\" readonly=\"readonly\">\n" +
     "\n" +
@@ -27,21 +32,6 @@ angular.module("ngFilter").run(function($templateCache) {
     "                            </div>\n" +
     "                        </div>\n" +
     "                    </div>\n" +
-    "                    <p>\n" +
-    "                        <a href=\"javascript: void(0)\" ng-click=\"filter.setDates(0)\" translate=\"\">listing.dates.today</a>\n" +
-    "                    </p>\n" +
-    "                    <p>\n" +
-    "                        <a href=\"javascript: void(0)\" ng-click=\"filter.setDates(-1)\" translate=\"\">listing.dates.yesterday</a>\n" +
-    "                    </p>\n" +
-    "                    <p>\n" +
-    "                        <a href=\"javascript: void(0)\" ng-click=\"filter.setDates(-7)\" translate=\"\">listing.dates.thisWeek</a>\n" +
-    "                    </p>\n" +
-    "                    <p>\n" +
-    "                        <a href=\"javascript: void(0)\" ng-click=\"filter.setDates(-30)\" translate=\"\">listing.dates.thisMonth</a>\n" +
-    "                    </p>\n" +
-    "                    <p>\n" +
-    "                        <a href=\"javascript: void(0)\" ng-click=\"filter.clearSelection()\" translate=\"\">listing.dates.clearFilter</a>\n" +
-    "                    </p>\n" +
     "                </div>\n" +
     "                <div ng-switch-default=\"\">\n" +
     "                    <ul class=\"filter-list nav nav-pills nav-stacked\">\n" +
@@ -53,7 +43,7 @@ angular.module("ngFilter").run(function($templateCache) {
     "                                </span>\n" +
     "                            </label>\n" +
     "                            <label class=\"radio\" ng-if=\"filter.type == 'single'\">\n" +
-    "                                <input type=\"radio\" name=\"{{filter.name}}\" ng-model=\"filter.selected\" ng-value=\"item.url\">\n" +
+    "                                <input type=\"radio\" name=\"{{filter.name}}\" ng-model=\"filter.selectedItem\" ng-value=\"item\">\n" +
     "                                <span>\n" +
     "                                    {{ item.name }} ({{ item.quantity }})\n" +
     "                                </span>\n" +
