@@ -42,7 +42,7 @@
                     <ul class="filter-list nav nav-pills nav-stacked">
                         <li ng-repeat="item in filter.items" ng-show="$index < 5 || moreOptionsShowFilters[filter.rangeUrlTemplate]" >
                             <label class="checkbox" ng-if="filter.type == 'multiple'">
-                                <input type="checkbox" name="{{filter.name}}" ng-model="item.selected">
+                                <input type="checkbox" name="{{filter.name}}" ng-model="item.selected" ng-change="filter.updateSelectedCount()">
                                 <span>
                                     {{ item.name }} ({{ item.quantity }})
                                 </span>

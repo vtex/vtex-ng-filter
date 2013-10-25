@@ -37,7 +37,7 @@ angular.module("ngFilter").run(function($templateCache) {
     "                    <ul class=\"filter-list nav nav-pills nav-stacked\">\n" +
     "                        <li ng-repeat=\"item in filter.items\" ng-show=\"$index < 5 || moreOptionsShowFilters[filter.rangeUrlTemplate]\">\n" +
     "                            <label class=\"checkbox\" ng-if=\"filter.type == 'multiple'\">\n" +
-    "                                <input type=\"checkbox\" name=\"{{filter.name}}\" ng-model=\"item.selected\">\n" +
+    "                                <input type=\"checkbox\" name=\"{{filter.name}}\" ng-model=\"item.selected\" ng-change=\"filter.updateSelectedCount()\">\n" +
     "                                <span>\n" +
     "                                    {{ item.name }} ({{ item.quantity }})\n" +
     "                                </span>\n" +
