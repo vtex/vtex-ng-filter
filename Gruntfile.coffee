@@ -14,7 +14,7 @@ module.exports = (grunt) ->
 				dest: 'dist/ng-filter.html'
 			oms:
 				cwd: 'dist/'
-				src: 'ng-filter-with-template.min.js'
+				src: ['ng-filter.js', 'ng-filter-template.js']
 				dest: '../vcs.order-management-ui/src/lib/ng-filter/'
 				expand: true
 
