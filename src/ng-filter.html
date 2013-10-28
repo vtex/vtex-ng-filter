@@ -25,7 +25,8 @@
                             <p translate>listing.dates.from</p>
                             <div class="well well-small pull-left"
                                  ng-model="filter.date.from">
-                                <datepicker show-weeks="false"></datepicker>
+                                <datepicker show-weeks="false"
+                                            max="filter.date.to"></datepicker>
                             </div>
                         </div>
 
@@ -33,7 +34,8 @@
                             <p translate>listing.dates.to</p>
                             <div class="well well-small pull-left"
                                  ng-model="filter.date.to">
-                                <datepicker show-weeks="false"></datepicker>
+                                <datepicker show-weeks="false"
+                                            min="filter.date.from"></datepicker>
                             </div>
                         </div>
                     </div>
