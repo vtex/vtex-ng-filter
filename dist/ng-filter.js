@@ -228,8 +228,11 @@
             filter.setSelectedItems(searchQuery);
           }
         }
-        return $scope.$watch('filters', (function() {
+        return $scope.$watch('filters', (function(newValue, oldValue) {
           var _k, _len2;
+          if (newValue === oldValue) {
+            return;
+          }
           for (_k = 0, _len2 = filters.length; _k < _len2; _k++) {
             filter = filters[_k];
             $location.search(filter.rangeUrlTemplate, filter.getSelectedItemsURL());

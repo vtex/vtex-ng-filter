@@ -134,7 +134,8 @@ angular.module('ngFilter', ["ui.bootstrap.accordion"])
         filter.setSelectedItems(searchQuery) if searchQuery
 
       # Watch filters to modify search query
-      $scope.$watch 'filters', (->
+      $scope.$watch 'filters', ( (newValue, oldValue) ->
+        return if newValue is oldValue
         for filter in filters
           $location.search filter.rangeUrlTemplate, filter.getSelectedItemsURL()
         # Sets paging to 1 on modified filters
