@@ -30,6 +30,7 @@
         if (this.type === 'date') {
           this.dateObjectCache = {};
           this.date = {};
+          this.today = moment().endOf('day').toDate();
           this.setDates = function(offset) {
             var date;
             date = {

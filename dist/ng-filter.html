@@ -26,7 +26,7 @@
                             <div class="well well-small pull-left"
                                  ng-model="filter.date.from">
                                 <datepicker show-weeks="false"
-                                            max="filter.date.to"></datepicker>
+                                            max="filter.date.to ? filter.date.to : filter.today"></datepicker>
                             </div>
                         </div>
 
@@ -35,7 +35,8 @@
                             <div class="well well-small pull-left"
                                  ng-model="filter.date.to">
                                 <datepicker show-weeks="false"
-                                            min="filter.date.from"></datepicker>
+                                            min="filter.date.from"
+                                            max="filter.today"></datepicker>
                             </div>
                         </div>
                     </div>

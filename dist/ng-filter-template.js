@@ -21,14 +21,14 @@ angular.module("ngFilter").run(function($templateCache) {
     "                        <div class=\"controls\">\n" +
     "                            <p translate=\"\">listing.dates.from</p>\n" +
     "                            <div class=\"well well-small pull-left\" ng-model=\"filter.date.from\">\n" +
-    "                                <datepicker show-weeks=\"false\" max=\"filter.date.to\"></datepicker>\n" +
+    "                                <datepicker show-weeks=\"false\" max=\"filter.date.to ? filter.date.to : filter.today\"></datepicker>\n" +
     "                            </div>\n" +
     "                        </div>\n" +
     "\n" +
     "                        <div class=\"controls\">\n" +
     "                            <p translate=\"\">listing.dates.to</p>\n" +
     "                            <div class=\"well well-small pull-left\" ng-model=\"filter.date.to\">\n" +
-    "                                <datepicker show-weeks=\"false\" min=\"filter.date.from\"></datepicker>\n" +
+    "                                <datepicker show-weeks=\"false\" min=\"filter.date.from\" max=\"filter.today\"></datepicker>\n" +
     "                            </div>\n" +
     "                        </div>\n" +
     "                    </div>\n" +

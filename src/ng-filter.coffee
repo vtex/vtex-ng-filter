@@ -1,5 +1,5 @@
 config =
-	path: ''
+  path: ''
 
 openFilters = {}
 moreOptionsShowFilters = {}
@@ -16,6 +16,7 @@ angular.module('ngFilter', ["ui.bootstrap.accordion"])
         if @type is 'date'
           @dateObjectCache = {}
           @date = {}
+          @today = moment().endOf('day').toDate()
 
           @setDates = (offset) =>
             date =
@@ -98,26 +99,26 @@ angular.module('ngFilter', ["ui.bootstrap.accordion"])
 
         @updateSelectedCount()
 
-	.directive "filter", ->
-		restrict: 'E'
-		scope:
-			filters: '=filters'
-		templateUrl: if config.path then config.path + '/ng-filter.html' else 'ng-filter.html'
-		link: ($scope) ->
-			# Initialize open filters if needed
-			for filter in $scope.filters
-				unless openFilters.hasOwnProperty(filter.rangeUrlTemplate)
-					openFilters[filter.rangeUrlTemplate] = false
+  .directive "filter", ->
+    restrict: 'E'
+    scope:
+      filters: '=filters'
+    templateUrl: if config.path then config.path + '/ng-filter.html' else 'ng-filter.html'
+    link: ($scope) ->
+      # Initialize open filters if needed
+      for filter in $scope.filters
+        unless openFilters.hasOwnProperty(filter.rangeUrlTemplate)
+          openFilters[filter.rangeUrlTemplate] = false
 
-				unless moreOptionsShowFilters.hasOwnProperty(filter.rangeUrlTemplate)
-					moreOptionsShowFilters[filter.rangeUrlTemplate] = false
+        unless moreOptionsShowFilters.hasOwnProperty(filter.rangeUrlTemplate)
+          moreOptionsShowFilters[filter.rangeUrlTemplate] = false
 
-			$scope.openFilters = openFilters
-			$scope.moreOptionsShowFilters = moreOptionsShowFilters
+      $scope.openFilters = openFilters
+      $scope.moreOptionsShowFilters = moreOptionsShowFilters
 
-			$scope.clearAll = ->
-				filter.clearSelection() for filter in $scope.filters
+      $scope.clearAll = ->
+        filter.clearSelection() for filter in $scope.filters
 
-	.provider 'vtexNgFilter',
-		config: config
-		$get: (filter) -> filter
+  .provider 'vtexNgFilter',
+    config: config
+    $get: (filter) -> filter
