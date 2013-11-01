@@ -180,7 +180,7 @@
       return Filter;
 
     })();
-  }).directive("filter", function() {
+  }).directive("vtFilter", function($location) {
     return {
       restrict: 'E',
       scope: {
@@ -188,10 +188,10 @@
       },
       templateUrl: config.path ? config.path + '/ng-filter.html' : 'ng-filter.html',
       link: function($scope) {
-        var filter, _i, _len, _ref;
-        _ref = $scope.filters;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          filter = _ref[_i];
+        var filter, filters, locationSearch, searchQuery, _i, _j, _len, _len1;
+        filters = $scope.filters;
+        for (_i = 0, _len = filters.length; _i < _len; _i++) {
+          filter = filters[_i];
           if (!openFilters.hasOwnProperty(filter.rangeUrlTemplate)) {
             openFilters[filter.rangeUrlTemplate] = false;
           }
@@ -201,16 +201,41 @@
         }
         $scope.openFilters = openFilters;
         $scope.moreOptionsShowFilters = moreOptionsShowFilters;
-        return $scope.clearAll = function() {
-          var _j, _len1, _ref1, _results;
-          _ref1 = $scope.filters;
+        $scope.clearAll = function() {
+          var _j, _len1, _results;
           _results = [];
-          for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-            filter = _ref1[_j];
+          for (_j = 0, _len1 = filters.length; _j < _len1; _j++) {
+            filter = filters[_j];
             _results.push(filter.clearSelection());
           }
           return _results;
         };
+        filters.getAppliedFilters = function() {
+          return _.filter(filters, function(f) {
+            return f.getSelectedItems().length > 0;
+          });
+        };
+        filters.getAppliedItems = function() {
+          return _.chain(filters.getAppliedFilters()).map(function(f) {
+            return f.getSelectedItems();
+          }).flatten().value();
+        };
+        locationSearch = $location.search();
+        for (_j = 0, _len1 = filters.length; _j < _len1; _j++) {
+          filter = filters[_j];
+          searchQuery = locationSearch[filter.rangeUrlTemplate];
+          if (searchQuery) {
+            filter.setSelectedItems(searchQuery);
+          }
+        }
+        return $scope.$watch('filters', (function() {
+          var _k, _len2;
+          for (_k = 0, _len2 = filters.length; _k < _len2; _k++) {
+            filter = filters[_k];
+            $location.search(filter.rangeUrlTemplate, filter.getSelectedItemsURL());
+          }
+          return $location.search('page', 1);
+        }), true);
       }
     };
   }).provider('vtexNgFilter', {

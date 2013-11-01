@@ -102,14 +102,15 @@ angular.module('ngFilter', ["ui.bootstrap.accordion"])
 
         @updateSelectedCount()
 
-  .directive "filter", ->
+  .directive "vtFilter", ($location) ->
     restrict: 'E'
     scope:
       filters: '=filters'
     templateUrl: if config.path then config.path + '/ng-filter.html' else 'ng-filter.html'
     link: ($scope) ->
+      filters = $scope.filters
       # Initialize open filters if needed
-      for filter in $scope.filters
+      for filter in filters
         unless openFilters.hasOwnProperty(filter.rangeUrlTemplate)
           openFilters[filter.rangeUrlTemplate] = false
 
@@ -120,7 +121,25 @@ angular.module('ngFilter', ["ui.bootstrap.accordion"])
       $scope.moreOptionsShowFilters = moreOptionsShowFilters
 
       $scope.clearAll = ->
-        filter.clearSelection() for filter in $scope.filters
+        filter.clearSelection() for filter in filters
+
+      filters.getAppliedFilters = -> _.filter filters, (f) -> f.getSelectedItems().length > 0
+      filters.getAppliedItems = -> _.chain(filters.getAppliedFilters()).map((f) -> f.getSelectedItems()).flatten().value()
+
+      # Handle search query
+      locationSearch = $location.search()
+      for filter in filters
+        searchQuery = locationSearch[filter.rangeUrlTemplate]
+        # Se está na URL, está selected
+        filter.setSelectedItems(searchQuery) if searchQuery
+
+      # Watch filters to modify search query
+      $scope.$watch 'filters', (->
+        for filter in filters
+          $location.search filter.rangeUrlTemplate, filter.getSelectedItemsURL()
+        # Sets paging to 1 on modified filters
+        $location.search 'page', 1
+      ), true
 
   .provider 'vtexNgFilter',
     config: config
