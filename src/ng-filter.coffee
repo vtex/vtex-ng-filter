@@ -18,16 +18,19 @@ angular.module('ngFilter', ["ui.bootstrap.accordion"])
           @date = {}
           @today = moment().endOf('day').toDate()
 
-          @setDates = (offset) =>
+          @setDates = (offsetFrom = 0, offsetTo = 0) =>
             date =
-              from: moment().add('d', offset).startOf('day').toDate()
-              to: moment().endOf('day').toDate()
+              from: moment().add('d', offsetFrom).startOf('day').toDate()
+              to: moment().add('d', offsetTo).endOf('day').toDate()
             @date = date
 
           @dateRangeLabel = =>
             if @date.from and @date.to
               if moment(@date.from).startOf('day').isSame(moment().startOf('day'))
-                $translate('listing.dates.today')
+                  $translate('listing.dates.today')
+              else if moment(@date.from).isSame(moment().add('d', -1).startOf('day')) and
+                moment(@date.to).isSame(moment().add('d', -1).endOf('day'))
+                  $translate('listing.dates.yesterday')
               else if moment(@date.to).startOf('day').isSame(moment().startOf('day'))
                 "#{moment(@date.from).add('hours', moment().hours()).fromNow()} #{$translate('listing.dates.untilToday')}"
               else

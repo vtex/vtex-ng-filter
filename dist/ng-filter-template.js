@@ -7,8 +7,8 @@ angular.module("ngFilter").run(function($templateCache) {
     "\n" +
     "            <div ng-switch=\"\" on=\"filter.type\">\n" +
     "                <div ng-switch-when=\"date\">\n" +
-    "                    <p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates(0)\" translate=\"\">listing.dates.today</a></p>\n" +
-    "                    <p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates(-1)\" translate=\"\">listing.dates.yesterday</a></p>\n" +
+    "                    <p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates()\" translate=\"\">listing.dates.today</a></p>\n" +
+    "                    <p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates(-1, -1)\" translate=\"\">listing.dates.yesterday</a></p>\n" +
     "                    <p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates(-7)\" translate=\"\">listing.dates.thisWeek</a></p>\n" +
     "                    <p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates(-30)\" translate=\"\">listing.dates.thisMonth</a></p>\n" +
     "                    <p><a href=\"javascript: void(0)\" ng-click=\"filter.clearSelection()\" translate=\"\">listing.dates.clearFilter</a></p>\n" +

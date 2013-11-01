@@ -31,11 +31,17 @@
           this.dateObjectCache = {};
           this.date = {};
           this.today = moment().endOf('day').toDate();
-          this.setDates = function(offset) {
+          this.setDates = function(offsetFrom, offsetTo) {
             var date;
+            if (offsetFrom == null) {
+              offsetFrom = 0;
+            }
+            if (offsetTo == null) {
+              offsetTo = 0;
+            }
             date = {
-              from: moment().add('d', offset).startOf('day').toDate(),
-              to: moment().endOf('day').toDate()
+              from: moment().add('d', offsetFrom).startOf('day').toDate(),
+              to: moment().add('d', offsetTo).endOf('day').toDate()
             };
             return _this.date = date;
           };
@@ -43,6 +49,8 @@
             if (_this.date.from && _this.date.to) {
               if (moment(_this.date.from).startOf('day').isSame(moment().startOf('day'))) {
                 return $translate('listing.dates.today');
+              } else if (moment(_this.date.from).isSame(moment().add('d', -1).startOf('day')) && moment(_this.date.to).isSame(moment().add('d', -1).endOf('day'))) {
+                return $translate('listing.dates.yesterday');
               } else if (moment(_this.date.to).startOf('day').isSame(moment().startOf('day'))) {
                 return "" + (moment(_this.date.from).add('hours', moment().hours()).fromNow()) + " " + ($translate('listing.dates.untilToday'));
               } else {
