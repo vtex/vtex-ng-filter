@@ -1,4 +1,29 @@
 angular.module("ngFilter").run(function($templateCache) { 
+  $templateCache.put('ng-filter-button.html',
+    "<a class=\"btn\" href=\"javascript:void(0);\" ng-click=\"openFilters()\">\n" +
+    "    <i class=\"icon-filter\" ng-class=\"{'icon-blue': filters.getAppliedItems().length > 0}\"></i>&nbsp;\n" +
+    "    <span translate=\"\">listing.filters</span>\n" +
+    "    <span class=\"badge badge-info badge-corner\" data-ng-show=\"filters.getAppliedItems().length > 0\">{{filters.getAppliedItems().length}}</span>\n" +
+    "</a>"
+  );
+
+
+  $templateCache.put('ng-filter-summary.html',
+    "<div class=\"filters-summary\">\n" +
+    "    <small ng-show=\"filters.length > 0\" ng-repeat=\"filter in filters.getAppliedFilters()\">\n" +
+    "\t\t\t<span ng-repeat=\"item in filter.getSelectedItems()\">\n" +
+    "\t\t\t\t<span class=\"label label-info\">\n" +
+    "\t\t\t\t\t<span>{{item.name}}</span>&nbsp;\n" +
+    "\t\t\t\t\t<a href=\"javascript:void(0);\" ng-click=\"filter.clearItem(item)\">\n" +
+    "                        <i class=\"icon-remove-sign\"></i>\n" +
+    "                    </a>\n" +
+    "\t\t\t\t</span>&nbsp;\n" +
+    "\t\t\t</span>\n" +
+    "    </small>\n" +
+    "</div>"
+  );
+
+
   $templateCache.put('ng-filter.html',
     "<div class=\"filters-block\">\n" +
     "\n" +

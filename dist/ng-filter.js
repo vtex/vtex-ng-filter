@@ -238,6 +238,24 @@
         }), true);
       }
     };
+  }).directive("vtFilterSummary", function() {
+    return {
+      restrict: 'E',
+      scope: {
+        filters: '=filters'
+      },
+      templateUrl: config.path ? config.path + '/ng-filter-summary.html' : 'ng-filter-summary.html'
+    };
+  }).directive("vtFilterButton", function() {
+    return {
+      restrict: 'E',
+      scope: {
+        filters: '=filters',
+        openFilters: '&'
+      },
+      templateUrl: config.path ? config.path + '/ng-filter-button.html' : 'ng-filter-button.html',
+      link: function($scope) {}
+    };
   }).provider('vtexNgFilter', {
     config: config,
     $get: function(filter) {

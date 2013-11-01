@@ -141,6 +141,20 @@ angular.module('ngFilter', ["ui.bootstrap.accordion"])
         $location.search 'page', 1
       ), true
 
+  .directive "vtFilterSummary", ->
+    restrict: 'E'
+    scope:
+      filters: '=filters'
+    templateUrl: if config.path then config.path + '/ng-filter-summary.html' else 'ng-filter-summary.html'
+
+  .directive "vtFilterButton", ->
+    restrict: 'E'
+    scope:
+      filters: '=filters'
+      openFilters: '&'
+    templateUrl: if config.path then config.path + '/ng-filter-button.html' else 'ng-filter-button.html'
+    link: ($scope) ->
+
   .provider 'vtexNgFilter',
     config: config
     $get: (filter) -> filter
