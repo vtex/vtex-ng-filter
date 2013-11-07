@@ -64,13 +64,13 @@ angular.module("ngFilter").run(function($templateCache) {
     "                            <label class=\"checkbox\" ng-if=\"filter.type == 'multiple'\">\n" +
     "                                <input type=\"checkbox\" name=\"{{filter.name}}\" ng-model=\"item.selected\" ng-change=\"filter.updateSelectedCount()\">\n" +
     "                                <span>\n" +
-    "                                    {{ item.name }} ({{ item.quantity }})\n" +
+    "                                    {{ item.name }} {{ item.quantity ? '(' + item.quantity + ')' : '' }}\n" +
     "                                </span>\n" +
     "                            </label>\n" +
     "                            <label class=\"radio\" ng-if=\"filter.type == 'single'\">\n" +
     "                                <input type=\"radio\" name=\"{{filter.name}}\" ng-model=\"filter.selectedItem\" ng-value=\"item\">\n" +
     "                                <span>\n" +
-    "                                    {{ item.name }} ({{ item.quantity }})\n" +
+    "                                    {{ item.name }} {{ item.quantity ? '(' + item.quantity + ')' : '' }}\n" +
     "                                </span>\n" +
     "                            </label>\n" +
     "                        </li>\n" +
