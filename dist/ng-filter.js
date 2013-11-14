@@ -15,6 +15,7 @@
     var Filter;
     return Filter = (function() {
       function Filter(filter) {
+        this.update = __bind(this.update, this);
         this.clearSelection = __bind(this.clearSelection, this);
         this.getSelectedItemsURL = __bind(this.getSelectedItemsURL, this);
         this.getSelectedItems = __bind(this.getSelectedItems, this);
@@ -177,6 +178,27 @@
         return this.updateSelectedCount();
       };
 
+      Filter.prototype.update = function(filterJSON) {
+        var item, updatedItem, _i, _len, _ref, _ref1, _results;
+        if (filterJSON == null) {
+          filterJSON = this;
+        }
+        _ref = this.items;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          item = _ref[_i];
+          updatedItem = _.find(filterJSON.items, function(i) {
+            return i.name === item.name;
+          });
+          if (updatedItem && ((_ref1 = this.getSelectedItems()) != null ? _ref1.length : void 0) === 0) {
+            _results.push(item.quantity = updatedItem.quantity);
+          } else {
+            _results.push(item.quantity = 0);
+          }
+        }
+        return _results;
+      };
+
       return Filter;
 
     })();
@@ -226,6 +248,7 @@
           searchQuery = locationSearch[filter.rangeUrlTemplate];
           if (searchQuery) {
             filter.setSelectedItems(searchQuery);
+            filter.update();
           }
         }
         return $scope.$watch('filters', (function(newValue, oldValue) {

@@ -102,6 +102,14 @@ angular.module('ngFilter', ["ui.bootstrap.accordion"])
 
         @updateSelectedCount()
 
+      update: (filterJSON = @) =>
+        for item in @items
+          updatedItem = _.find filterJSON.items, (i) -> i.name is item.name
+          if updatedItem and @getSelectedItems()?.length is 0
+            item.quantity = updatedItem.quantity
+          else
+            item.quantity = 0
+
   .directive "vtFilter", ($location) ->
     restrict: 'E'
     scope:
@@ -131,7 +139,9 @@ angular.module('ngFilter', ["ui.bootstrap.accordion"])
       for filter in filters
         searchQuery = locationSearch[filter.rangeUrlTemplate]
         # Se está na URL, está selected
-        filter.setSelectedItems(searchQuery) if searchQuery
+        if searchQuery
+          filter.setSelectedItems(searchQuery)
+          filter.update()
 
       # Watch filters to modify search query
       $scope.$watch 'filters', ( (newValue, oldValue) ->
