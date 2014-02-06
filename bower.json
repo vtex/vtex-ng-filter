@@ -1,6 +1,5 @@
 {
-	"name": "ng-filter",
-	"version": "1.0.0",
+	"name": "vtex-ng-filter",
 	"main": [
 		"dist/ng-filter-with-template.min.js",
 		"dist/ng-filter.js",

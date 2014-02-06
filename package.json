@@ -1,29 +1,30 @@
 {
-	"name": "vtex-ng-pagination",
-	"version": "1.0.0",
-	"readmeFilename": "README.md",
-	"description": "Ng Pagination",
-	"main": "index.html",
-	"dependencies": {
-		"grunt": "~0.4.1",
-		"grunt-contrib-clean": "~0.4.0",
-		"grunt-contrib-copy": "~0.4.1",
-		"grunt-contrib-coffee": "*",
-		"grunt-contrib-watch": "*",
-		"grunt-contrib-cssmin": "~0.5.0",
-		"grunt-contrib-uglify": "~0.2.0",
-		"grunt-angular-templates": "~0.4.2"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git://github.com/vtex/speedbag.git"
-	},
-	"keywords": [
-		"grunt",
-		"coffee",
-		"less",
-		"livereload"
-	],
-	"author": "Guilherme Rodrigues <gadr90@gmail.com>",
-	"license": "MIT"
+  "name": "vtex-ng-filter",
+  "version": "0.2.0",
+  "readmeFilename": "README.md",
+  "description": "VTEX Angular Filter directive",
+  "main": "dist/vtex-ng-filter-tpls.js",
+  "dependencies": {
+    "grunt": "~0.4.2",
+    "grunt-contrib-clean": "~0.4.0",
+    "grunt-contrib-copy": "~0.4.1",
+    "grunt-contrib-coffee": "*",
+    "grunt-contrib-watch": "*",
+    "grunt-contrib-cssmin": "~0.5.0",
+    "grunt-contrib-uglify": "~0.2.0",
+    "grunt-angular-templates": "~0.4.2",
+    "grunt-contrib-concat": "~0.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/vtex/speedbag.git"
+  },
+  "keywords": [
+    "grunt",
+    "coffee",
+    "less",
+    "livereload"
+  ],
+  "author": "Guilherme Rodrigues <gadr90@gmail.com>",
+  "license": "MIT"
 }

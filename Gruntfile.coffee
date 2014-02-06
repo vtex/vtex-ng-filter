@@ -3,42 +3,42 @@ module.exports = (grunt) ->
 
 	# Project configuration.
 	grunt.initConfig
-		# App variables
-		relativePath: ''
-
 		# Tasks
-		clean: ['build']
-		copy:
-			main:
-				src: 'src/ng-filter.html'
-				dest: 'dist/ng-filter.html'
-			oms:
-				cwd: 'dist/'
-				src: ['ng-filter.js', 'ng-filter-template.js']
-				dest: '../vcs.order-management-ui/src/lib/ng-filter/'
-				expand: true
+		clean: ['dist', 'build']
 
 		coffee:
 			main:
 				files:
-					'dist/ng-filter.js': 'src/ng-filter.coffee'
+					'build/vtex-ng-filter.js': 'src/vtex-ng-filter.coffee'
 
 		ngtemplates:
 			app:
 				cwd: 'src/'
 				src: '*.html'
-				dest: 'dist/<%= relativePath %>/ng-filter-template.js'
+				dest: 'build/vtex-ng-filter-template.js'
 				options:
+					htmlmin:  collapseWhitespace: true, collapseBooleanAttributes: true
 					bootstrap:  (module, script) ->
-						'angular.module("ngFilter").run(function($templateCache) { ' + script + ' });'
+						'angular.module("vtexNgFilter").run(function($templateCache) { ' + script + ' });'
+
+		concat:
+			main:
+				src: ['build/vtex-ng-filter.js', 'build/vtex-ng-filter-template.js']
+				dest: 'dist/vtex-ng-filter-tpls.js'
 
 		uglify:
 			main:
 				files:
-					'dist/<%= relativePath %>/ng-filter-with-template.min.js':
-						['dist/ng-filter.js', 'dist/ng-filter-template.js']
+					'dist/vtex-ng-filter-tpls.min.js': 'dist/vtex-ng-filter-tpls.js'
 				options:
 					mangle: false
+
+		copy:
+			oms:
+				cwd: 'dist/'
+				src: ['vtex-ng-filter-tpls.js']
+				dest: '../vcs.order-management-ui/src/lib/vtex-ng-filter/'
+				expand: true
 
 		watch:
 			oms:
@@ -47,5 +47,5 @@ module.exports = (grunt) ->
 
 	grunt.loadNpmTasks name for name of pkg.dependencies when name[0..5] is 'grunt-'
 
-	grunt.registerTask 'default', ['copy:main', 'coffee', 'ngtemplates', 'uglify']
-	grunt.registerTask 'oms', ['default', 'watch:oms']
+	grunt.registerTask 'default', ['clean', 'coffee', 'ngtemplates', 'concat:main', 'uglify']
+	grunt.registerTask 'oms', ['default', 'copy:oms', 'watch:oms']

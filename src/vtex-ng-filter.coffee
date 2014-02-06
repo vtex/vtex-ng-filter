@@ -4,7 +4,7 @@ config =
 openFilters = {}
 moreOptionsShowFilters = {}
 
-angular.module('ngFilter', ["ui.bootstrap.accordion"])
+angular.module('vtexNgFilter', ["ui.bootstrap.accordion"])
   .factory "Filter", ($translate) ->
     class Filter
       constructor: (filter) ->
@@ -114,7 +114,7 @@ angular.module('ngFilter', ["ui.bootstrap.accordion"])
     restrict: 'E'
     scope:
       filters: '=filters'
-    templateUrl: if config.path then config.path + '/ng-filter.html' else 'ng-filter.html'
+    templateUrl: if config.path then config.path + '/vtex-ng-filter.html' else 'vtex-ng-filter.html'
     link: ($scope) ->
       filters = $scope.filters
       # Initialize open filters if needed
@@ -156,14 +156,14 @@ angular.module('ngFilter', ["ui.bootstrap.accordion"])
     restrict: 'E'
     scope:
       filters: '=filters'
-    templateUrl: if config.path then config.path + '/ng-filter-summary.html' else 'ng-filter-summary.html'
+    templateUrl: if config.path then config.path + '/vtex-ng-filter-summary.html' else 'vtex-ng-filter-summary.html'
 
   .directive "vtFilterButton", ->
     restrict: 'E'
     scope:
       filters: '=filters'
       openFilters: '&'
-    templateUrl: if config.path then config.path + '/ng-filter-button.html' else 'ng-filter-button.html'
+    templateUrl: if config.path then config.path + '/vtex-ng-filter-button.html' else 'vtex-ng-filter-button.html'
     link: ($scope) ->
 
   .provider 'vtexNgFilter',
