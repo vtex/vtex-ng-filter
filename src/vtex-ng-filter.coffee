@@ -44,11 +44,15 @@ angular.module('vtexNgFilter', ["ui.bootstrap.accordion"])
         if @type is 'date'
           @selectedCount = if @date.from and @date.to then 1 else 0
         else if @type is 'multiple'
+          (lastSelectedItemIndex = i if item.selected) for item, i in @items
+          moreOptionsShowFilters[@rangeUrlTemplate] = true if lastSelectedItemIndex > 4
           @selectedCount = (_.filter @items, (i) -> i.selected).length
         else if @type is 'single'
+          (selectedItemIndex = i if item is @selectedItem) for item, i in @items
+          moreOptionsShowFilters[@rangeUrlTemplate] = true if selectedItemIndex > 4
           @selectedCount = if @selectedItem then 1 else 0
 
-        openFilters[@rangeUrlTemplate] = if @selectedCount is 0 then false else true
+        openFilters[@rangeUrlTemplate] = true if @selectedCount > 0
         @selectedCountLabel = if @selectedCount then "(#{@selectedCount})" else ""
 
       setSelectedItems: (itemsAsSearchParameter) =>

@@ -69,16 +69,39 @@
       }
 
       Filter.prototype.updateSelectedCount = function() {
+        var i, item, lastSelectedItemIndex, selectedItemIndex, _i, _j, _len, _len1, _ref, _ref1;
         if (this.type === 'date') {
           this.selectedCount = this.date.from && this.date.to ? 1 : 0;
         } else if (this.type === 'multiple') {
+          _ref = this.items;
+          for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
+            item = _ref[i];
+            if (item.selected) {
+              lastSelectedItemIndex = i;
+            }
+          }
+          if (lastSelectedItemIndex > 4) {
+            moreOptionsShowFilters[this.rangeUrlTemplate] = true;
+          }
           this.selectedCount = (_.filter(this.items, function(i) {
             return i.selected;
           })).length;
         } else if (this.type === 'single') {
+          _ref1 = this.items;
+          for (i = _j = 0, _len1 = _ref1.length; _j < _len1; i = ++_j) {
+            item = _ref1[i];
+            if (item === this.selectedItem) {
+              selectedItemIndex = i;
+            }
+          }
+          if (selectedItemIndex > 4) {
+            moreOptionsShowFilters[this.rangeUrlTemplate] = true;
+          }
           this.selectedCount = this.selectedItem ? 1 : 0;
         }
-        openFilters[this.rangeUrlTemplate] = this.selectedCount === 0 ? false : true;
+        if (this.selectedCount > 0) {
+          openFilters[this.rangeUrlTemplate] = true;
+        }
         return this.selectedCountLabel = this.selectedCount ? "(" + this.selectedCount + ")" : "";
       };
 
