@@ -11,6 +11,8 @@ angular.module('vtexNgFilter', ["ui.bootstrap.accordion"])
         for k, v of filter
           @[k] = v
 
+        @rangeUrlTemplate = filter.rangeUrlTemplate
+
         @selectedCount = 0
 
         if @type is 'date'
@@ -139,22 +141,32 @@ angular.module('vtexNgFilter', ["ui.bootstrap.accordion"])
       filters.getAppliedItems = -> _.chain(filters.getAppliedFilters()).map((f) -> f.getSelectedItems()).flatten().value()
 
       # Handle search query
-      locationSearch = $location.search()
-      for filter in filters
-        searchQuery = locationSearch[filter.rangeUrlTemplate]
-        # Se está na URL, está selected
-        if searchQuery
-          filter.setSelectedItems(searchQuery)
-          filter.update()
+      updateFiltersOnLocationSearch = ->
+        for filter in filters
+          searchQuery = $location.search()[filter.rangeUrlTemplate]
+          # Se está na URL, está selected
+          if searchQuery
+            filter.setSelectedItems(searchQuery)
+            filter.update()
+
+      # When initializing the directive, get the selected filters from the url.
+      updateFiltersOnLocationSearch()
+
+      # If url changes, update filters to match
+      $scope.$on '$locationChangeSuccess', ->
+        queryFilters = (_.map filters, (f) -> $location.search()[f.rangeUrlTemplate]).join() # filters on search
+        selectedFilters = (_.map filters, (f) -> f.getSelectedItemsURL()).join() # filters selected 
+        return if queryFilters is selectedFilters
+        updateFiltersOnLocationSearch()
 
       # Watch filters to modify search query
-      $scope.$watch 'filters', ( (newValue, oldValue) ->
-        return if newValue is oldValue
-        for filter in filters
-          $location.search filter.rangeUrlTemplate, filter.getSelectedItemsURL()
-        # Sets paging to 1 on modified filters
-        $location.search 'page', 1
-      ), true
+      _.each filters, (filter, i) ->
+        $scope.$watch ((scope) -> scope.filters[i].getSelectedItemsURL()), (newValue, oldValue) ->
+          return if newValue is oldValue
+          for filter in filters
+            $location.search filter.rangeUrlTemplate, filter.getSelectedItemsURL()
+          # Sets paging to 1 on modified filters
+          $location.search 'page', 1
 
   .directive "vtFilterSummary", ->
     restrict: 'E'

@@ -26,6 +26,7 @@
           v = filter[k];
           this[k] = v;
         }
+        this.rangeUrlTemplate = filter.rangeUrlTemplate;
         this.selectedCount = 0;
         if (this.type === 'date') {
           this.dateObjectCache = {};
@@ -236,7 +237,7 @@
       },
       templateUrl: config.path ? config.path + '/vtex-ng-filter.html' : 'vtex-ng-filter.html',
       link: function($scope) {
-        var filter, filters, locationSearch, searchQuery, _i, _j, _len, _len1;
+        var filter, filters, updateFiltersOnLocationSearch, _i, _len;
         filters = $scope.filters;
         for (_i = 0, _len = filters.length; _i < _len; _i++) {
           filter = filters[_i];
@@ -268,26 +269,50 @@
             return f.getSelectedItems();
           }).flatten().value();
         };
-        locationSearch = $location.search();
-        for (_j = 0, _len1 = filters.length; _j < _len1; _j++) {
-          filter = filters[_j];
-          searchQuery = locationSearch[filter.rangeUrlTemplate];
-          if (searchQuery) {
-            filter.setSelectedItems(searchQuery);
-            filter.update();
+        updateFiltersOnLocationSearch = function() {
+          var searchQuery, _j, _len1, _results;
+          _results = [];
+          for (_j = 0, _len1 = filters.length; _j < _len1; _j++) {
+            filter = filters[_j];
+            searchQuery = $location.search()[filter.rangeUrlTemplate];
+            if (searchQuery) {
+              filter.setSelectedItems(searchQuery);
+              _results.push(filter.update());
+            } else {
+              _results.push(void 0);
+            }
           }
-        }
-        return $scope.$watch('filters', (function(newValue, oldValue) {
-          var _k, _len2;
-          if (newValue === oldValue) {
+          return _results;
+        };
+        updateFiltersOnLocationSearch();
+        $scope.$on('$locationChangeSuccess', function() {
+          var queryFilters, selectedFilters;
+          queryFilters = (_.map(filters, function(f) {
+            return $location.search()[f.rangeUrlTemplate];
+          })).join();
+          selectedFilters = (_.map(filters, function(f) {
+            return f.getSelectedItemsURL();
+          })).join();
+          if (queryFilters === selectedFilters) {
             return;
           }
-          for (_k = 0, _len2 = filters.length; _k < _len2; _k++) {
-            filter = filters[_k];
-            $location.search(filter.rangeUrlTemplate, filter.getSelectedItemsURL());
-          }
-          return $location.search('page', 1);
-        }), true);
+          return updateFiltersOnLocationSearch();
+        });
+        return _.each(filters, function(filter, i) {
+          return $scope.$watch((function(scope) {
+            return scope.filters[i].getSelectedItemsURL();
+          }), function(newValue, oldValue) {
+            var _j, _len1;
+            if (newValue === oldValue) {
+              return;
+            }
+            for (_j = 0, _len1 = filters.length; _j < _len1; _j++) {
+              filter = filters[_j];
+              $location.search(filter.rangeUrlTemplate, filter.getSelectedItemsURL());
+            }
+            return $location.search('page', 1);
+          });
+        });
       }
     };
   }).directive("vtFilterSummary", function() {
