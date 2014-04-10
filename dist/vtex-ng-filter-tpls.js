@@ -26,7 +26,6 @@
           v = filter[k];
           this[k] = v;
         }
-        this.rangeUrlTemplate = filter.rangeUrlTemplate;
         this.selectedCount = 0;
         if (this.type === 'date') {
           this.dateObjectCache = {};

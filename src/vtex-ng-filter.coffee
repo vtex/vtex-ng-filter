@@ -11,8 +11,6 @@ angular.module('vtexNgFilter', ["ui.bootstrap.accordion"])
         for k, v of filter
           @[k] = v
 
-        @rangeUrlTemplate = filter.rangeUrlTemplate
-
         @selectedCount = 0
 
         if @type is 'date'
