@@ -1,6 +1,7 @@
 <div class="filters-block">
+<h3><span translate>listing.filters</span> <button translate class="btn btn-small btn-clean-filters" ng-click="clearAll()">listing.clearAll</button></h3>
 
-    <accordion close-others="false" template-url="window.versionDirectory + 'lib/angular-ui/accordion.html'">
+    <accordion close-others="true">
         <accordion-group is-open="openFilters[filter.rangeUrlTemplate]"
                          heading="{{ 'filters.' + filter.rangeUrlTemplate | translate }} {{ filter.selectedCountLabel }}"
                          ng-repeat="filter in filters">
@@ -71,6 +72,5 @@
         </accordion-group>
     </accordion>
 
-    <button translate class="btn pull-right" ng-click="clearAll()">listing.clearAll</button>
 
 </div>
