@@ -44,7 +44,11 @@
                 </div>
                 <div ng-switch-default>
                     <ul class="filter-list nav nav-pills nav-stacked">
-                        <li ng-repeat="item in filter.items" ng-show="$index < 5 || moreOptionsShowFilters[filter.rangeUrlTemplate]" >
+                        <!-- If 5 items, show all 5.
+                             If 6 items, show all 6.
+                             If 7 items, show 5 and button to show more. -->
+                        <li ng-repeat="item in filter.items"
+                            ng-show="(filter.items.length <= 6) || ($index < 5) || moreOptionsShowFilters[filter.rangeUrlTemplate]" >
                             <label class="checkbox" ng-if="filter.type == 'multiple'">
                                 <input type="checkbox" name="{{filter.name}}" ng-model="item.selected" ng-change="filter.updateSelectedCount()">
                                 <span>
@@ -60,10 +64,10 @@
                         </li>
                     </ul>
                     <a href="javascript:void(0)" ng-click="moreOptionsShowFilters[filter.rangeUrlTemplate] = true"
-                       ng-show="filter.items.length > 5 && !moreOptionsShowFilters[filter.rangeUrlTemplate]"
+                       ng-show="filter.items.length > 6 && !moreOptionsShowFilters[filter.rangeUrlTemplate]"
                        class="muted">{{ 'filters.moreOptionsShow' | translate}} ({{ filter.items.length }})</a>
                     <a href="javascript:void(0)" ng-click="moreOptionsShowFilters[filter.rangeUrlTemplate] = false"
-                       ng-show="filter.items.length > 5 && moreOptionsShowFilters[filter.rangeUrlTemplate]"
+                       ng-show="filter.items.length > 6 && moreOptionsShowFilters[filter.rangeUrlTemplate]"
                        class="muted">{{ 'filters.moreOptionsHide' | translate}}</a>
 
                     <button translate class="btn" ng-click="filter.clearSelection()" ng-show="filter.type === 'single' && filter.selectedItem">search.clear</button>

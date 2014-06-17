@@ -4,6 +4,7 @@ module.exports = (grunt) ->
 	# Project configuration.
 	grunt.initConfig
 		# Tasks
+		pkg: pkg
 		clean: ['dist', 'build']
 
 		coffee:
@@ -25,13 +26,16 @@ module.exports = (grunt) ->
 			main:
 				src: ['build/vtex-ng-filter.js', 'build/vtex-ng-filter-template.js']
 				dest: 'dist/vtex-ng-filter-tpls.js'
+				options:
+					banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %> */\n'
 
 		uglify:
 			main:
-				files:
-					'dist/vtex-ng-filter-tpls.min.js': 'dist/vtex-ng-filter-tpls.js'
+				src: 'dist/vtex-ng-filter-tpls.js'
+				dest: 'dist/vtex-ng-filter-tpls.min.js'
 				options:
 					mangle: false
+					preserveComments: 'some'
 
 		copy:
 			oms:
