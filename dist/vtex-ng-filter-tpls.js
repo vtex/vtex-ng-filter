@@ -1,4 +1,4 @@
-/*! vtex-ng-filter - v0.3.1 - 2014-06-17 */
+/*! vtex-ng-filter - v0.3.1 - 2014-08-15 */
 (function() {
   var config, moreOptionsShowFilters, openFilters,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
