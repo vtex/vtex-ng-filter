@@ -18,10 +18,16 @@ angular.module('vtexNgFilter', ["ui.bootstrap.accordion"])
           @date = {}
           @today = moment().endOf('day').toDate()
 
-          @setDates = (offsetFrom = 0, offsetTo = 0) =>
-            date =
-              from: moment().add('d', offsetFrom).startOf('day').toDate()
-              to: moment().add('d', offsetTo).endOf('day').toDate()
+          @setDates = (offsetFrom = 0, offsetTo = 0, currentMonth = false) =>
+            if !currentMonth? or currentMonth is false
+              date =
+                from: moment().add('d', offsetFrom).startOf('day').toDate()
+                to: moment().add('d', offsetTo).endOf('day').toDate()
+            else
+              date =
+                from: moment().startOf('month').toDate()
+                to: moment().endOf('month').toDate()
+
             @date = date
 
           @dateRangeLabel = =>
@@ -31,6 +37,9 @@ angular.module('vtexNgFilter', ["ui.bootstrap.accordion"])
               else if moment(@date.from).isSame(moment().add('d', -1).startOf('day')) and
                 moment(@date.to).isSame(moment().add('d', -1).endOf('day'))
                   $translate('listing.dates.yesterday')
+              else if moment(@date.from).isSame(moment().startOf('month').toDate()) and
+                moment(@date.to).isSame(moment().endOf('month').toDate())
+                  $translate('listing.dates.currentMonth')
               else if moment(@date.to).startOf('day').isSame(moment().startOf('day'))
                 "#{moment(@date.from).add('hours', moment().hours()).fromNow()} #{$translate('listing.dates.untilToday')}"
               else

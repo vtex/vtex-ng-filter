@@ -1,4 +1,4 @@
-/*! vtex-ng-filter - v0.3.1 - 2014-08-15 */
+/*! vtex-ng-filter - v0.3.1 - 2014-09-15 */
 (function() {
   var config, moreOptionsShowFilters, openFilters,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -33,7 +33,7 @@
           this.date = {};
           this.today = moment().endOf('day').toDate();
           this.setDates = (function(_this) {
-            return function(offsetFrom, offsetTo) {
+            return function(offsetFrom, offsetTo, currentMonth) {
               var date;
               if (offsetFrom == null) {
                 offsetFrom = 0;
@@ -41,10 +41,20 @@
               if (offsetTo == null) {
                 offsetTo = 0;
               }
-              date = {
-                from: moment().add('d', offsetFrom).startOf('day').toDate(),
-                to: moment().add('d', offsetTo).endOf('day').toDate()
-              };
+              if (currentMonth == null) {
+                currentMonth = false;
+              }
+              if ((currentMonth == null) || currentMonth === false) {
+                date = {
+                  from: moment().add('d', offsetFrom).startOf('day').toDate(),
+                  to: moment().add('d', offsetTo).endOf('day').toDate()
+                };
+              } else {
+                date = {
+                  from: moment().startOf('month').toDate(),
+                  to: moment().endOf('month').toDate()
+                };
+              }
               return _this.date = date;
             };
           })(this);
@@ -55,6 +65,8 @@
                   return $translate('listing.dates.today');
                 } else if (moment(_this.date.from).isSame(moment().add('d', -1).startOf('day')) && moment(_this.date.to).isSame(moment().add('d', -1).endOf('day'))) {
                   return $translate('listing.dates.yesterday');
+                } else if (moment(_this.date.from).isSame(moment().startOf('month').toDate()) && moment(_this.date.to).isSame(moment().endOf('month').toDate())) {
+                  return $translate('listing.dates.currentMonth');
                 } else if (moment(_this.date.to).startOf('day').isSame(moment().startOf('day'))) {
                   return "" + (moment(_this.date.from).add('hours', moment().hours()).fromNow()) + " " + ($translate('listing.dates.untilToday'));
                 } else {
@@ -350,12 +362,12 @@ angular.module("vtexNgFilter").run(function($templateCache) {   'use strict';
 
 
   $templateCache.put('vtex-ng-filter-summary.html',
-    "<div class=\"filters-summary\"><small ng-show=\"filters.length > 0\" ng-repeat=\"filter in filters.getAppliedFilters()\"><span ng-repeat=\"item in filter.getSelectedItems()\"><span class=\"label label-info\"><span>{{item.name}}</span>&nbsp; <a href=\"javascript:void(0);\" ng-click=\"filter.clearItem(item)\"><i class=\"icon-remove-sign\"></i></a></span>&nbsp;</span></small></div>"
+    "<div class=\"filters-summary\"><small ng-show=\"filters.length > 0\" ng-repeat=\"filter in filters.getAppliedFilters()\"><span ng-repeat=\"item in filter.getSelectedItems()\"><span class=\"label label-info\"><span translate=\"\">{{item.name}}</span>&nbsp; <a href=\"javascript:void(0);\" ng-click=\"filter.clearItem(item)\"><i class=\"icon-remove-sign\"></i></a></span>&nbsp;</span></small></div>"
   );
 
 
   $templateCache.put('vtex-ng-filter.html',
-    "<div class=\"filters-block\"><h3><span translate=\"\">listing.filters</span> <button translate=\"\" class=\"btn btn-small btn-clean-filters\" ng-click=\"clearAll()\">listing.clearAll</button></h3><accordion close-others=\"true\"><accordion-group is-open=\"openFilters[filter.rangeUrlTemplate]\" heading=\"{{ 'filters.' + filter.rangeUrlTemplate | translate }} {{ filter.selectedCountLabel }}\" ng-repeat=\"filter in filters\"><div ng-switch=\"\" on=\"filter.type\"><div ng-switch-when=\"date\"><p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates()\" translate=\"\">listing.dates.today</a></p><p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates(-1, -1)\" translate=\"\">listing.dates.yesterday</a></p><p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates(-7)\" translate=\"\">listing.dates.thisWeek</a></p><p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates(-30)\" translate=\"\">listing.dates.thisMonth</a></p><p><a href=\"javascript: void(0)\" ng-click=\"filter.clearSelection()\" translate=\"\">listing.dates.clearFilter</a></p><div class=\"input-append\"><input type=\"text\" ng-click=\"openFilters[filter.rangeUrlTemplate + 'Selector'] = !openFilters[filter.rangeUrlTemplate + 'Selector']\" value=\"{{filter.dateRangeLabel()}}\" readonly><a href=\"javascript:void(0);\" class=\"add-on\" ng-click=\"openFilters[filter.rangeUrlTemplate + 'Selector'] = !openFilters[filter.rangeUrlTemplate + 'Selector']\"><i class=\"icon-calendar\"></i></a></div><div class=\"date-selectors\" ng-show=\"openFilters[filter.rangeUrlTemplate + 'Selector']\"><div class=\"controls\"><p translate=\"\">listing.dates.from</p><div class=\"well well-small pull-left\" ng-model=\"filter.date.from\"><datepicker show-weeks=\"false\" max=\"filter.date.to ? filter.date.to : filter.today\"></datepicker></div></div><div class=\"controls\"><p translate=\"\">listing.dates.to</p><div class=\"well well-small pull-left\" ng-model=\"filter.date.to\"><datepicker show-weeks=\"false\" min=\"filter.date.from\" max=\"filter.today\"></datepicker></div></div></div></div><div ng-switch-default=\"\"><ul class=\"filter-list nav nav-pills nav-stacked\"><!-- If 5 items, show all 5.\n" +
+    "<div class=\"filters-block\"><h3><span translate=\"\">listing.filters</span> <button translate=\"\" class=\"btn btn-small btn-clean-filters\" ng-click=\"clearAll()\">listing.clearAll</button></h3><accordion close-others=\"true\"><accordion-group is-open=\"openFilters[filter.rangeUrlTemplate]\" heading=\"{{ 'filters.' + filter.rangeUrlTemplate | translate }} {{ filter.selectedCountLabel }}\" ng-repeat=\"filter in filters\"><div ng-switch=\"\" on=\"filter.type\"><div ng-switch-when=\"date\"><p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates()\" translate=\"\">listing.dates.today</a></p><p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates(-1, -1)\" translate=\"\">listing.dates.yesterday</a></p><p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates(-7)\" translate=\"\">listing.dates.thisWeek</a></p><p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates(0, 0, true)\" translate=\"\">listing.dates.currentMonth</a></p><p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates(-30)\" translate=\"\">listing.dates.thisMonth</a></p><p><a href=\"javascript: void(0)\" ng-click=\"filter.clearSelection()\" translate=\"\">listing.dates.clearFilter</a></p><div class=\"input-append\"><input type=\"text\" ng-click=\"openFilters[filter.rangeUrlTemplate + 'Selector'] = !openFilters[filter.rangeUrlTemplate + 'Selector']\" value=\"{{filter.dateRangeLabel()}}\" readonly><a href=\"javascript:void(0);\" class=\"add-on\" ng-click=\"openFilters[filter.rangeUrlTemplate + 'Selector'] = !openFilters[filter.rangeUrlTemplate + 'Selector']\"><i class=\"icon-calendar\"></i></a></div><div class=\"date-selectors\" ng-show=\"openFilters[filter.rangeUrlTemplate + 'Selector']\"><div class=\"controls\"><p translate=\"\">listing.dates.from</p><div class=\"well well-small pull-left\" ng-model=\"filter.date.from\"><datepicker show-weeks=\"false\" max=\"filter.date.to ? filter.date.to : filter.today\"></datepicker></div></div><div class=\"controls\"><p translate=\"\">listing.dates.to</p><div class=\"well well-small pull-left\" ng-model=\"filter.date.to\"><datepicker show-weeks=\"false\" min=\"filter.date.from\" max=\"filter.today\"></datepicker></div></div></div></div><div ng-switch-default=\"\"><ul class=\"filter-list nav nav-pills nav-stacked\"><!-- If 5 items, show all 5.\n" +
     "                             If 6 items, show all 6.\n" +
     "                             If 7 items, show 5 and button to show more. --><li ng-repeat=\"item in filter.items\" ng-show=\"(filter.items.length <= 6) || ($index < 5) || moreOptionsShowFilters[filter.rangeUrlTemplate]\"><label class=\"checkbox\" ng-if=\"filter.type == 'multiple'\"><input type=\"checkbox\" name=\"{{filter.name}}\" ng-model=\"item.selected\" ng-change=\"filter.updateSelectedCount()\"><span>{{ item.name }} {{ item.quantity ? '(' + item.quantity + ')' : '' }}</span></label><label class=\"radio\" ng-if=\"filter.type == 'single'\"><input type=\"radio\" name=\"{{filter.name}}\" ng-model=\"filter.selectedItem\" ng-value=\"item\"><span>{{ item.name }} {{ item.quantity ? '(' + item.quantity + ')' : '' }}</span></label></li></ul><a href=\"javascript:void(0)\" ng-click=\"moreOptionsShowFilters[filter.rangeUrlTemplate] = true\" ng-show=\"filter.items.length > 6 && !moreOptionsShowFilters[filter.rangeUrlTemplate]\" class=\"muted\">{{ 'filters.moreOptionsShow' | translate}} ({{ filter.items.length }})</a> <a href=\"javascript:void(0)\" ng-click=\"moreOptionsShowFilters[filter.rangeUrlTemplate] = false\" ng-show=\"filter.items.length > 6 && moreOptionsShowFilters[filter.rangeUrlTemplate]\" class=\"muted\">{{ 'filters.moreOptionsHide' | translate}}</a> <button translate=\"\" class=\"btn\" ng-click=\"filter.clearSelection()\" ng-show=\"filter.type === 'single' && filter.selectedItem\">search.clear</button></div></div></accordion-group></accordion></div>"
   );
