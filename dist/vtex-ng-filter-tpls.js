@@ -1,4 +1,4 @@
-/*! vtex-ng-filter - v0.3.1 - 2014-09-30 */
+/*! vtex-ng-filter - v0.3.1 - 2014-10-22 */
 (function() {
   var config, moreOptionsShowFilters, openFilters,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -12,7 +12,7 @@
 
   moreOptionsShowFilters = {};
 
-  angular.module('vtexNgFilter', ["ui.bootstrap.accordion"]).factory("Filter", function($translate) {
+  angular.module('vtexNgFilter', []).factory("Filter", function($translate) {
     var Filter;
     return Filter = (function() {
       function Filter(filter) {
@@ -145,6 +145,8 @@
         var item, url, _base, _i, _len, _ref, _results;
         if (this.type === 'date') {
           if (this.date.from && this.date.to) {
+            console.log('date from', this.date.from);
+            console.log('date to', this.date.to);
             url = "" + this.name + ":[" + (moment(this.date.from).startOf('day').toISOString()) + " TO " + (moment(this.date.to).endOf('day').toISOString()) + "]";
             (_base = this.dateObjectCache)[url] || (_base[url] = {
               name: this.dateRangeLabel(),

@@ -4,7 +4,7 @@ config =
 openFilters = {}
 moreOptionsShowFilters = {}
 
-angular.module('vtexNgFilter', ["ui.bootstrap.accordion"])
+angular.module('vtexNgFilter', [])
   .factory "Filter", ($translate) ->
     class Filter
       constructor: (filter) ->
