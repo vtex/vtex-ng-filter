@@ -1,4 +1,4 @@
-/*! vtex-ng-filter - v0.3.1 - 2014-10-23 */
+/*! vtex-ng-filter - v0.3.1 - 2014-10-26 */
 (function() {
   var config, moreOptionsShowFilters, openFilters,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -31,7 +31,7 @@
         if (this.type === 'date') {
           this.dateObjectCache = {};
           this.date = {};
-          this.today = moment().endOf('day').toDate();
+          this.today = this.dateEndOfDay(new Date());
           this.setDates = (function(_this) {
             return function(offsetFrom, offsetTo, currentMonth) {
               var date;
@@ -46,8 +46,8 @@
               }
               if ((currentMonth == null) || currentMonth === false) {
                 date = {
-                  from: moment().add('d', offsetFrom).startOf('day').toDate(),
-                  to: moment().add('d', offsetTo).endOf('day').toDate()
+                  from: moment().add('d', offsetFrom).toDate(),
+                  to: moment().add('d', offsetTo).toDate()
                 };
               } else {
                 date = {
@@ -55,19 +55,22 @@
                   to: moment().endOf('month').toDate()
                 };
               }
-              return _this.date = date;
+              return _this.date = {
+                from: _this.dateStartOfDay(date.from),
+                to: _this.dateStartOfDay(date.to)
+              };
             };
           })(this);
           this.dateRangeLabel = (function(_this) {
             return function() {
               if (_this.date.from && _this.date.to) {
-                if (moment(_this.date.from).startOf('day').isSame(moment().startOf('day'))) {
+                if (_this.dateStartOfDay(_this.date.from).toString() === _this.dateStartOfDay(new Date()).toString()) {
                   return $translate('listing.dates.today');
-                } else if (moment(_this.date.from).isSame(moment().add('d', -1).startOf('day')) && moment(_this.date.to).isSame(moment().add('d', -1).endOf('day'))) {
+                } else if (moment(_this.date.from) === _this.dateStartOfDay(moment().add('d', -1)) && moment(_this.date.to).toISOString() === _this.dateEndOfDay(moment().add('d', -1)).toISOString()) {
                   return $translate('listing.dates.yesterday');
                 } else if (moment(_this.date.from).isSame(moment().startOf('month').toDate()) && moment(_this.date.to).isSame(moment().endOf('month').toDate())) {
                   return $translate('listing.dates.currentMonth');
-                } else if (moment(_this.date.to).startOf('day').isSame(moment().startOf('day'))) {
+                } else if (_this.dateStartOfDay(_this.date.to).toISOString() === _this.dateStartOfDay(new Date()).toISOString()) {
                   return "" + (moment(_this.date.from).add('hours', moment().hours()).fromNow()) + " " + ($translate('listing.dates.untilToday'));
                 } else {
                   return "" + (moment(_this.date.from).add('hours', moment().hours()).fromNow()) + " " + ($translate('listing.dates.until')) + " " + (moment(_this.date.to).add('hours', moment().hours()).fromNow());
@@ -145,7 +148,7 @@
         var item, url, _base, _i, _len, _ref, _results;
         if (this.type === 'date') {
           if (this.date.from && this.date.to) {
-            url = "" + this.name + ":[" + (moment(this.date.from).startOf('day').toISOString()) + " TO " + (moment(this.date.to).endOf('day').toISOString()) + "]";
+            url = this.name + ":[" + this.dateStartOfDay(this.date.from).toISOString() + " TO " + this.dateEndOfDay(this.date.to).toISOString() + "]";
             (_base = this.dateObjectCache)[url] || (_base[url] = {
               name: this.dateRangeLabel(),
               url: url
@@ -236,6 +239,20 @@
           }
         }
         return _results;
+      };
+
+      Filter.prototype.dateStartOfDay = function(dateStr) {
+        var date;
+        date = new Date(dateStr);
+        date.setHours(0, 0, 0, 0);
+        return date;
+      };
+
+      Filter.prototype.dateEndOfDay = function(dateStr) {
+        var date;
+        date = new Date(dateStr);
+        date.setHours(23, 59, 59, 999);
+        return date;
       };
 
       return Filter;

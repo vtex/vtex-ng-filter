@@ -16,31 +16,33 @@ angular.module('vtexNgFilter', [])
         if @type is 'date'
           @dateObjectCache = {}
           @date = {}
-          @today = moment().endOf('day').toDate()
+          @today = @dateEndOfDay(new Date())
 
           @setDates = (offsetFrom = 0, offsetTo = 0, currentMonth = false) =>
             if !currentMonth? or currentMonth is false
               date =
-                from: moment().add('d', offsetFrom).startOf('day').toDate()
-                to: moment().add('d', offsetTo).endOf('day').toDate()
+                from: moment().add('d', offsetFrom).toDate()
+                to: moment().add('d', offsetTo).toDate()
             else
               date =
                 from: moment().startOf('month').toDate()
                 to: moment().endOf('month').toDate()
 
-            @date = date
+            @date =
+              from: @dateStartOfDay(date.from)
+              to: @dateStartOfDay(date.to)
 
           @dateRangeLabel = =>
             if @date.from and @date.to
-              if moment(@date.from).startOf('day').isSame(moment().startOf('day'))
+              if @dateStartOfDay(@date.from).toString() is @dateStartOfDay(new Date()).toString()
                   $translate('listing.dates.today')
-              else if moment(@date.from).isSame(moment().add('d', -1).startOf('day')) and
-                moment(@date.to).isSame(moment().add('d', -1).endOf('day'))
+              else if moment(@date.from) is @dateStartOfDay(moment().add('d', -1)) and
+                moment(@date.to).toISOString() is @dateEndOfDay(moment().add('d', -1)).toISOString()
                   $translate('listing.dates.yesterday')
               else if moment(@date.from).isSame(moment().startOf('month').toDate()) and
                 moment(@date.to).isSame(moment().endOf('month').toDate())
                   $translate('listing.dates.currentMonth')
-              else if moment(@date.to).startOf('day').isSame(moment().startOf('day'))
+              else if @dateStartOfDay(@date.to).toISOString() is @dateStartOfDay(new Date()).toISOString()
                 "#{moment(@date.from).add('hours', moment().hours()).fromNow()} #{$translate('listing.dates.untilToday')}"
               else
                 "#{moment(@date.from).add('hours', moment().hours()).fromNow()} #{$translate('listing.dates.until')} #{moment(@date.to).add('hours', moment().hours()).fromNow()}"
@@ -82,7 +84,7 @@ angular.module('vtexNgFilter', [])
       getSelectedItems: =>
         if @type is 'date'
           if @date.from and @date.to
-            url = "#{@name}:[#{moment(@date.from).startOf('day').toISOString()} TO #{moment(@date.to).endOf('day').toISOString()}]"
+            url = @name + ":[" + @dateStartOfDay(@date.from).toISOString() + " TO " + @dateEndOfDay(@date.to).toISOString() + "]"
             @dateObjectCache[url] or=
               name: @dateRangeLabel()
               url: url
@@ -123,7 +125,17 @@ angular.module('vtexNgFilter', [])
           else
             item.quantity = 0
 
-  .directive "vtFilter", ($location) ->
+      dateStartOfDay: (dateStr) ->
+          date = new Date(dateStr)
+          date.setHours 0, 0, 0, 0
+          date
+
+      dateEndOfDay: (dateStr) ->
+          date = new Date(dateStr)
+          date.setHours 23, 59, 59, 999
+          date
+
+.directive "vtFilter", ($location) ->
     restrict: 'E'
     scope:
       filters: '=filters'
@@ -162,7 +174,7 @@ angular.module('vtexNgFilter', [])
       # If url changes, update filters to match
       $scope.$on '$locationChangeSuccess', ->
         queryFilters = (_.map filters, (f) -> $location.search()[f.rangeUrlTemplate]).join() # filters on search
-        selectedFilters = (_.map filters, (f) -> f.getSelectedItemsURL()).join() # filters selected 
+        selectedFilters = (_.map filters, (f) -> f.getSelectedItemsURL()).join() # filters selected
         return if queryFilters is selectedFilters
         updateFiltersOnLocationSearch()
 
