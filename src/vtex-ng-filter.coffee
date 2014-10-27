@@ -5,7 +5,7 @@ openFilters = {}
 moreOptionsShowFilters = {}
 
 angular.module('vtexNgFilter', [])
-  .factory "Filter", ($translate) ->
+  .factory "Filter", (DateTransform, $translate) ->
     class Filter
       constructor: (filter) ->
         for k, v of filter
@@ -15,8 +15,12 @@ angular.module('vtexNgFilter', [])
 
         if @type is 'date'
           @dateObjectCache = {}
+
+          dateGetterSetter = (date, propertyName) =>
+            if angular.isDefined(date) then @[propertyName] = date else @[propertyName] ? false
+
           @date = {}
-          @today = @dateEndOfDay(new Date())
+          @today = DateTransform.endOfDay(new Date())
 
           @setDates = (offsetFrom = 0, offsetTo = 0, currentMonth = false) =>
             if !currentMonth? or currentMonth is false
@@ -29,20 +33,20 @@ angular.module('vtexNgFilter', [])
                 to: moment().endOf('month').toDate()
 
             @date =
-              from: @dateStartOfDay(date.from)
-              to: @dateStartOfDay(date.to)
+              from: DateTransform.startOfDay(date.from)
+              to: DateTransform.startOfDay(date.to)
 
           @dateRangeLabel = =>
             if @date.from and @date.to
-              if @dateStartOfDay(@date.from).toString() is @dateStartOfDay(new Date()).toString()
+              if DateTransform.startOfDay(@date.from).toString() is DateTransform.startOfDay(new Date()).toString()
                   $translate('listing.dates.today')
-              else if moment(@date.from) is @dateStartOfDay(moment().add('d', -1)) and
-                moment(@date.to).toISOString() is @dateEndOfDay(moment().add('d', -1)).toISOString()
+              else if moment(@date.from) is DateTransform.startOfDay(moment().add('d', -1)) and
+                moment(@date.to).toISOString() is DateTransform.endOfDay(moment().add('d', -1)).toISOString()
                   $translate('listing.dates.yesterday')
               else if moment(@date.from).isSame(moment().startOf('month').toDate()) and
                 moment(@date.to).isSame(moment().endOf('month').toDate())
                   $translate('listing.dates.currentMonth')
-              else if @dateStartOfDay(@date.to).toISOString() is @dateStartOfDay(new Date()).toISOString()
+              else if DateTransform.startOfDay(@date.to).toISOString() is DateTransform.startOfDay(new Date()).toISOString()
                 "#{moment(@date.from).add('hours', moment().hours()).fromNow()} #{$translate('listing.dates.untilToday')}"
               else
                 "#{moment(@date.from).add('hours', moment().hours()).fromNow()} #{$translate('listing.dates.until')} #{moment(@date.to).add('hours', moment().hours()).fromNow()}"
@@ -84,7 +88,7 @@ angular.module('vtexNgFilter', [])
       getSelectedItems: =>
         if @type is 'date'
           if @date.from and @date.to
-            url = @name + ":[" + @dateStartOfDay(@date.from).toISOString() + " TO " + @dateEndOfDay(@date.to).toISOString() + "]"
+            url = @name + ":[" + DateTransform.startOfDay(@date.from).toISOString() + " TO " + DateTransform.endOfDay(@date.to).toISOString() + "]"
             @dateObjectCache[url] or=
               name: @dateRangeLabel()
               url: url
@@ -125,67 +129,82 @@ angular.module('vtexNgFilter', [])
           else
             item.quantity = 0
 
-      dateStartOfDay: (dateStr) ->
-          date = new Date(dateStr)
-          date.setHours 0, 0, 0, 0
-          date
+  # To use instead of moment's due to weird date bug
+  .service 'DateTransform', ->
+    @startOfDay = (dateStr) ->
+      date = new Date(dateStr)
+      date.setHours 0, 0, 0, 0
+      date
 
-      dateEndOfDay: (dateStr) ->
-          date = new Date(dateStr)
-          date.setHours 23, 59, 59, 999
-          date
+    @endOfDay = (dateStr) ->
+      date = new Date(dateStr)
+      date.setHours 23, 59, 59, 999
+      date
 
-.directive "vtFilter", ($location) ->
-    restrict: 'E'
-    scope:
-      filters: '=filters'
-    templateUrl: if config.path then config.path + '/vtex-ng-filter.html' else 'vtex-ng-filter.html'
-    link: ($scope) ->
-      filters = $scope.filters
-      # Initialize open filters if needed
-      for filter in filters
-        unless openFilters.hasOwnProperty(filter.rangeUrlTemplate)
-          openFilters[filter.rangeUrlTemplate] = false
+    @validate = (date) ->
+      return if not date?
+      date = new Date(date)
+      date.setDate(date.getUTCDate()) if date.getUTCDate() isnt date.getDate()
+      return date
 
-        unless moreOptionsShowFilters.hasOwnProperty(filter.rangeUrlTemplate)
-          moreOptionsShowFilters[filter.rangeUrlTemplate] = false
+    return this
 
-      $scope.openFilters = openFilters
-      $scope.moreOptionsShowFilters = moreOptionsShowFilters
 
-      $scope.clearAll = ->
-        filter.clearSelection() for filter in filters
-
-      filters.getAppliedFilters = -> _.filter filters, (f) -> f.getSelectedItems().length > 0
-      filters.getAppliedItems = -> _.chain(filters.getAppliedFilters()).map((f) -> f.getSelectedItems()).flatten().value()
-
-      # Handle search query
-      updateFiltersOnLocationSearch = ->
+  .directive "vtFilter", ($rootScope, $location, DateTransform) ->
+      restrict: 'E'
+      scope:
+        filters: '=filters'
+      templateUrl: if config.path then config.path + '/vtex-ng-filter.html' else 'vtex-ng-filter.html'
+      link: ($scope) ->
+        filters = $scope.filters
+        # Initialize open filters if needed
         for filter in filters
-          searchQuery = $location.search()[filter.rangeUrlTemplate]
-          # Se está na URL, está selected
-          if searchQuery
-            filter.setSelectedItems(searchQuery)
-            filter.update()
+          unless openFilters.hasOwnProperty(filter.rangeUrlTemplate)
+            openFilters[filter.rangeUrlTemplate] = false
 
-      # When initializing the directive, get the selected filters from the url.
-      updateFiltersOnLocationSearch()
+          unless moreOptionsShowFilters.hasOwnProperty(filter.rangeUrlTemplate)
+            moreOptionsShowFilters[filter.rangeUrlTemplate] = false
 
-      # If url changes, update filters to match
-      $scope.$on '$locationChangeSuccess', ->
-        queryFilters = (_.map filters, (f) -> $location.search()[f.rangeUrlTemplate]).join() # filters on search
-        selectedFilters = (_.map filters, (f) -> f.getSelectedItemsURL()).join() # filters selected
-        return if queryFilters is selectedFilters
+        $scope.openFilters = openFilters
+        $scope.moreOptionsShowFilters = moreOptionsShowFilters
+
+        $scope.clearAll = ->
+          filter.clearSelection() for filter in filters
+
+        filters.getAppliedFilters = -> _.filter filters, (f) -> f.getSelectedItems().length > 0
+        filters.getAppliedItems = -> _.chain(filters.getAppliedFilters()).map((f) -> f.getSelectedItems()).flatten().value()
+
+        # Handle search query
+        updateFiltersOnLocationSearch = ->
+          for filter in filters
+            searchQuery = $location.search()[filter.rangeUrlTemplate]
+            # Se está na URL, está selected
+            if searchQuery
+              filter.setSelectedItems(searchQuery)
+              filter.update()
+
+        # When initializing the directive, get the selected filters from the url.
         updateFiltersOnLocationSearch()
 
-      # Watch filters to modify search query
-      _.each filters, (filter, i) ->
-        $scope.$watch ((scope) -> scope.filters[i].getSelectedItemsURL()), (newValue, oldValue) ->
-          return if newValue is oldValue
-          for filter in filters
-            $location.search filter.rangeUrlTemplate, filter.getSelectedItemsURL()
-          # Sets paging to 1 on modified filters
-          $location.search 'page', 1
+        # If url changes, update filters to match
+        $scope.$on '$locationChangeSuccess', ->
+          queryFilters = (_.map filters, (f) -> $location.search()[f.rangeUrlTemplate]).join() # filters on search
+          selectedFilters = (_.map filters, (f) -> f.getSelectedItemsURL()).join() # filters selected
+          return if queryFilters is selectedFilters
+          updateFiltersOnLocationSearch()
+
+        # Watch filters to modify search query
+        _.each filters, (filter, i) ->
+          $scope.$watch ((scope) -> scope.filters[i].getSelectedItemsURL()), (newValue, oldValue) ->
+            return if newValue is oldValue
+            if filter.type is 'date' and filter.date?
+              filters[i].date.from = DateTransform.validate(filter.date.from)
+              filters[i].date.to = DateTransform.validate(filter.date.to)
+              $rootScope.$digest() unless $rootScope.$$phase
+            for filter in filters
+              $location.search filter.rangeUrlTemplate, filter.getSelectedItemsURL()
+            # Sets paging to 1 on modified filters
+            $location.search 'page', 1
 
   .directive "vtFilterSummary", ->
     restrict: 'E'

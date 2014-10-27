@@ -1,4 +1,4 @@
-/*! vtex-ng-filter - v0.3.1 - 2014-10-26 */
+/*! vtex-ng-filter - v0.3.1 - 2014-10-27 */
 (function() {
   var config, moreOptionsShowFilters, openFilters,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -12,7 +12,7 @@
 
   moreOptionsShowFilters = {};
 
-  angular.module('vtexNgFilter', []).factory("Filter", function($translate) {
+  angular.module('vtexNgFilter', []).factory("Filter", function(DateTransform, $translate) {
     var Filter;
     return Filter = (function() {
       function Filter(filter) {
@@ -22,7 +22,7 @@
         this.getSelectedItems = __bind(this.getSelectedItems, this);
         this.setSelectedItems = __bind(this.setSelectedItems, this);
         this.updateSelectedCount = __bind(this.updateSelectedCount, this);
-        var k, v;
+        var dateGetterSetter, k, v;
         for (k in filter) {
           v = filter[k];
           this[k] = v;
@@ -30,8 +30,18 @@
         this.selectedCount = 0;
         if (this.type === 'date') {
           this.dateObjectCache = {};
+          dateGetterSetter = (function(_this) {
+            return function(date, propertyName) {
+              var _ref;
+              if (angular.isDefined(date)) {
+                return _this[propertyName] = date;
+              } else {
+                return (_ref = _this[propertyName]) != null ? _ref : false;
+              }
+            };
+          })(this);
           this.date = {};
-          this.today = this.dateEndOfDay(new Date());
+          this.today = DateTransform.endOfDay(new Date());
           this.setDates = (function(_this) {
             return function(offsetFrom, offsetTo, currentMonth) {
               var date;
@@ -56,21 +66,21 @@
                 };
               }
               return _this.date = {
-                from: _this.dateStartOfDay(date.from),
-                to: _this.dateStartOfDay(date.to)
+                from: DateTransform.startOfDay(date.from),
+                to: DateTransform.startOfDay(date.to)
               };
             };
           })(this);
           this.dateRangeLabel = (function(_this) {
             return function() {
               if (_this.date.from && _this.date.to) {
-                if (_this.dateStartOfDay(_this.date.from).toString() === _this.dateStartOfDay(new Date()).toString()) {
+                if (DateTransform.startOfDay(_this.date.from).toString() === DateTransform.startOfDay(new Date()).toString()) {
                   return $translate('listing.dates.today');
-                } else if (moment(_this.date.from) === _this.dateStartOfDay(moment().add('d', -1)) && moment(_this.date.to).toISOString() === _this.dateEndOfDay(moment().add('d', -1)).toISOString()) {
+                } else if (moment(_this.date.from) === DateTransform.startOfDay(moment().add('d', -1)) && moment(_this.date.to).toISOString() === DateTransform.endOfDay(moment().add('d', -1)).toISOString()) {
                   return $translate('listing.dates.yesterday');
                 } else if (moment(_this.date.from).isSame(moment().startOf('month').toDate()) && moment(_this.date.to).isSame(moment().endOf('month').toDate())) {
                   return $translate('listing.dates.currentMonth');
-                } else if (_this.dateStartOfDay(_this.date.to).toISOString() === _this.dateStartOfDay(new Date()).toISOString()) {
+                } else if (DateTransform.startOfDay(_this.date.to).toISOString() === DateTransform.startOfDay(new Date()).toISOString()) {
                   return "" + (moment(_this.date.from).add('hours', moment().hours()).fromNow()) + " " + ($translate('listing.dates.untilToday'));
                 } else {
                   return "" + (moment(_this.date.from).add('hours', moment().hours()).fromNow()) + " " + ($translate('listing.dates.until')) + " " + (moment(_this.date.to).add('hours', moment().hours()).fromNow());
@@ -148,7 +158,7 @@
         var item, url, _base, _i, _len, _ref, _results;
         if (this.type === 'date') {
           if (this.date.from && this.date.to) {
-            url = this.name + ":[" + this.dateStartOfDay(this.date.from).toISOString() + " TO " + this.dateEndOfDay(this.date.to).toISOString() + "]";
+            url = this.name + ":[" + DateTransform.startOfDay(this.date.from).toISOString() + " TO " + DateTransform.endOfDay(this.date.to).toISOString() + "]";
             (_base = this.dateObjectCache)[url] || (_base[url] = {
               name: this.dateRangeLabel(),
               url: url
@@ -241,24 +251,34 @@
         return _results;
       };
 
-      Filter.prototype.dateStartOfDay = function(dateStr) {
-        var date;
-        date = new Date(dateStr);
-        date.setHours(0, 0, 0, 0);
-        return date;
-      };
-
-      Filter.prototype.dateEndOfDay = function(dateStr) {
-        var date;
-        date = new Date(dateStr);
-        date.setHours(23, 59, 59, 999);
-        return date;
-      };
-
       return Filter;
 
     })();
-  }).directive("vtFilter", function($location) {
+  }).service('DateTransform', function() {
+    this.startOfDay = function(dateStr) {
+      var date;
+      date = new Date(dateStr);
+      date.setHours(0, 0, 0, 0);
+      return date;
+    };
+    this.endOfDay = function(dateStr) {
+      var date;
+      date = new Date(dateStr);
+      date.setHours(23, 59, 59, 999);
+      return date;
+    };
+    this.validate = function(date) {
+      if (date == null) {
+        return;
+      }
+      date = new Date(date);
+      if (date.getUTCDate() !== date.getDate()) {
+        date.setDate(date.getUTCDate());
+      }
+      return date;
+    };
+    return this;
+  }).directive("vtFilter", function($rootScope, $location, DateTransform) {
     return {
       restrict: 'E',
       scope: {
@@ -334,6 +354,13 @@
             var _j, _len1;
             if (newValue === oldValue) {
               return;
+            }
+            if (filter.type === 'date' && (filter.date != null)) {
+              filters[i].date.from = DateTransform.validate(filter.date.from);
+              filters[i].date.to = DateTransform.validate(filter.date.to);
+              if (!$rootScope.$$phase) {
+                $rootScope.$digest();
+              }
             }
             for (_j = 0, _len1 = filters.length; _j < _len1; _j++) {
               filter = filters[_j];
