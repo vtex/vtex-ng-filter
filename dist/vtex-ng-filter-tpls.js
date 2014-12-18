@@ -1,4 +1,4 @@
-/*! vtex-ng-filter - v0.3.1 - 2014-10-27 */
+/*! vtex-ng-filter - v0.3.1 - 2014-12-18 */
 (function() {
   var config, moreOptionsShowFilters, openFilters,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -12,7 +12,7 @@
 
   moreOptionsShowFilters = {};
 
-  angular.module('vtexNgFilter', []).factory("Filter", function(DateTransform, $translate) {
+  angular.module('vtexNgFilter', []).factory("Filter", function(DateTransform, $filter) {
     var Filter;
     return Filter = (function() {
       function Filter(filter) {
@@ -75,18 +75,18 @@
             return function() {
               if (_this.date.from && _this.date.to) {
                 if (DateTransform.startOfDay(_this.date.from).toString() === DateTransform.startOfDay(new Date()).toString()) {
-                  return $translate('listing.dates.today');
+                  return $filter('translate')('listing.dates.today');
                 } else if (moment(_this.date.from) === DateTransform.startOfDay(moment().add('d', -1)) && moment(_this.date.to).toISOString() === DateTransform.endOfDay(moment().add('d', -1)).toISOString()) {
-                  return $translate('listing.dates.yesterday');
+                  return $filter('translate')('listing.dates.yesterday');
                 } else if (moment(_this.date.from).isSame(moment().startOf('month').toDate()) && moment(_this.date.to).isSame(moment().endOf('month').toDate())) {
-                  return $translate('listing.dates.currentMonth');
+                  return $filter('translate')('listing.dates.currentMonth');
                 } else if (DateTransform.startOfDay(_this.date.to).toISOString() === DateTransform.startOfDay(new Date()).toISOString()) {
-                  return "" + (moment(_this.date.from).add('hours', moment().hours()).fromNow()) + " " + ($translate('listing.dates.untilToday'));
+                  return "" + (moment(_this.date.from).add('hours', moment().hours()).fromNow()) + " " + ($filter('translate')('listing.dates.untilToday'));
                 } else {
-                  return "" + (moment(_this.date.from).add('hours', moment().hours()).fromNow()) + " " + ($translate('listing.dates.until')) + " " + (moment(_this.date.to).add('hours', moment().hours()).fromNow());
+                  return "" + (moment(_this.date.from).add('hours', moment().hours()).fromNow()) + " " + ($filter('translate')('listing.dates.until')) + " " + (moment(_this.date.to).add('hours', moment().hours()).fromNow());
                 }
               } else {
-                return $translate('listing.dates.noRangeSelected');
+                return $filter('translate')('listing.dates.noRangeSelected');
               }
             };
           })(this);

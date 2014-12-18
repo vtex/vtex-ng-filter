@@ -5,7 +5,7 @@ openFilters = {}
 moreOptionsShowFilters = {}
 
 angular.module('vtexNgFilter', [])
-  .factory "Filter", (DateTransform, $translate) ->
+  .factory "Filter", (DateTransform, $filter) ->
     class Filter
       constructor: (filter) ->
         for k, v of filter
@@ -39,19 +39,19 @@ angular.module('vtexNgFilter', [])
           @dateRangeLabel = =>
             if @date.from and @date.to
               if DateTransform.startOfDay(@date.from).toString() is DateTransform.startOfDay(new Date()).toString()
-                  $translate('listing.dates.today')
+                  $filter('translate')('listing.dates.today')
               else if moment(@date.from) is DateTransform.startOfDay(moment().add('d', -1)) and
                 moment(@date.to).toISOString() is DateTransform.endOfDay(moment().add('d', -1)).toISOString()
-                  $translate('listing.dates.yesterday')
+                  $filter('translate')('listing.dates.yesterday')
               else if moment(@date.from).isSame(moment().startOf('month').toDate()) and
                 moment(@date.to).isSame(moment().endOf('month').toDate())
-                  $translate('listing.dates.currentMonth')
+                  $filter('translate')('listing.dates.currentMonth')
               else if DateTransform.startOfDay(@date.to).toISOString() is DateTransform.startOfDay(new Date()).toISOString()
-                "#{moment(@date.from).add('hours', moment().hours()).fromNow()} #{$translate('listing.dates.untilToday')}"
+                "#{moment(@date.from).add('hours', moment().hours()).fromNow()} #{$filter('translate')('listing.dates.untilToday')}"
               else
-                "#{moment(@date.from).add('hours', moment().hours()).fromNow()} #{$translate('listing.dates.until')} #{moment(@date.to).add('hours', moment().hours()).fromNow()}"
+                "#{moment(@date.from).add('hours', moment().hours()).fromNow()} #{$filter('translate')('listing.dates.until')} #{moment(@date.to).add('hours', moment().hours()).fromNow()}"
             else
-              $translate('listing.dates.noRangeSelected')
+              $filter('translate')('listing.dates.noRangeSelected')
 
         @updateSelectedCount()
 
