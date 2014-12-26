@@ -11,6 +11,8 @@ angular.module('vtexNgFilter', [])
         for k, v of filter
           @[k] = v
 
+        @setGroup()
+
         @selectedCount = 0
 
         if @type is 'date'
@@ -129,6 +131,16 @@ angular.module('vtexNgFilter', [])
           else
             item.quantity = 0
 
+      setGroup: =>
+        if @name in ['creationDate', 'authorizedDate', 'ShippingEstimatedDate']
+          @groupName = 'date'
+        else if @name in ['SalesChannelName', 'CallCenterOperatorName', 'SellerNames', 'UtmSource']
+          @groupName = 'channel'
+        else if @name in ['StatusDescription', 'orderSituation', 'errorStatus']
+          @groupName = 'status'
+        else
+          @groupName = 'other'
+
   # To use instead of moment's due to weird date bug
   .service 'DateTransform', ->
     @startOfDay = (dateStr) ->
@@ -156,7 +168,7 @@ angular.module('vtexNgFilter', [])
         filters: '=filters'
       templateUrl: if config.path then config.path + '/vtex-ng-filter.html' else 'vtex-ng-filter.html'
       link: ($scope) ->
-        filters = $scope.filters
+        filters = _.flatten $scope.filters
         # Initialize open filters if needed
         for filter in filters
           unless openFilters.hasOwnProperty(filter.rangeUrlTemplate)
@@ -195,7 +207,7 @@ angular.module('vtexNgFilter', [])
 
         # Watch filters to modify search query
         _.each filters, (filter, i) ->
-          $scope.$watch ((scope) -> scope.filters[i].getSelectedItemsURL()), (newValue, oldValue) ->
+          $scope.$watch ((scope) -> _.flatten(scope.filters)[i].getSelectedItemsURL()), (newValue, oldValue) ->
             return if newValue is oldValue
             if filter.type is 'date' and filter.date?
               filters[i].date.from = DateTransform.validate(filter.date.from)
