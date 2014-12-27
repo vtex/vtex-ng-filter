@@ -1,4 +1,4 @@
-/*! vtex-ng-filter - v0.3.1 - 2014-12-26 */
+/*! vtex-ng-filter - v0.3.1 - 2014-12-27 */
 (function() {
   var config, moreOptionsShowFilters, openFilters,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -323,13 +323,13 @@
           }
           return _results;
         };
-        filters.getAppliedFilters = function() {
+        $scope.filters.getAppliedFilters = function() {
           return _.filter(filters, function(f) {
             return f.getSelectedItems().length > 0;
           });
         };
-        filters.getAppliedItems = function() {
-          return _.chain(filters.getAppliedFilters()).map(function(f) {
+        $scope.filters.getAppliedItems = function() {
+          return _.chain($scope.filters.getAppliedFilters()).map(function(f) {
             return f.getSelectedItems();
           }).flatten().value();
         };
