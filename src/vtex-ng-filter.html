@@ -46,17 +46,20 @@
           <div class="date-selectors"
                ng-show="openFilters[filter.rangeUrlTemplate + 'Selector']">
 
-            <div class="control-group vtex-datepicker-container">
-              <label for="date-from-{{ $index }}" translate>listing.dates.from</label>
-              <input type="text" id="date-from-{{ $index }}"
-                     vtex-datepicker date-model="filter.date.from" date-placeholder="filter.date.from">
-            </div>
+            <div class="row-fluid">
+              <div class="span5 control-group vtex-datepicker-container">
+                <label for="date-from-{{ $index }}" translate>listing.dates.from</label>
+                <input type="text" id="date-from-{{ $index }}"
+                       vtex-datepicker date-model="filter.date.from" date-placeholder="filter.date.from">
+              </div>
 
-            <div class="control-group vtex-datepicker-container">
-              <label for="date-to-{{ $index }}" translate>listing.dates.to</label>
-              <input type="text" id="date-to-{{ $index }}"
-                     vtex-datepicker date-model="filter.date.to" date-placeholder="filter.date.to">
-            </div>
+              <div class="span5 offset1 control-group vtex-datepicker-container">
+                <label for="date-to-{{ $index }}" translate>listing.dates.to</label>
+                <input type="text" id="date-to-{{ $index }}"
+                       vtex-datepicker date-model="filter.date.to" date-placeholder="filter.date.to">
+              </div>
+            </div><!-- /row-fluid -->
+
           </div>
           <!-- /datepickers -->
         </div>
