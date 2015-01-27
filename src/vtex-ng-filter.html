@@ -15,10 +15,15 @@
     </h3>
 
     <accordion close-others="true">
-      <accordion-group is-open="openFilters[filter.rangeUrlTemplate]"
-                       heading="{{ 'filters.' + filter.rangeUrlTemplate | translate }} {{ filter.selectedCountLabel }}"
-                       ng-repeat="filter in group">
+      <accordion-group is-open="openFilters[filter.rangeUrlTemplate]" ng-repeat="filter in group">
 
+        <accordion-heading>
+          <span>{{ 'filters.' + filter.rangeUrlTemplate | translate }}</span>
+          <span ng-if="filter.getSelectedItems().length" class="badge badge-lightblue pull-right">
+            <span ng-if="filter.type === 'multiple' && filter.selectedCount">{{ filter.selectedCount }}</span>
+            <span ng-if="filter.type !== 'multiple'" class="fa fa-dot-circle-o"></span>
+          </span>
+        </accordion-heading>
 
         <!-- DATE -->
         <div ng-if="filter.type === 'date'">
