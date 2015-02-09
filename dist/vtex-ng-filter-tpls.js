@@ -1,4 +1,4 @@
-/*! vtex-ng-filter - v0.3.1 - 2015-02-06 */
+/*! vtex-ng-filter - v0.3.1 - 2015-02-09 */
 (function() {
   var config, moreOptionsShowFilters, openFilters,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -401,8 +401,7 @@
         filters: '=filters',
         openFilters: '&'
       },
-      templateUrl: config.path ? config.path + '/vtex-ng-filter-button.html' : 'vtex-ng-filter-button.html',
-      link: function($scope) {}
+      templateUrl: config.path ? config.path + '/vtex-ng-filter-button.html' : 'vtex-ng-filter-button.html'
     };
   }).provider('vtexNgFilter', {
     config: config,
@@ -416,12 +415,12 @@
 angular.module("vtexNgFilter").run(function($templateCache) {   'use strict';
 
   $templateCache.put('vtex-ng-filter-button.html',
-    "<a class=\"btn\" href=\"javascript:void(0);\" ng-click=\"openFilters()\"><i class=\"icon-filter\" ng-class=\"{'icon-blue': filters.getAppliedItems().length > 0}\"></i>&nbsp; <span translate=\"\">listing.filters</span> <span class=\"badge badge-info badge-corner\" data-ng-show=\"filters.getAppliedItems().length > 0\">{{filters.getAppliedItems().length}}</span></a>"
+    "<a class=\"btn\" href=\"javascript:void(0);\" ng-click=\"openFilters()\"><i class=\"icon-filter\" ng-class=\"{ 'icon-blue': filters.getAppliedItems().length > 0 }\"></i>&nbsp; <span translate=\"\">listing.filters</span> <span class=\"badge badge-info badge-corner\" data-ng-show=\"filters.getAppliedItems().length > 0\">{{ filters.getAppliedItems().length }}</span></a>"
   );
 
 
   $templateCache.put('vtex-ng-filter-summary.html',
-    "<div class=\"filters-summary\"><small ng-show=\"filters.length > 0\" ng-repeat=\"filter in filters.getAppliedFilters()\"><span ng-repeat=\"item in filter.getSelectedItems()\"><span class=\"label label-info\"><span translate=\"\">{{item.name}}</span>&nbsp; <a href=\"javascript:void(0);\" ng-click=\"filter.clearItem(item)\"><i class=\"icon-remove-sign\"></i></a></span>&nbsp;</span></small></div>"
+    "<div class=\"filters-summary\"><small ng-show=\"filters.length\" ng-repeat=\"filter in filters.getAppliedFilters()\"><span ng-repeat=\"item in filter.getSelectedItems()\"><span class=\"label label-info\"><span translate=\"\">{{ item.name }}</span>&nbsp; <a href=\"javascript:void(0);\" ng-click=\"filter.clearItem(item)\"><i class=\"icon-remove-sign\"></i></a></span>&nbsp;</span></small></div>"
   );
 
 

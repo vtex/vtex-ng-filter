@@ -1,11 +1,9 @@
 <div class="filters-summary">
-    <small ng-show="filters.length > 0" ng-repeat="filter in filters.getAppliedFilters()">
+    <small ng-show="filters.length" ng-repeat="filter in filters.getAppliedFilters()">
 			<span ng-repeat="item in filter.getSelectedItems()">
 				<span class="label label-info">
-					<span translate>{{item.name}}</span>&nbsp;
-					<a href="javascript:void(0);" ng-click="filter.clearItem(item)">
-                        <i class="icon-remove-sign"></i>
-                    </a>
+					<span translate>{{ item.name }}</span>&nbsp;
+					<a href="javascript:void(0);" ng-click="filter.clearItem(item)"><i class="icon-remove-sign"></i></a>
 				</span>&nbsp;
 			</span>
     </small>

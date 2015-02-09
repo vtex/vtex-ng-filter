@@ -228,7 +228,6 @@ angular.module('vtexNgFilter', [])
       filters: '=filters'
       openFilters: '&'
     templateUrl: if config.path then config.path + '/vtex-ng-filter-button.html' else 'vtex-ng-filter-button.html'
-    link: ($scope) ->
 
   .provider 'vtexNgFilter',
     config: config
