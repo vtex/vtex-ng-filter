@@ -1,4 +1,4 @@
-node_modules/
-bower_components/
-.idea/
-build/
+node_modules
+build
+.idea
+.DS_Store
