@@ -357,7 +357,7 @@
           selectedFilters = (_.map(filters, function(f) {
             return f.getSelectedItemsURL();
           })).join();
-          if (queryFilters === selectedFilters) {
+          if (decodeURIComponent(queryFilters) === selectedFilters) {
             return;
           }
           return updateFiltersOnLocationSearch();

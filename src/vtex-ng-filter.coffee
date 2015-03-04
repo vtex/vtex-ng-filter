@@ -201,7 +201,7 @@ angular.module('vtexNgFilter', [])
         $scope.$on '$locationChangeSuccess', ->
           queryFilters = (_.map filters, (f) -> $location.search()[f.rangeUrlTemplate]).join() # filters on search
           selectedFilters = (_.map filters, (f) -> f.getSelectedItemsURL()).join() # filters selected
-          return if queryFilters is selectedFilters
+          return if decodeURIComponent(queryFilters) is selectedFilters
           updateFiltersOnLocationSearch()
 
         # Watch filters to modify search query
