@@ -1,4 +1,4 @@
-/*! vtex-ng-filter - v0.3.1 - 2015-02-09 */
+/*! vtex-ng-filter - v0.3.1 - 2015-03-04 */
 (function() {
   var config, moreOptionsShowFilters, openFilters,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -343,7 +343,7 @@
               filter.setSelectedItems(searchQuery);
               _results.push(filter.update());
             } else {
-              _results.push(void 0);
+              _results.push(filter.clearSelection());
             }
           }
           return _results;

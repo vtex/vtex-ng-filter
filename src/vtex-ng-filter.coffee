@@ -192,6 +192,7 @@ angular.module('vtexNgFilter', [])
             if searchQuery
               filter.setSelectedItems(searchQuery)
               filter.update()
+            else filter.clearSelection()
 
         # When initializing the directive, get the selected filters from the url.
         updateFiltersOnLocationSearch()
