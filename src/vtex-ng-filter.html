@@ -2,7 +2,8 @@
   <h3>
     <span translate>listing.filters</span>
     <button translate class="btn btn-small btn-clean-filters"
-            ng-if="filters.getAppliedFilters().length" ng-click="clearAll()">listing.clearAll</button>
+            ng-if="filters.getAppliedFilters().length" ng-click="clearAll()"
+            ga-event ga-label="filter-clear-all">listing.clearAll</button>
   </h3>
 
   <div ng-repeat="group in filters">
@@ -89,7 +90,9 @@
              ng-show="filter.items.length > 6 && moreOptionsShowFilters[filter.rangeUrlTemplate]"
              class="muted">{{ 'filters.moreOptionsHide' | translate}}</a>
 
-          <button translate class="btn" ng-click="filter.clearSelection()" ng-show="filter.type === 'single' && filter.selectedItem">search.clear</button>
+          <button translate class="btn"
+                  ng-click="filter.clearSelection()"
+                  ng-show="filter.type === 'single' && filter.selectedItem">search.clear</button>
         </div>
 
       </accordion-group>
