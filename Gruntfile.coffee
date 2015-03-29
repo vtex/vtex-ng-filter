@@ -11,6 +11,7 @@ module.exports = (grunt) ->
       main:
         files:
           'build/vtex-ng-filter.js': 'src/vtex-ng-filter.coffee'
+          'build/vtex-ng-filter-models.js': 'src/vtex-ng-filter-models.coffee'
 
     ngtemplates:
       app:
@@ -24,7 +25,7 @@ module.exports = (grunt) ->
 
     concat:
       main:
-        src: ['build/vtex-ng-filter.js', 'build/vtex-ng-filter-template.js']
+        src: ['build/vtex-ng-filter.js', 'build/vtex-ng-filter-models.js', 'build/vtex-ng-filter-template.js']
         dest: 'dist/vtex-ng-filter-tpls.js'
         options:
           banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %> */\n'
