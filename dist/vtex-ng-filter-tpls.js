@@ -1,4 +1,4 @@
-/*! vtex-ng-filter - v0.3.1 - 2015-03-29 */
+/*! vtex-ng-filter - v0.3.1 - 2015-03-30 */
 (function() {
   var config, moreOptionsShowFilters, openFilters;
 
@@ -53,7 +53,7 @@
     this.getFacets = function(endpoint, filters, search) {
       var url;
       url = "" + endpoint + "?" + (setFacetsQuery(filters));
-      if (search) {
+      if (transformSearch(search)) {
         url += "&" + (transformSearch(search));
       }
       return $http.get(url).then(function(res) {

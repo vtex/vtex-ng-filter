@@ -40,7 +40,7 @@ angular.module('vtexNgFilter', [])
     @getFacets = (endpoint, filters, search) ->
       url = "#{endpoint}?#{ setFacetsQuery( filters ) }"
       # Caso tenha uma busca, adiciona ela a URL e trás o resultado filtrado por ela
-      if search then url += "&#{transformSearch(search)}"
+      if transformSearch(search) then url += "&#{transformSearch(search)}"
       $http.get(url).then (res) -> res.data
 
     return this
