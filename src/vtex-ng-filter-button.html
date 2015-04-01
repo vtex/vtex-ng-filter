@@ -1,6 +1,5 @@
-<a class="btn" href="javascript:void(0);" ng-click="openFilters()" ga-event ga-label="filter-open">
-    <i class="fa fa-filter" ng-class="{ 'fa-blue': filters.getAppliedItems().length > 0 }"></i>&nbsp;
-    <span translate>listing.filters</span>
+<button class="btn" ng-click="sidebar.show('filters')" ga-event ga-label="filter-open">
+    <i class="fa fa-filter" ng-class="{ 'fa-blue': activeFilters.list.length > 0 }"></i>
     <span class="badge badge-info badge-corner"
-          data-ng-show="filters.getAppliedItems().length > 0">{{ filters.getAppliedItems().length }}</span>
-</a>
+          data-ng-show="activeFilters.list.length > 0">{{ activeFilters.list.length }}</span>
+</button>

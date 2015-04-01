@@ -5,7 +5,11 @@ angular.module('vtexNgFilter')
         return [ 
           { name: 'today',       interval: ['now-1d',  'now'] }
           { name: 'yesterday',   interval: ['now-2d',  'now-1d'] }
-          { name: 'oneWeekAgo',  interval: ['now-14d', 'now-7d'] } ]
+          { name: 'thisWeek',    interval: ['now-1w',  'now'] } 
+          { name: 'oneWeekAgo',  interval: ['now-2w',  'now-1w'] } 
+          { name: 'twoWeeksAgo', interval: ['now-3w',  'now-2w'] }
+          { name: 'thisMonth',   interval: ['now-30d', 'now'] }
+          { name: 'lastMonth',   interval: ['now-60d', 'now-30d'] }]
 
   .factory 'TransactionGroup', (TransactionFilter) ->
     class TransactionGroup
@@ -67,10 +71,33 @@ angular.module('vtexNgFilter')
         @url = url
         @type = type
         @group = group
+        @active = false
         @options = []
         if type is "date" and !range
           @range = new DefaultIntervalFilter()
         else @range = range
 
+        @clearOptions = ->
+          @options = []
+
         @setOptions = (name, quantity, status) ->
-          @options.push new FilterOption(name, quantity, @type, status)
+          _active = false
+          for option in @options
+            # Checa se existe algum filtro ativo
+            if option.active then _active = true
+            
+            # Checa se já opção já existe e atualiza ela
+            if name is option.name
+              option.quantity = quantity
+              option.status = status
+              return option
+          
+          # Avisa que o filtro esta ativo caso o status 
+          # seja positivo ou exista um filtro ativo
+          @active = status || _active
+
+          # Caso não exista opção, instância uma nova
+          newOption = new FilterOption(name, quantity, @type, status)
+          @options.push newOption
+
+          return newOption

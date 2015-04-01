@@ -14,17 +14,20 @@
     </h3>
 
     <accordion close-others="true">
-      <accordion-group ng-repeat="filter in group">
+      <accordion-group ng-repeat="filter in group" ng-if="filter.options.length">
 
         <accordion-heading>
           {{ 'filters.' + filter.name | translate }}
+          <span class="label label-info pull-right" ng-if="filter.active"><i class="fa fa-dot-circle-o"></i></span>
         </accordion-heading>
 
         <ul class="filter-list nav nav-pills nav-stacked">
           <li ng-repeat="item in filter.options">
-            <div class="checkbox">
+            <div class="checkbox" ng-class="{'checkbox': filter.type == 'multiple', 'radio': filter.type == 'date'}">
               <label>
-                <input type="checkbox" ng-value="item.value" ng-model="item.active" ng-change="updateQueryString()">
+                <input type="checkbox" name="{{ filter.url }}" ng-if="filter.type == 'multiple'" ng-value="item.value" ng-model="item.active" ng-change="updateQueryString()">
+                
+                <input type="radio" name="{{ filter.url }}" ng-if="filter.type == 'date'" ng-value="item.value" ng-model="item.active" ng-change="updateQueryString()">
                 <!-- <input type="radio" name="{{filter.name}}" ng-model="filter.selectedItem" ng-value="item"> -->
                 {{ item.name | translate }} <span class="text-muted">({{ item.quantity }})</span></span>
               </label>

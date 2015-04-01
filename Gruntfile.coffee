@@ -9,9 +9,14 @@ module.exports = (grunt) ->
 
     coffee:
       main:
-        files:
-          'build/vtex-ng-filter.js': 'src/vtex-ng-filter.coffee'
-          'build/vtex-ng-filter-models.js': 'src/vtex-ng-filter-models.coffee'
+        files: [
+          expand: true
+          cwd: 'src/'
+          src: ['**/*.coffee']
+          dest: "build/"
+          rename: (path, filename) ->
+            path + filename.replace("coffee", "js")
+        ]
 
     ngtemplates:
       app:
@@ -25,10 +30,10 @@ module.exports = (grunt) ->
 
     concat:
       main:
-        src: ['build/vtex-ng-filter.js', 'build/vtex-ng-filter-models.js', 'build/vtex-ng-filter-template.js']
-        dest: 'dist/vtex-ng-filter-tpls.js'
+        src: 'build/**/*.js'
+        dest: "dist/vtex-ng-filter-tpls.js"
         options:
-          banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+          banner: 'angular.module("vtexNgFilter", []);'
 
     uglify:
       main:
