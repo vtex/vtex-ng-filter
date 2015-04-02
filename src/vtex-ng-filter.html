@@ -25,11 +25,11 @@
           <li ng-repeat="item in filter.options">
             <div class="checkbox" ng-class="{'checkbox': filter.type == 'multiple', 'radio': filter.type == 'date'}">
               <label>
-                <input type="checkbox" name="{{ filter.url }}" ng-if="filter.type == 'multiple'" ng-value="item.value" ng-model="item.active" ng-change="updateQueryString()">
+                <input type="checkbox" name="{{ ::filter.url }}" ng-if="filter.type == 'multiple'" ng-value="::item.value" ng-model="::item.active" ng-change="updateQueryString()">
                 
-                <input type="radio" name="{{ filter.url }}" ng-if="filter.type == 'date'" ng-value="item.value" ng-model="item.active" ng-change="updateQueryString()">
+                <input type="radio" name="{{ ::filter.url }}" ng-if="filter.type == 'date'" ng-value="::item.value" ng-model="::item.active" ng-change="updateQueryString()">
                 <!-- <input type="radio" name="{{filter.name}}" ng-model="filter.selectedItem" ng-value="item"> -->
-                {{ item.name | translate }} <span class="text-muted">({{ item.quantity }})</span></span>
+                {{ ::item.name | translate }} <span class="text-muted">({{ ::item.quantity }})</span></span>
               </label>
             </div>
           </li>

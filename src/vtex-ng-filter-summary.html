@@ -1,7 +1,7 @@
 <div class="filters-summary">
   <span ng-show="activeFilters.list.length" ng-repeat="filter in activeFilters.list" ng-if="filter.active">
   	<button class="btn btn-xs btn-info" ng-click="disableFilter(filter)">
-  		{{ filter.name | translate }} 
+  		{{ ::filter.name | translate }} 
 		  <i class="fa fa-remove"></i>
   	</button>&nbsp;
   </span>
