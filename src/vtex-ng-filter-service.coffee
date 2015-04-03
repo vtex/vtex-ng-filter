@@ -1,13 +1,15 @@
 angular.module('vtexNgFilter')
 
   # Organiza filtro de datas
-  .service "vtFilterService", ($http, $location, TransactionGroup) ->
+  .service "vtFilterService", ($http, $location, TransactionGroup, DefaultIntervalFilter) ->
     self = @
+    baseInterval = new DefaultIntervalFilter()
+
     getDateRangeFilter = (date) ->
       _d = "#{date.url}->"
       arr = []
       for range in date.range
-        arr.push("#{range.name}[#{range.interval[0]} TO #{range.interval[1]}]")
+        arr.push("#{range.name}#{range.interval}")
 
       _d += arr.join(';')
       return _d
@@ -41,36 +43,36 @@ angular.module('vtexNgFilter')
     self.activeFilters = list: []
 
     self.updateQueryString = ->
-      querystring = []
       query = {}
 
       for url, filter of self.filters
-        for option in filter.options
-          if option.active
-            query[url] = query[url] || []
-            query[url].push option.value
+        query[url] = query[url] || []
 
-        if query[url]
-          query[url] = query[url].join(' OR ')
+        for option in filter.options
+          if option.active then query[url].push option.value
+
+        if query[url].length then query[url] = query[url].join(' OR ') else query[url] = null 
 
       for querieName, querieValue of query
-        querystring.push "#{querieName}=#{querieValue}"
+        $location.search querieName, querieValue
 
-      querystring = querystring.join('&')
-
-      $location.search(querystring)
+    self.clearAllFilters = -> 
+      self.filters = _.each self.filters, (f) -> 
+        f.active = false
+        _.each f.options, (o) -> o.active = false
 
     self.setFilters = (endpoint, clear) ->
       locationSearch = $location.search()
       
       # Com resultado da API, preenche filtros com opcões disponíveis
-      self.getFacets(endpoint, self.filters, locationSearch).then (res) ->
-        locationActiveFilters = self.getActiveFilters(locationSearch, self.filters)
+      self.getAvailableFacets(endpoint, self.filters, locationSearch).then (res) ->
+        locationActiveFilters = self.getQueryStringFilters(locationSearch, self.filters)
 
         # Lista de filtros ativos 
         self.activeFilters.list = []
 
         _.each res, (categoryOptions, categoryName) -> 
+
           
           # Limpa opções antes de criar novas
           # Opção usada quando usuário atualiza a lista
@@ -82,10 +84,8 @@ angular.module('vtexNgFilter')
             # e altera o status dele para ativo
             if locationActiveFilters[categoryName]
               for activeFilterName in locationActiveFilters[categoryName]
-                status = false
-                if activeFilterName is filterName
-                  status = true
-                  break
+                status = if activeFilterName is filterName then activeFilterName else false
+                break if status
 
             # Instância os filtros dentro das categorias correspondentes
             if filterQuantity
@@ -94,14 +94,19 @@ angular.module('vtexNgFilter')
               self.activeFilters.list.push option if option.active
 
     # Retorna filtros ativos na querystring que sejam válidos
-    self.getActiveFilters = (search, filters) ->
+    self.getQueryStringFilters = (search, filters) ->
       obj = {}
       for k, v of search 
-        if filters[k] then obj[k] = v.split(' OR ') 
+        if filters[k]
+          # Caso seja uma data, retorna o name correspondete ao intervalo
+          if filters[k].type is 'date'
+            interval = _.find baseInterval, (i) -> i.interval is v
+            v = interval.name
+          obj[k] = v.split(' OR ') 
       return obj
 
     # Retorna lista de filtros
-    self.getFacets = (endpoint, filters, search) ->
+    self.getAvailableFacets = (endpoint, filters, search) ->      
       url = "#{endpoint}?#{ setFacetsQuery( filters ) }"
       # Caso tenha uma busca, adiciona ela a URL e trás o resultado filtrado por ela
       if transformSearch(search) then url += "&#{transformSearch(search)}"

@@ -6,25 +6,25 @@ angular.module("vtexNgFilter", []);(function() {
         return [
           {
             name: 'today',
-            interval: ['now-1d', 'now']
+            interval: '[now-1d TO now]'
           }, {
             name: 'yesterday',
-            interval: ['now-2d', 'now-1d']
+            interval: '[now-2d TO now-1d]'
           }, {
             name: 'thisWeek',
-            interval: ['now-1w', 'now']
+            interval: '[now-1w TO now]'
           }, {
             name: 'oneWeekAgo',
-            interval: ['now-2w', 'now-1w']
+            interval: '[now-2w TO now-1w]'
           }, {
             name: 'twoWeeksAgo',
-            interval: ['now-3w', 'now-2w']
+            interval: '[now-3w TO now-2w]'
           }, {
             name: 'thisMonth',
-            interval: ['now-30d', 'now']
+            interval: '[now-30d TO now]'
           }, {
             name: 'lastMonth',
-            interval: ['now-60d', 'now-30d']
+            interval: '[now-60d TO now-30d]'
           }
         ];
       }
@@ -72,7 +72,7 @@ angular.module("vtexNgFilter", []);(function() {
           for (_i = 0, _len = intervals.length; _i < _len; _i++) {
             range = intervals[_i];
             if (range.name === name) {
-              option.value = "" + range.interval[0] + " TO " + range.interval[1];
+              option.value = range.interval;
             }
           }
         }
@@ -128,9 +128,10 @@ angular.module("vtexNgFilter", []);(function() {
 }).call(this);
 
 (function() {
-  angular.module('vtexNgFilter').service("vtFilterService", function($http, $location, TransactionGroup) {
-    var getDateRangeFilter, self, setFacetsQuery, transformSearch;
+  angular.module('vtexNgFilter').service("vtFilterService", function($http, $location, TransactionGroup, DefaultIntervalFilter) {
+    var baseInterval, getDateRangeFilter, self, setFacetsQuery, transformSearch;
     self = this;
+    baseInterval = new DefaultIntervalFilter();
     getDateRangeFilter = function(date) {
       var arr, range, _d, _i, _len, _ref;
       _d = "" + date.url + "->";
@@ -138,7 +139,7 @@ angular.module("vtexNgFilter", []);(function() {
       _ref = date.range;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         range = _ref[_i];
-        arr.push("" + range.name + "[" + range.interval[0] + " TO " + range.interval[1] + "]");
+        arr.push("" + range.name + range.interval);
       }
       _d += arr.join(';');
       return _d;
@@ -174,37 +175,46 @@ angular.module("vtexNgFilter", []);(function() {
       list: []
     };
     self.updateQueryString = function() {
-      var filter, option, querieName, querieValue, query, querystring, url, _i, _len, _ref, _ref1;
-      querystring = [];
+      var filter, option, querieName, querieValue, query, url, _i, _len, _ref, _ref1, _results;
       query = {};
       _ref = self.filters;
       for (url in _ref) {
         filter = _ref[url];
+        query[url] = query[url] || [];
         _ref1 = filter.options;
         for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
           option = _ref1[_i];
           if (option.active) {
-            query[url] = query[url] || [];
             query[url].push(option.value);
           }
         }
-        if (query[url]) {
+        if (query[url].length) {
           query[url] = query[url].join(' OR ');
+        } else {
+          query[url] = null;
         }
       }
+      _results = [];
       for (querieName in query) {
         querieValue = query[querieName];
-        querystring.push("" + querieName + "=" + querieValue);
+        _results.push($location.search(querieName, querieValue));
       }
-      querystring = querystring.join('&');
-      return $location.search(querystring);
+      return _results;
+    };
+    self.clearAllFilters = function() {
+      return self.filters = _.each(self.filters, function(f) {
+        f.active = false;
+        return _.each(f.options, function(o) {
+          return o.active = false;
+        });
+      });
     };
     self.setFilters = function(endpoint, clear) {
       var locationSearch;
       locationSearch = $location.search();
-      return self.getFacets(endpoint, self.filters, locationSearch).then(function(res) {
+      return self.getAvailableFacets(endpoint, self.filters, locationSearch).then(function(res) {
         var locationActiveFilters;
-        locationActiveFilters = self.getActiveFilters(locationSearch, self.filters);
+        locationActiveFilters = self.getQueryStringFilters(locationSearch, self.filters);
         self.activeFilters.list = [];
         return _.each(res, function(categoryOptions, categoryName) {
           var activeFilterName, filterName, filterQuantity, option, status, _i, _len, _ref, _results;
@@ -218,9 +228,8 @@ angular.module("vtexNgFilter", []);(function() {
               _ref = locationActiveFilters[categoryName];
               for (_i = 0, _len = _ref.length; _i < _len; _i++) {
                 activeFilterName = _ref[_i];
-                status = false;
-                if (activeFilterName === filterName) {
-                  status = true;
+                status = activeFilterName === filterName ? activeFilterName : false;
+                if (status) {
                   break;
                 }
               }
@@ -240,18 +249,24 @@ angular.module("vtexNgFilter", []);(function() {
         });
       });
     };
-    self.getActiveFilters = function(search, filters) {
-      var k, obj, v;
+    self.getQueryStringFilters = function(search, filters) {
+      var interval, k, obj, v;
       obj = {};
       for (k in search) {
         v = search[k];
         if (filters[k]) {
+          if (filters[k].type === 'date') {
+            interval = _.find(baseInterval, function(i) {
+              return i.interval === v;
+            });
+            v = interval.name;
+          }
           obj[k] = v.split(' OR ');
         }
       }
       return obj;
     };
-    self.getFacets = function(endpoint, filters, search) {
+    self.getAvailableFacets = function(endpoint, filters, search) {
       var url;
       url = "" + endpoint + "?" + (setFacetsQuery(filters));
       if (transformSearch(search)) {
@@ -279,10 +294,10 @@ angular.module("vtexNgFilter").run(function($templateCache) {   'use strict';
 
 
   $templateCache.put('vtex-ng-filter.html',
-    "<div class=\"filters-block\"><h3><span translate=\"\">listing.filters</span> <button translate=\"\" class=\"btn btn-small btn-clean-filters\" ng-click=\"clearAll()\">listing.clearAll</button></h3><div ng-repeat=\"(name, group) in groups\"><h3 class=\"group-header\"><i class=\"fa\" ng-class=\"{ 'fa-credit-card': name === 'paymentCondition',\n" +
+    "<div class=\"filters-block\"><h3>{{ 'listing.filters' | translate }} <button translate=\"\" class=\"btn btn-small btn-clean-filters\" ng-if=\"activeFilters.list.length > 0\" ng-click=\"clearAllFilters()\">listing.clearAll</button></h3><div ng-repeat=\"(name, group) in groups\"><h3 class=\"group-header\"><i class=\"fa\" ng-class=\"{ 'fa-credit-card': name === 'paymentCondition',\n" +
     "                                 'fa-calendar-o': name === 'date', \n" +
     "                                   'fa-exchange': name === 'channel',\n" +
-    "                                    'fa-refresh': name === 'status', }\"></i> {{ ('filters.groups.' + name) | translate }}</h3><accordion close-others=\"true\"><accordion-group ng-repeat=\"filter in group\" ng-if=\"filter.options.length\"><accordion-heading>{{ 'filters.' + filter.name | translate }} <span class=\"label label-info pull-right\" ng-if=\"filter.active\"><i class=\"fa fa-dot-circle-o\"></i></span></accordion-heading><ul class=\"filter-list nav nav-pills nav-stacked\"><li ng-repeat=\"item in filter.options\"><div class=\"checkbox\" ng-class=\"{'checkbox': filter.type == 'multiple', 'radio': filter.type == 'date'}\"><label><input type=\"checkbox\" name=\"{{ ::filter.url }}\" ng-if=\"filter.type == 'multiple'\" ng-value=\"::item.value\" ng-model=\"::item.active\" ng-change=\"updateQueryString()\"><input type=\"radio\" name=\"{{ ::filter.url }}\" ng-if=\"filter.type == 'date'\" ng-value=\"::item.value\" ng-model=\"::item.active\" ng-change=\"updateQueryString()\"><!-- <input type=\"radio\" name=\"{{filter.name}}\" ng-model=\"filter.selectedItem\" ng-value=\"item\"> -->{{ ::item.name | translate }} <span class=\"text-muted\">({{ ::item.quantity }})</span></label></div></li></ul><button translate=\"\" class=\"btn\" ng-click=\"filter.clearSelection()\" ng-show=\"filter.type === 'single' && filter.selectedItem\">search.clear</button></accordion-group></accordion></div></div>"
+    "                                    'fa-refresh': name === 'status', }\"></i> {{ ('filters.groups.' + name) | translate }}</h3><accordion close-others=\"true\"><accordion-group ng-repeat=\"filter in group\" ng-if=\"filter.options.length\"><accordion-heading>{{ 'filters.' + filter.name | translate }} <span class=\"label label-info pull-right\" ng-if=\"filter.active\"><i class=\"fa fa-dot-circle-o\"></i></span></accordion-heading><ul class=\"filter-list nav nav-pills nav-stacked\"><li ng-repeat=\"item in filter.options\"><div ng-class=\"{'checkbox': filter.type == 'multiple', 'radio': filter.type == 'date'}\"><label><input type=\"checkbox\" name=\"{{ ::filter.url }}\" ng-if=\"filter.type == 'multiple'\" ng-value=\"::item.name\" ng-model=\"item.active\" ng-checked=\"item.active\" ng-change=\"updateQueryString()\"><input type=\"radio\" name=\"{{ ::filter.url }}\" ng-if=\"filter.type == 'date'\" ng-value=\"::item.name\" ng-model=\"item.active\" ng-change=\"updateQueryString()\">{{ ::item.name | translate }} <span class=\"text-muted\">({{ ::item.quantity }})</span></label></div></li></ul><button translate=\"\" class=\"btn\" ng-click=\"filter.clearSelection()\" ng-show=\"filter.type === 'single' && filter.selectedItem\">search.clear</button></accordion-group></accordion></div></div>"
   );
  });
 (function() {
@@ -301,6 +316,11 @@ angular.module("vtexNgFilter").run(function($templateCache) {   'use strict';
         $scope.groups = _.groupBy(filters, function(_f) {
           return _f.group;
         });
+        $scope.activeFilters = services.activeFilters;
+        $scope.clearAllFilters = function() {
+          services.clearAllFilters();
+          services.updateQueryString();
+        };
         $scope.updateQueryString = services.updateQueryString;
         services.setFilters(endpoint);
         return $scope.$on('$locationChangeSuccess', function() {
@@ -317,7 +337,6 @@ angular.module("vtexNgFilter").run(function($templateCache) {   'use strict';
         var services;
         services = vtFilterService;
         $scope.activeFilters = services.activeFilters;
-        $scope.updateQueryString = services.updateQueryString;
         return $scope.disableFilter = function(filter) {
           filter.active = false;
           return services.updateQueryString();

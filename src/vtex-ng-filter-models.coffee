@@ -3,13 +3,13 @@ angular.module('vtexNgFilter')
     class DefaultIntervalFilter
       constructor: ->
         return [ 
-          { name: 'today',       interval: ['now-1d',  'now'] }
-          { name: 'yesterday',   interval: ['now-2d',  'now-1d'] }
-          { name: 'thisWeek',    interval: ['now-1w',  'now'] } 
-          { name: 'oneWeekAgo',  interval: ['now-2w',  'now-1w'] } 
-          { name: 'twoWeeksAgo', interval: ['now-3w',  'now-2w'] }
-          { name: 'thisMonth',   interval: ['now-30d', 'now'] }
-          { name: 'lastMonth',   interval: ['now-60d', 'now-30d'] }]
+          { name: 'today',       interval: '[now-1d TO now]' }
+          { name: 'yesterday',   interval: '[now-2d TO now-1d]' }
+          { name: 'thisWeek',    interval: '[now-1w TO now]' } 
+          { name: 'oneWeekAgo',  interval: '[now-2w TO now-1w]' } 
+          { name: 'twoWeeksAgo', interval: '[now-3w TO now-2w]' }
+          { name: 'thisMonth',   interval: '[now-30d TO now]' }
+          { name: 'lastMonth',   interval: '[now-60d TO now-30d]' }]
 
   .factory 'TransactionGroup', (TransactionFilter) ->
     class TransactionGroup
@@ -60,8 +60,7 @@ angular.module('vtexNgFilter')
         else
           intervals = new DefaultIntervalFilter()
           for range in intervals
-            if range.name is name
-              option.value = "#{range.interval[0]} TO #{range.interval[1]}"
+            if range.name is name then option.value = range.interval
 
         return option
 

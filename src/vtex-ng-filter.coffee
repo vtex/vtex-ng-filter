@@ -11,6 +11,11 @@ angular.module('vtexNgFilter')
 
       # Group Filters by group to UI
       $scope.groups = _.groupBy filters, (_f) -> _f.group 
+      $scope.activeFilters = services.activeFilters
+      $scope.clearAllFilters = ->
+        services.clearAllFilters()
+        services.updateQueryString()
+        return
 
       $scope.updateQueryString = services.updateQueryString
 
@@ -28,8 +33,6 @@ angular.module('vtexNgFilter')
       services = vtFilterService 
 
       $scope.activeFilters = services.activeFilters
-      $scope.updateQueryString = services.updateQueryString
-
       $scope.disableFilter = (filter) ->
         filter.active = false
         services.updateQueryString()
