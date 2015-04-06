@@ -76,8 +76,7 @@ angular.module('vtexNgFilter')
           @range = new DefaultIntervalFilter()
         else @range = range
 
-        @clearOptions = ->
-          @options = []
+        @clearOptions = -> @options = []
 
         @setOptions = (name, quantity, status) ->
           _active = false

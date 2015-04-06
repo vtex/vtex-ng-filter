@@ -42,7 +42,7 @@ angular.module('vtexNgFilter')
 
     self.activeFilters = list: []
 
-    self.updateQueryString = ->
+    self.updateQueryString = () ->
       query = {}
 
       for url, filter of self.filters
@@ -53,6 +53,7 @@ angular.module('vtexNgFilter')
 
         if query[url].length then query[url] = query[url].join(' OR ') else query[url] = null 
 
+      console.log 'QUERY', query
       for querieName, querieValue of query
         $location.search querieName, querieValue
 
@@ -72,8 +73,6 @@ angular.module('vtexNgFilter')
         self.activeFilters.list = []
 
         _.each res, (categoryOptions, categoryName) -> 
-
-          
           # Limpa opções antes de criar novas
           # Opção usada quando usuário atualiza a lista
           # removendo filtros não mais existentes
@@ -84,14 +83,21 @@ angular.module('vtexNgFilter')
             # e altera o status dele para ativo
             if locationActiveFilters[categoryName]
               for activeFilterName in locationActiveFilters[categoryName]
-                status = if activeFilterName is filterName then activeFilterName else false
+                status = if activeFilterName is filterName then activeFilterName
                 break if status
 
             # Instância os filtros dentro das categorias correspondentes
-            if filterQuantity
-              option = self.filters[categoryName].setOptions(filterName, filterQuantity, status)
-              # Popula array de filtros ativos
-              self.activeFilters.list.push option if option.active
+            option = self.filters[categoryName].setOptions(filterName, filterQuantity, status)
+
+            # Transforma Value do option em booleano caso seja um checkbox
+            # necessário por conta do angular boboca
+            if self.filters[categoryName].type is "multiple"
+              console.log 'MULTIPLE'
+              option.active = !!option.active
+
+            console.log 'OPTION', option
+            # Popula array de filtros ativos
+            self.activeFilters.list.push option if option.active
 
     # Retorna filtros ativos na querystring que sejam válidos
     self.getQueryStringFilters = (search, filters) ->

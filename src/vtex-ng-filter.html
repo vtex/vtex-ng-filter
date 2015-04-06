@@ -15,21 +15,22 @@
 
     <accordion close-others="true">
       <accordion-group ng-repeat="filter in group" ng-if="filter.options.length">
-
+        
         <accordion-heading>
           {{ 'filters.' + filter.name | translate }}
           <span class="label label-info pull-right" ng-if="filter.active"><i class="fa fa-dot-circle-o"></i></span>
         </accordion-heading>
 
         <ul class="filter-list nav nav-pills nav-stacked">
-          <li ng-repeat="item in filter.options">
-            <div ng-class="{'checkbox': filter.type == 'multiple', 'radio': filter.type == 'date'}">
+          <li ng-repeat="option in filter.options">
+            <div ng-class="{'disabled': !option.quantity, 'checkbox': filter.type == 'multiple', 'radio': filter.type == 'date'}">
               <label>
-                <input type="checkbox" name="{{ ::filter.url }}" ng-if="filter.type == 'multiple'" ng-value="::item.name" ng-model="item.active" ng-checked="item.active" ng-change="updateQueryString()">
-                
-                <input type="radio" name="{{ ::filter.url }}" ng-if="filter.type == 'date'" ng-value="::item.name" ng-model="item.active" ng-change="updateQueryString()">
 
-                {{ ::item.name | translate }} <span class="text-muted">({{ ::item.quantity }})</span></span>
+                <input ng-disabled="!option.quantity" name="{{ ::filter.url }}" ng-change="updateQueryString()" ng-model="option.active" type="checkbox" ng-if="filter.type == 'multiple'" ng-checked="option.active">
+                
+                <input ng-disabled="!option.quantity" name="{{ ::filter.url }}" ng-change="updateQueryString()" ng-value="::option.name" ng-model="option.active" type="radio" ng-if="filter.type == 'date'">
+
+                {{ ::option.name | translate }} <span class="text-muted">({{ ::option.quantity }})</span></span>
               </label>
             </div>
           </li>

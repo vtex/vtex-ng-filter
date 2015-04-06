@@ -15,7 +15,7 @@ angular.module('vtexNgFilter')
       $scope.clearAllFilters = ->
         services.clearAllFilters()
         services.updateQueryString()
-        return
+        return true
 
       $scope.updateQueryString = services.updateQueryString
 
