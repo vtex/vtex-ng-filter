@@ -66,6 +66,8 @@ angular.module('vtexNgFilter')
 
     class TransactionFilter
       constructor: (name, url, type, group, range) ->
+        self = @
+
         @name = name
         @url = url
         @type = type
@@ -76,26 +78,30 @@ angular.module('vtexNgFilter')
           @range = new DefaultIntervalFilter()
         else @range = range
 
-        @clearOptions = -> @options = []
+        @clearOptions = -> 
+          self.options = _.map self.options, (o) ->
+            o.active = false
+            o.quantity = 0
+            return o
 
         @setOptions = (name, quantity, status) ->
+          updatedOption = false
           _active = false
-          for option in @options
-            # Checa se existe algum filtro ativo
-            if option.active then _active = true
-            
+          for option in self.options
+            _active = _active || option.active
             # Checa se já opção já existe e atualiza ela
             if name is option.name
               option.quantity = quantity
-              option.status = status
-              return option
-          
-          # Avisa que o filtro esta ativo caso o status 
-          # seja positivo ou exista um filtro ativo
-          @active = status || _active
+              option.active = status
+              updatedOption = option
 
-          # Caso não exista opção, instância uma nova
-          newOption = new FilterOption(name, quantity, @type, status)
-          @options.push newOption
+          self.active = status || _active
 
-          return newOption
+          if updatedOption 
+            return updatedOption
+          else
+            # Caso não exista opção, instância uma nova
+            newOption = new FilterOption(name, quantity, self.type, status)
+            self.options.push newOption
+
+            return newOption

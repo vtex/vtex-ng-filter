@@ -93,6 +93,8 @@ angular.module("vtexNgFilter", []);(function() {
     })();
     return TransactionFilter = (function() {
       function TransactionFilter(name, url, type, group, range) {
+        var self;
+        self = this;
         this.name = name;
         this.url = url;
         this.type = type;
@@ -105,27 +107,34 @@ angular.module("vtexNgFilter", []);(function() {
           this.range = range;
         }
         this.clearOptions = function() {
-          return this.options = [];
+          return self.options = _.map(self.options, function(o) {
+            o.active = false;
+            o.quantity = 0;
+            return o;
+          });
         };
         this.setOptions = function(name, quantity, status) {
-          var newOption, option, _active, _i, _len, _ref;
+          var newOption, option, updatedOption, _active, _i, _len, _ref;
+          updatedOption = false;
           _active = false;
-          _ref = this.options;
+          _ref = self.options;
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             option = _ref[_i];
-            if (option.active) {
-              _active = true;
-            }
+            _active = _active || option.active;
             if (name === option.name) {
               option.quantity = quantity;
-              option.status = status;
-              return option;
+              option.active = status;
+              updatedOption = option;
             }
           }
-          this.active = status || _active;
-          newOption = new FilterOption(name, quantity, this.type, status);
-          this.options.push(newOption);
-          return newOption;
+          self.active = status || _active;
+          if (updatedOption) {
+            return updatedOption;
+          } else {
+            newOption = new FilterOption(name, quantity, self.type, status);
+            self.options.push(newOption);
+            return newOption;
+          }
         };
       }
 
@@ -203,7 +212,6 @@ angular.module("vtexNgFilter", []);(function() {
           query[url] = null;
         }
       }
-      console.log('QUERY', query);
       _results = [];
       for (querieName in query) {
         querieValue = query[querieName];
@@ -219,18 +227,16 @@ angular.module("vtexNgFilter", []);(function() {
         });
       });
     };
-    self.setFilters = function(endpoint, clear) {
-      var locationSearch;
-      locationSearch = $location.search();
-      return self.getAvailableFacets(endpoint, self.filters, locationSearch).then(function(res) {
-        var locationActiveFilters;
-        locationActiveFilters = self.getQueryStringFilters(locationSearch, self.filters);
-        self.activeFilters.list = [];
+    self.setFilters = function(endpoint, filters, search) {
+      var locationActiveFilters;
+      locationActiveFilters = self.getQueryStringFilters(search, filters);
+      console.log('-------------');
+      console.log('ACTIVE FILTERS', locationActiveFilters);
+      self.activeFilters.list = [];
+      return self.getAvailableFacets(endpoint, filters, search).then(function(res) {
         return _.each(res, function(categoryOptions, categoryName) {
           var activeFilterName, filterName, filterQuantity, option, status, _i, _len, _ref, _results;
-          if (clear) {
-            self.filters[categoryName].clearOptions();
-          }
+          filters[categoryName].clearOptions();
           _results = [];
           for (filterName in categoryOptions) {
             filterQuantity = categoryOptions[filterName];
@@ -244,12 +250,10 @@ angular.module("vtexNgFilter", []);(function() {
                 }
               }
             }
-            option = self.filters[categoryName].setOptions(filterName, filterQuantity, status);
-            if (self.filters[categoryName].type === "multiple") {
-              console.log('MULTIPLE');
-              option.active = !!option.active;
+            if (filters[categoryName].type === "multiple") {
+              status = !!status;
             }
-            console.log('OPTION', option);
+            option = filters[categoryName].setOptions(filterName, filterQuantity, status);
             if (option.active) {
               _results.push(self.activeFilters.list.push(option));
             } else {
@@ -308,7 +312,9 @@ angular.module("vtexNgFilter").run(function($templateCache) {   'use strict';
     "<div class=\"filters-block\"><h3>{{ 'listing.filters' | translate }} <button translate=\"\" class=\"btn btn-small btn-clean-filters\" ng-if=\"activeFilters.list.length > 0\" ng-click=\"clearAllFilters()\">listing.clearAll</button></h3><div ng-repeat=\"(name, group) in groups\"><h3 class=\"group-header\"><i class=\"fa\" ng-class=\"{ 'fa-credit-card': name === 'paymentCondition',\n" +
     "                                 'fa-calendar-o': name === 'date', \n" +
     "                                   'fa-exchange': name === 'channel',\n" +
-    "                                    'fa-refresh': name === 'status', }\"></i> {{ ('filters.groups.' + name) | translate }}</h3><accordion close-others=\"true\"><accordion-group ng-repeat=\"filter in group\" ng-if=\"filter.options.length\"><accordion-heading>{{ 'filters.' + filter.name | translate }} <span class=\"label label-info pull-right\" ng-if=\"filter.active\"><i class=\"fa fa-dot-circle-o\"></i></span></accordion-heading><ul class=\"filter-list nav nav-pills nav-stacked\"><li ng-repeat=\"option in filter.options\"><div ng-class=\"{'disabled': !option.quantity, 'checkbox': filter.type == 'multiple', 'radio': filter.type == 'date'}\"><label><input ng-disabled=\"!option.quantity\" name=\"{{ ::filter.url }}\" ng-change=\"updateQueryString()\" ng-model=\"option.active\" type=\"checkbox\" ng-if=\"filter.type == 'multiple'\" ng-checked=\"option.active\"><input ng-disabled=\"!option.quantity\" name=\"{{ ::filter.url }}\" ng-change=\"updateQueryString()\" ng-value=\"::option.name\" ng-model=\"option.active\" type=\"radio\" ng-if=\"filter.type == 'date'\">{{ ::option.name | translate }} <span class=\"text-muted\">({{ ::option.quantity }})</span></label></div></li></ul><button translate=\"\" class=\"btn\" ng-click=\"filter.clearSelection()\" ng-show=\"filter.type === 'single' && filter.selectedItem\">search.clear</button></accordion-group></accordion></div></div>"
+    "                                    'fa-refresh': name === 'status', }\"></i> {{ ('filters.groups.' + name) | translate }}</h3><accordion close-others=\"true\"><accordion-group ng-repeat=\"filter in group\" ng-if=\"filter.options.length\"><accordion-heading>{{ 'filters.' + filter.name | translate }} <span class=\"label label-info pull-right\" ng-if=\"filter.active\"><i class=\"fa fa-dot-circle-o\"></i></span></accordion-heading><ul class=\"filter-list nav nav-pills nav-stacked\"><li ng-repeat=\"option in filter.options\"><!-- <div>\n" +
+    "              <pre>{{ option | json }}</pre>\n" +
+    "            </div> --><div ng-class=\"{'disabled': !option.quantity, 'checkbox': filter.type == 'multiple', 'radio': filter.type == 'date'}\"><label><input ng-disabled=\"!option.quantity\" name=\"{{ ::filter.url }}\" ng-change=\"updateQueryString()\" ng-model=\"option.active\" type=\"checkbox\" ng-if=\"filter.type == 'multiple'\" ng-checked=\"option.active\"><input ng-disabled=\"!option.quantity\" name=\"{{ ::filter.url }}\" ng-change=\"updateQueryString()\" ng-value=\"::option.name\" ng-model=\"option.active\" type=\"radio\" ng-if=\"filter.type == 'date'\">{{ ::option.name | translate }} <span class=\"text-muted\">({{ option.quantity }})</span></label></div></li></ul><button translate=\"\" class=\"btn\" ng-click=\"filter.clearSelection()\" ng-show=\"filter.type === 'single' && filter.selectedItem\">search.clear</button></accordion-group></accordion></div></div>"
   );
  });
 (function() {
@@ -334,9 +340,15 @@ angular.module("vtexNgFilter").run(function($templateCache) {   'use strict';
           return true;
         };
         $scope.updateQueryString = services.updateQueryString;
-        services.setFilters(endpoint);
+        services.setFilters(endpoint, filters).then(function(data) {
+          var search;
+          search = $location.search();
+          if (Object.keys(search).length) {
+            return services.setFilters(endpoint, filters, search);
+          }
+        });
         return $scope.$on('$locationChangeSuccess', function() {
-          return services.setFilters(endpoint, true);
+          return services.setFilters(endpoint, filters, $location.search());
         });
       }
     };

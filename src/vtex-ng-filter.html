@@ -23,6 +23,9 @@
 
         <ul class="filter-list nav nav-pills nav-stacked">
           <li ng-repeat="option in filter.options">
+            <!-- <div>
+              <pre>{{ option | json }}</pre>
+            </div> -->
             <div ng-class="{'disabled': !option.quantity, 'checkbox': filter.type == 'multiple', 'radio': filter.type == 'date'}">
               <label>
 
@@ -30,7 +33,7 @@
                 
                 <input ng-disabled="!option.quantity" name="{{ ::filter.url }}" ng-change="updateQueryString()" ng-value="::option.name" ng-model="option.active" type="radio" ng-if="filter.type == 'date'">
 
-                {{ ::option.name | translate }} <span class="text-muted">({{ ::option.quantity }})</span></span>
+                {{ ::option.name | translate }} <span class="text-muted">({{ option.quantity }})</span></span>
               </label>
             </div>
           </li>

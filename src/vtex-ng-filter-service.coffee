@@ -53,7 +53,6 @@ angular.module('vtexNgFilter')
 
         if query[url].length then query[url] = query[url].join(' OR ') else query[url] = null 
 
-      console.log 'QUERY', query
       for querieName, querieValue of query
         $location.search querieName, querieValue
 
@@ -62,21 +61,21 @@ angular.module('vtexNgFilter')
         f.active = false
         _.each f.options, (o) -> o.active = false
 
-    self.setFilters = (endpoint, clear) ->
-      locationSearch = $location.search()
-      
+    self.setFilters = (endpoint, filters, search) ->
+      locationActiveFilters = self.getQueryStringFilters(search, filters)
+            
+      console.log '-------------'
+      console.log 'ACTIVE FILTERS', locationActiveFilters
+      # Lista de filtros ativos 
+      self.activeFilters.list = []
+
       # Com resultado da API, preenche filtros com opcões disponíveis
-      self.getAvailableFacets(endpoint, self.filters, locationSearch).then (res) ->
-        locationActiveFilters = self.getQueryStringFilters(locationSearch, self.filters)
-
-        # Lista de filtros ativos 
-        self.activeFilters.list = []
-
+      self.getAvailableFacets(endpoint, filters, search).then (res) ->
         _.each res, (categoryOptions, categoryName) -> 
           # Limpa opções antes de criar novas
           # Opção usada quando usuário atualiza a lista
           # removendo filtros não mais existentes
-          if clear then self.filters[categoryName].clearOptions()
+          filters[categoryName].clearOptions()
           
           for filterName, filterQuantity of categoryOptions
             # Verifica se o filtro esta presente na querystring 
@@ -86,16 +85,13 @@ angular.module('vtexNgFilter')
                 status = if activeFilterName is filterName then activeFilterName
                 break if status
 
-            # Instância os filtros dentro das categorias correspondentes
-            option = self.filters[categoryName].setOptions(filterName, filterQuantity, status)
-
             # Transforma Value do option em booleano caso seja um checkbox
             # necessário por conta do angular boboca
-            if self.filters[categoryName].type is "multiple"
-              console.log 'MULTIPLE'
-              option.active = !!option.active
+            if filters[categoryName].type is "multiple" then status = !!status
 
-            console.log 'OPTION', option
+            # Instância os filtros dentro das categorias correspondentes
+            option = filters[categoryName].setOptions(filterName, filterQuantity, status)
+
             # Popula array de filtros ativos
             self.activeFilters.list.push option if option.active
 
@@ -104,15 +100,15 @@ angular.module('vtexNgFilter')
       obj = {}
       for k, v of search 
         if filters[k]
-          # Caso seja uma data, retorna o name correspondete ao intervalo
+          # Caso seja uma data, retorna o name correspondente ao intervalo
           if filters[k].type is 'date'
             interval = _.find baseInterval, (i) -> i.interval is v
             v = interval.name
-          obj[k] = v.split(' OR ') 
+          obj[k] = v.split(' OR ')
       return obj
 
     # Retorna lista de filtros
-    self.getAvailableFacets = (endpoint, filters, search) ->      
+    self.getAvailableFacets = (endpoint, filters, search) ->
       url = "#{endpoint}?#{ setFacetsQuery( filters ) }"
       # Caso tenha uma busca, adiciona ela a URL e trás o resultado filtrado por ela
       if transformSearch(search) then url += "&#{transformSearch(search)}"

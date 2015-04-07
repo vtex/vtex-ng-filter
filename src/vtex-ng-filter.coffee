@@ -20,10 +20,14 @@ angular.module('vtexNgFilter')
       $scope.updateQueryString = services.updateQueryString
 
       # Start directive
-      services.setFilters(endpoint)
+      services.setFilters(endpoint, filters).then (data) ->
+        # Checa se existe alguma busca existente 
+        # e pede novamente os filtros com parametros de busca
+        search = $location.search()
+        if Object.keys(search).length then services.setFilters(endpoint, filters, search)
 
       # If url changes, update filters to match
-      $scope.$on '$locationChangeSuccess', -> services.setFilters(endpoint, true)
+      $scope.$on '$locationChangeSuccess', -> services.setFilters(endpoint, filters, $location.search())
 
   .directive "vtFilterSummary", (vtFilterService) ->
     restrict: 'E'
