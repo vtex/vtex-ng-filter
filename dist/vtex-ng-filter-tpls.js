@@ -1,8 +1,8 @@
-/*! vtex-ng-filter - v0.3.1 - 2015-03-17 */
+/*! vtex-ng-filter - v0.3.1 - 2015-04-22 */
 (function() {
   var config, moreOptionsShowFilters, openFilters,
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+    bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   config = {
     path: ''
@@ -16,13 +16,13 @@
     var Filter;
     return Filter = (function() {
       function Filter(filter) {
-        this.setGroup = __bind(this.setGroup, this);
-        this.update = __bind(this.update, this);
-        this.clearSelection = __bind(this.clearSelection, this);
-        this.getSelectedItemsURL = __bind(this.getSelectedItemsURL, this);
-        this.getSelectedItems = __bind(this.getSelectedItems, this);
-        this.setSelectedItems = __bind(this.setSelectedItems, this);
-        this.updateSelectedCount = __bind(this.updateSelectedCount, this);
+        this.setGroup = bind(this.setGroup, this);
+        this.update = bind(this.update, this);
+        this.clearSelection = bind(this.clearSelection, this);
+        this.getSelectedItemsURL = bind(this.getSelectedItemsURL, this);
+        this.getSelectedItems = bind(this.getSelectedItems, this);
+        this.setSelectedItems = bind(this.setSelectedItems, this);
+        this.updateSelectedCount = bind(this.updateSelectedCount, this);
         var dateGetterSetter, k, v;
         for (k in filter) {
           v = filter[k];
@@ -34,11 +34,11 @@
           this.dateObjectCache = {};
           dateGetterSetter = (function(_this) {
             return function(date, propertyName) {
-              var _ref;
+              var ref;
               if (angular.isDefined(date)) {
                 return _this[propertyName] = date;
               } else {
-                return (_ref = _this[propertyName]) != null ? _ref : false;
+                return (ref = _this[propertyName]) != null ? ref : false;
               }
             };
           })(this);
@@ -83,9 +83,9 @@
                 } else if (moment(_this.date.from).isSame(moment().startOf('month').toDate()) && moment(_this.date.to).isSame(moment().endOf('month').toDate())) {
                   return $filter('translate')('listing.dates.currentMonth');
                 } else if (DateTransform.startOfDay(_this.date.to).toISOString() === DateTransform.startOfDay(new Date()).toISOString()) {
-                  return "" + (moment(_this.date.from).add('hours', moment().hours()).fromNow()) + " " + ($filter('translate')('listing.dates.untilToday'));
+                  return (moment(_this.date.from).add('hours', moment().hours()).fromNow()) + " " + ($filter('translate')('listing.dates.untilToday'));
                 } else {
-                  return "" + (moment(_this.date.from).add('hours', moment().hours()).fromNow()) + " " + ($filter('translate')('listing.dates.until')) + " " + (moment(_this.date.to).add('hours', moment().hours()).fromNow());
+                  return (moment(_this.date.from).add('hours', moment().hours()).fromNow()) + " " + ($filter('translate')('listing.dates.until')) + " " + (moment(_this.date.to).add('hours', moment().hours()).fromNow());
                 }
               } else {
                 return $filter('translate')('listing.dates.noRangeSelected');
@@ -97,13 +97,13 @@
       }
 
       Filter.prototype.updateSelectedCount = function() {
-        var i, item, lastSelectedItemIndex, selectedItemIndex, _i, _j, _len, _len1, _ref, _ref1;
+        var i, item, j, l, lastSelectedItemIndex, len, len1, ref, ref1, selectedItemIndex;
         if (this.type === 'date') {
           this.selectedCount = this.date.from && this.date.to ? 1 : 0;
         } else if (this.type === 'multiple') {
-          _ref = this.items;
-          for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
-            item = _ref[i];
+          ref = this.items;
+          for (i = j = 0, len = ref.length; j < len; i = ++j) {
+            item = ref[i];
             if (item.selected) {
               lastSelectedItemIndex = i;
             }
@@ -115,9 +115,9 @@
             return i.selected;
           })).length;
         } else if (this.type === 'single') {
-          _ref1 = this.items;
-          for (i = _j = 0, _len1 = _ref1.length; _j < _len1; i = ++_j) {
-            item = _ref1[i];
+          ref1 = this.items;
+          for (i = l = 0, len1 = ref1.length; l < len1; i = ++l) {
+            item = ref1[i];
             if (item === this.selectedItem) {
               selectedItemIndex = i;
             }
@@ -134,7 +134,7 @@
       };
 
       Filter.prototype.setSelectedItems = function(itemsAsSearchParameter) {
-        var date, item, items, _i, _len, _ref, _ref1;
+        var date, item, items, j, len, ref, ref1;
         if (this.type === 'date') {
           items = itemsAsSearchParameter.replace(this.name + ':[', '').replace(']', '').split(' TO ');
           date = {
@@ -143,10 +143,10 @@
           };
           this.date = date;
         } else if (this.type === 'multiple') {
-          _ref = this.items;
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            item = _ref[_i];
-            item.selected = (_ref1 = item.url, __indexOf.call(itemsAsSearchParameter.split(','), _ref1) >= 0);
+          ref = this.items;
+          for (j = 0, len = ref.length; j < len; j++) {
+            item = ref[j];
+            item.selected = (ref1 = item.url, indexOf.call(itemsAsSearchParameter.split(','), ref1) >= 0);
           }
         } else if (this.type === 'single') {
           this.selectedItem = _.find(this.items, function(i) {
@@ -157,11 +157,11 @@
       };
 
       Filter.prototype.getSelectedItems = function() {
-        var item, url, _base, _i, _len, _ref, _results;
+        var base, item, j, len, ref, results, url;
         if (this.type === 'date') {
           if (this.date.from && this.date.to) {
             url = this.name + ":[" + DateTransform.startOfDay(this.date.from).toISOString() + " TO " + DateTransform.endOfDay(this.date.to).toISOString() + "]";
-            (_base = this.dateObjectCache)[url] || (_base[url] = {
+            (base = this.dateObjectCache)[url] || (base[url] = {
               name: this.dateRangeLabel(),
               url: url
             });
@@ -170,15 +170,15 @@
             return [];
           }
         } else if (this.type === 'multiple') {
-          _ref = this.items;
-          _results = [];
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            item = _ref[_i];
+          ref = this.items;
+          results = [];
+          for (j = 0, len = ref.length; j < len; j++) {
+            item = ref[j];
             if (item.selected) {
-              _results.push(item);
+              results.push(item);
             }
           }
-          return _results;
+          return results;
         } else if (this.type === 'single') {
           if (this.selectedItem) {
             return [this.selectedItem];
@@ -201,13 +201,13 @@
       };
 
       Filter.prototype.clearItem = function(itemObject) {
-        var item, _i, _len, _ref, _ref1;
-        if ((_ref = this.type) === 'date' || _ref === 'single') {
+        var item, j, len, ref, ref1;
+        if ((ref = this.type) === 'date' || ref === 'single') {
           return this.clearSelection();
         } else if (this.type === 'multiple') {
-          _ref1 = this.items;
-          for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-            item = _ref1[_i];
+          ref1 = this.items;
+          for (j = 0, len = ref1.length; j < len; j++) {
+            item = ref1[j];
             if (itemObject.url === item.url) {
               item.selected = false;
             }
@@ -217,13 +217,13 @@
       };
 
       Filter.prototype.clearSelection = function() {
-        var item, _i, _len, _ref;
+        var item, j, len, ref;
         if (this.type === 'date') {
           this.date = {};
         } else if (this.type === 'multiple') {
-          _ref = this.items;
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            item = _ref[_i];
+          ref = this.items;
+          for (j = 0, len = ref.length; j < len; j++) {
+            item = ref[j];
             item.selected = false;
           }
         } else if (this.type === 'single') {
@@ -233,33 +233,33 @@
       };
 
       Filter.prototype.update = function(filterJSON) {
-        var item, updatedItem, _i, _len, _ref, _ref1, _results;
+        var item, j, len, ref, ref1, results, updatedItem;
         if (filterJSON == null) {
           filterJSON = this;
         }
-        _ref = this.items;
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          item = _ref[_i];
+        ref = this.items;
+        results = [];
+        for (j = 0, len = ref.length; j < len; j++) {
+          item = ref[j];
           updatedItem = _.find(filterJSON.items, function(i) {
             return i.name === item.name;
           });
-          if (updatedItem && ((_ref1 = this.getSelectedItems()) != null ? _ref1.length : void 0) === 0) {
-            _results.push(item.quantity = updatedItem.quantity);
+          if (updatedItem && ((ref1 = this.getSelectedItems()) != null ? ref1.length : void 0) === 0) {
+            results.push(item.quantity = updatedItem.quantity);
           } else {
-            _results.push(item.quantity = 0);
+            results.push(item.quantity = 0);
           }
         }
-        return _results;
+        return results;
       };
 
       Filter.prototype.setGroup = function() {
-        var _ref, _ref1, _ref2;
-        if ((_ref = this.name) === 'creationDate' || _ref === 'authorizedDate' || _ref === 'ShippingEstimatedDate') {
+        var ref, ref1, ref2;
+        if ((ref = this.name) === 'creationDate' || ref === 'authorizedDate' || ref === 'ShippingEstimatedDate') {
           return this.groupName = 'date';
-        } else if ((_ref1 = this.name) === 'SalesChannelName' || _ref1 === 'CallCenterOperatorName' || _ref1 === 'SellerNames' || _ref1 === 'UtmSource') {
+        } else if ((ref1 = this.name) === 'SalesChannelName' || ref1 === 'CallCenterOperatorName' || ref1 === 'SellerNames' || ref1 === 'UtmSource' || ref1 === 'affiliateId') {
           return this.groupName = 'channel';
-        } else if ((_ref2 = this.name) === 'StatusDescription' || _ref2 === 'orderSituation' || _ref2 === 'errorStatus') {
+        } else if ((ref2 = this.name) === 'StatusDescription' || ref2 === 'orderSituation' || ref2 === 'errorStatus') {
           return this.groupName = 'status';
         } else {
           return this.groupName = 'other';
@@ -301,10 +301,10 @@
       },
       templateUrl: config.path ? config.path + '/vtex-ng-filter.html' : 'vtex-ng-filter.html',
       link: function($scope) {
-        var filter, filters, updateFiltersOnLocationSearch, _i, _len;
+        var filter, filters, j, len, updateFiltersOnLocationSearch;
         filters = _.flatten($scope.filters);
-        for (_i = 0, _len = filters.length; _i < _len; _i++) {
-          filter = filters[_i];
+        for (j = 0, len = filters.length; j < len; j++) {
+          filter = filters[j];
           if (!openFilters.hasOwnProperty(filter.rangeUrlTemplate)) {
             openFilters[filter.rangeUrlTemplate] = false;
           }
@@ -315,13 +315,13 @@
         $scope.openFilters = openFilters;
         $scope.moreOptionsShowFilters = moreOptionsShowFilters;
         $scope.clearAll = function() {
-          var _j, _len1, _results;
-          _results = [];
-          for (_j = 0, _len1 = filters.length; _j < _len1; _j++) {
-            filter = filters[_j];
-            _results.push(filter.clearSelection());
+          var l, len1, results;
+          results = [];
+          for (l = 0, len1 = filters.length; l < len1; l++) {
+            filter = filters[l];
+            results.push(filter.clearSelection());
           }
-          return _results;
+          return results;
         };
         $scope.filters.getAppliedFilters = function() {
           return _.filter(filters, function(f) {
@@ -334,19 +334,19 @@
           }).flatten().value();
         };
         updateFiltersOnLocationSearch = function() {
-          var searchQuery, _j, _len1, _results;
-          _results = [];
-          for (_j = 0, _len1 = filters.length; _j < _len1; _j++) {
-            filter = filters[_j];
+          var l, len1, results, searchQuery;
+          results = [];
+          for (l = 0, len1 = filters.length; l < len1; l++) {
+            filter = filters[l];
             searchQuery = $location.search()[filter.rangeUrlTemplate];
             if (searchQuery) {
               filter.setSelectedItems(searchQuery);
-              _results.push(filter.update());
+              results.push(filter.update());
             } else {
-              _results.push(filter.clearSelection());
+              results.push(filter.clearSelection());
             }
           }
-          return _results;
+          return results;
         };
         updateFiltersOnLocationSearch();
         $scope.$on('$locationChangeSuccess', function() {
@@ -366,7 +366,7 @@
           return $scope.$watch((function(scope) {
             return _.flatten(scope.filters)[i].getSelectedItemsURL();
           }), function(newValue, oldValue) {
-            var _j, _len1;
+            var l, len1;
             if (newValue === oldValue) {
               return;
             }
@@ -377,8 +377,8 @@
                 $rootScope.$digest();
               }
             }
-            for (_j = 0, _len1 = filters.length; _j < _len1; _j++) {
-              filter = filters[_j];
+            for (l = 0, len1 = filters.length; l < len1; l++) {
+              filter = filters[l];
               $location.search(filter.rangeUrlTemplate, filter.getSelectedItemsURL());
             }
             return $location.search('page', 1);
