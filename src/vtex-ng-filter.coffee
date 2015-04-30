@@ -132,6 +132,7 @@ angular.module('vtexNgFilter', [])
             item.quantity = 0
 
       setGroup: =>
+        return @groupName if @groupName
         if @name in ['creationDate', 'authorizedDate', 'ShippingEstimatedDate']
           @groupName = 'date'
         else if @name in ['SalesChannelName', 'CallCenterOperatorName', 'SellerNames', 'UtmSource', 'affiliateId']
