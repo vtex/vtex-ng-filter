@@ -1,4 +1,4 @@
-/*! vtex-ng-filter - v0.3.1 - 2015-04-22 */
+/*! vtex-ng-filter - v0.3.1 - 2015-05-05 */
 (function() {
   var config, moreOptionsShowFilters, openFilters,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -255,7 +255,7 @@
 
       Filter.prototype.setGroup = function() {
         var ref, ref1, ref2;
-        if ((ref = this.name) === 'creationDate' || ref === 'authorizedDate' || ref === 'ShippingEstimatedDate') {
+        if ((ref = this.name) === 'creationDate' || ref === 'authorizedDate' || ref === 'ShippingEstimatedDate' || ref === 'invoicedDate') {
           return this.groupName = 'date';
         } else if ((ref1 = this.name) === 'SalesChannelName' || ref1 === 'CallCenterOperatorName' || ref1 === 'SellerNames' || ref1 === 'UtmSource' || ref1 === 'affiliateId') {
           return this.groupName = 'channel';
