@@ -69,7 +69,7 @@
         </div>
         <!-- /DATE -->
 
-        <div ng-if="filter.type !== 'date'">
+        <div ng-if="filter.type === 'multiple' || filter.type === 'single'">
           <ul class="filter-list nav nav-pills nav-stacked">
             <!-- If 5 items, show all 5.
 								 If 6 items, show all 6.
@@ -96,6 +96,13 @@
           <button translate class="btn"
                   ng-click="filter.clearSelection()"
                   ng-show="filter.type === 'single' && filter.selectedItem">search.clear</button>
+        </div>
+
+        <div ng-if="filter.type === 'typeahead'">
+          <div class="row">
+            <input type="hidden" style="width: 430px; left: 30px;"
+                   ui-select2="filter.queryConfiguration" ng-model="filter.items">
+          </div>
         </div>
 
       </accordion-group>

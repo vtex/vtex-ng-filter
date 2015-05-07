@@ -5,7 +5,7 @@ openFilters = {}
 moreOptionsShowFilters = {}
 
 angular.module('vtexNgFilter', [])
-  .factory "Filter", (DateTransform, $filter) ->
+  .factory "Filter", ($filter, $http, DateTransform) ->
     class Filter
       constructor: (filter) ->
         for k, v of filter
@@ -101,6 +101,8 @@ angular.module('vtexNgFilter', [])
           item for item in @items when item.selected
         else if @type is 'single'
           if @selectedItem then [@selectedItem] else []
+        else if @type is 'typeahead'
+          @items or []
 
       getSelectedItemsURL: =>
         selectedArray = _.map @getSelectedItems(), (i) -> i.url
