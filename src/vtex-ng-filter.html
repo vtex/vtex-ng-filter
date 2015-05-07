@@ -20,7 +20,7 @@
 
         <accordion-heading>
           <span>{{ 'filters.' + filter.rangeUrlTemplate | translate }}</span>
-          <span ng-if="filter.getSelectedItems().length" class="badge pull-right">
+          <span ng-if="filter.getSelectedItems().length" class="pricing-filter-count-badge">
             <span ng-if="filter.type === 'multiple' && filter.selectedCount">{{ filter.selectedCount }}</span>
             <span ng-if="filter.type !== 'multiple'" class="fa fa-dot-circle-o"></span>
           </span>
