@@ -48,6 +48,11 @@ module.exports = (grunt) ->
         src: ['vtex-ng-filter-tpls.js']
         dest: '../vcs.pci-gateway-ui/src/lib/vtex-ng-filter/'
         expand: true
+      rnb:
+        cwd: 'dist/'
+        src: ['vtex-ng-filter-tpls.js']
+        dest: '../vcs.rates-and-benefits-ui/src/lib/vtex-ng-filter/'
+        expand: true
 
     watch:
       oms:
@@ -56,6 +61,9 @@ module.exports = (grunt) ->
       pci:
         files: ['src/**']
         tasks: ['default', 'copy:pci']
+      rnb:
+        files: ['src/**']
+        tasks: ['default', 'copy:rnb']
 
     karma:
       unit:
@@ -66,3 +74,4 @@ module.exports = (grunt) ->
   grunt.registerTask 'default', ['clean', 'coffee', 'ngtemplates', 'concat:main', 'uglify']
   grunt.registerTask 'oms', ['default', 'copy:oms', 'watch:oms']
   grunt.registerTask 'pci', ['default', 'copy:pci', 'watch:pci']
+  grunt.registerTask 'rnb', ['default', 'copy:rnb', 'watch:rnb']
