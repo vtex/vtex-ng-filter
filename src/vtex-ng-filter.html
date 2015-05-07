@@ -6,7 +6,7 @@
             ga-event ga-label="filter-clear-all">listing.clearAll</button>
   </h3>
 
-  <div ng-repeat="group in filters">
+  <div ng-repeat="group in filters" ng-if="group.length">
     <h3 class="group-header">
       <i ng-class="{ 'icon-calendar-empty':  group[0].groupName === 'date',
                         'icon-exchange': group[0].groupName === 'channel',
@@ -20,7 +20,7 @@
 
         <accordion-heading>
           <span>{{ 'filters.' + filter.rangeUrlTemplate | translate }}</span>
-          <span ng-if="filter.getSelectedItems().length" class="badge badge-lightblue pull-right">
+          <span ng-if="filter.getSelectedItems().length" class="badge pull-right">
             <span ng-if="filter.type === 'multiple' && filter.selectedCount">{{ filter.selectedCount }}</span>
             <span ng-if="filter.type !== 'multiple'" class="fa fa-dot-circle-o"></span>
           </span>

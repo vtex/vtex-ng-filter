@@ -11,7 +11,7 @@ angular.module('vtexNgFilter', [])
         for k, v of filter
           @[k] = v
 
-        @setGroup()
+        @setGroup() unless @groupName?
 
         @selectedCount = 0
 
@@ -169,6 +169,7 @@ angular.module('vtexNgFilter', [])
       templateUrl: if config.path then config.path + '/vtex-ng-filter.html' else 'vtex-ng-filter.html'
       link: ($scope) ->
         filters = _.flatten $scope.filters
+        console.log filters
         # Initialize open filters if needed
         for filter in filters
           unless openFilters.hasOwnProperty(filter.rangeUrlTemplate)
