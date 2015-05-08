@@ -14,6 +14,7 @@ angular.module('vtexNgFilter', [])
         @setGroup() unless @groupName?
 
         @selectedCount = 0
+        @selectedItem = [] if @type is 'typeahead'
 
         if @type is 'date'
           @dateObjectCache = {}
@@ -68,6 +69,8 @@ angular.module('vtexNgFilter', [])
           (selectedItemIndex = i if item is @selectedItem) for item, i in @items
           moreOptionsShowFilters[@rangeUrlTemplate] = true if selectedItemIndex > 4
           @selectedCount = if @selectedItem then 1 else 0
+        else if @type is 'typeahead'
+          @selectedCount = @selectedItem?.length ? 0
 
         openFilters[@rangeUrlTemplate] = true if @selectedCount > 0
         @selectedCountLabel = if @selectedCount then "(#{@selectedCount})" else ""
@@ -84,6 +87,10 @@ angular.module('vtexNgFilter', [])
             item.selected = item.url in itemsAsSearchParameter.split(',')
         else if @type is 'single'
           @selectedItem = _.find @items, (i) -> i.url is itemsAsSearchParameter
+        else if @type is 'typeahead'
+          for param in itemsAsSearchParameter.split ','
+            splitParam = param.split '['
+            @selectedItem.push id: splitParam[0], text: splitParam[1].replace /\]/g, ''
 
         @updateSelectedCount()
 
@@ -95,17 +102,18 @@ angular.module('vtexNgFilter', [])
               name: @dateRangeLabel()
               url: url
             [@dateObjectCache[url]]
-          else
-            []
+          else []
         else if @type is 'multiple'
           item for item in @items when item.selected
         else if @type is 'single'
           if @selectedItem then [@selectedItem] else []
         else if @type is 'typeahead'
-          @items or []
+          @selectedItem or []
 
       getSelectedItemsURL: =>
-        selectedArray = _.map @getSelectedItems(), (i) -> i.url
+        if @type is 'typeahead'
+          selectedArray = _.map @getSelectedItems(), (i) -> i.id + "[#{ i.text }]"
+        else selectedArray = _.map @getSelectedItems(), (i) -> i.url
         if selectedArray.length > 0 then selectedArray.join(',') else null
 
       clearItem: (itemObject) ->
@@ -114,6 +122,8 @@ angular.module('vtexNgFilter', [])
         else if @type is 'multiple'
           item.selected = false for item in @items when itemObject.url is item.url
           @updateSelectedCount()
+        else if @type is 'typeahead'
+          @selectedItem = []
 
       clearSelection: =>
         if @type is 'date'
@@ -122,16 +132,18 @@ angular.module('vtexNgFilter', [])
           item.selected = false for item in @items
         else if @type is 'single'
           @selectedItem = null
+        else if @type is 'typeahead'
+          @selectedItem = []
 
         @updateSelectedCount()
 
       update: (filterJSON = @) =>
+        return if not @items?.length
         for item in @items
           updatedItem = _.find filterJSON.items, (i) -> i.name is item.name
           if updatedItem and @getSelectedItems()?.length is 0
             item.quantity = updatedItem.quantity
-          else
-            item.quantity = 0
+          else item.quantity = 0
 
       setGroup: =>
         if @name in ['creationDate', 'authorizedDate', 'ShippingEstimatedDate', 'invoicedDate']
@@ -140,8 +152,7 @@ angular.module('vtexNgFilter', [])
           @groupName = 'channel'
         else if @name in ['StatusDescription', 'orderSituation', 'errorStatus']
           @groupName = 'status'
-        else
-          @groupName = 'other'
+        else @groupName = 'other'
 
   # To use instead of moment's due to weird date bug
   .service 'DateTransform', ->

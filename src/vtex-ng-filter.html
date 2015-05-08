@@ -22,7 +22,11 @@
           <span>{{ 'filters.' + filter.rangeUrlTemplate | translate }}</span>
           <span ng-if="filter.getSelectedItems().length" class="pricing-filter-count-badge">
             <span ng-if="filter.type === 'multiple' && filter.selectedCount">{{ filter.selectedCount }}</span>
-            <span ng-if="filter.type !== 'multiple'" class="fa fa-dot-circle-o"></span>
+            <span ng-if="filter.type !== 'multiple' && filter.type !== 'typeahead'" class="fa fa-dot-circle-o"></span>
+            <span ng-if="filter.type === 'typeahead'">
+              <span ng-if="filter.queryConfiguration.multiple">{{ filter.selectedItem.length }}</span>
+              <span ng-if="!filter.queryConfiguration.multiple" class="fa fa-dot-circle-o"></span>
+            </span>
           </span>
         </accordion-heading>
 
@@ -101,7 +105,7 @@
         <div ng-if="filter.type === 'typeahead'">
           <div class="row">
             <input type="hidden" style="width: 430px; left: 30px;"
-                   ui-select2="filter.queryConfiguration" ng-model="filter.items">
+                   ui-select2="filter.queryConfiguration" ng-model="filter.selectedItem">
           </div>
         </div>
 

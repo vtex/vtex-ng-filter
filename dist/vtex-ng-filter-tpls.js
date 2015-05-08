@@ -1,4 +1,4 @@
-/*! vtex-ng-filter - v0.3.1 - 2015-05-07 */
+/*! vtex-ng-filter - v0.3.1 - 2015-05-08 */
 (function() {
   var config, moreOptionsShowFilters, openFilters,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -32,6 +32,9 @@
           this.setGroup();
         }
         this.selectedCount = 0;
+        if (this.type === 'typeahead') {
+          this.selectedItem = [];
+        }
         if (this.type === 'date') {
           this.dateObjectCache = {};
           dateGetterSetter = (function(_this) {
@@ -99,7 +102,7 @@
       }
 
       Filter.prototype.updateSelectedCount = function() {
-        var i, item, lastSelectedItemIndex, selectedItemIndex, _i, _j, _len, _len1, _ref, _ref1;
+        var i, item, lastSelectedItemIndex, selectedItemIndex, _i, _j, _len, _len1, _ref, _ref1, _ref2, _ref3;
         if (this.type === 'date') {
           this.selectedCount = this.date.from && this.date.to ? 1 : 0;
         } else if (this.type === 'multiple') {
@@ -128,6 +131,8 @@
             moreOptionsShowFilters[this.rangeUrlTemplate] = true;
           }
           this.selectedCount = this.selectedItem ? 1 : 0;
+        } else if (this.type === 'typeahead') {
+          this.selectedCount = (_ref2 = (_ref3 = this.selectedItem) != null ? _ref3.length : void 0) != null ? _ref2 : 0;
         }
         if (this.selectedCount > 0) {
           openFilters[this.rangeUrlTemplate] = true;
@@ -136,7 +141,7 @@
       };
 
       Filter.prototype.setSelectedItems = function(itemsAsSearchParameter) {
-        var date, item, items, _i, _len, _ref, _ref1;
+        var date, item, items, param, splitParam, _i, _j, _len, _len1, _ref, _ref1, _ref2;
         if (this.type === 'date') {
           items = itemsAsSearchParameter.replace(this.name + ':[', '').replace(']', '').split(' TO ');
           date = {
@@ -154,6 +159,16 @@
           this.selectedItem = _.find(this.items, function(i) {
             return i.url === itemsAsSearchParameter;
           });
+        } else if (this.type === 'typeahead') {
+          _ref2 = itemsAsSearchParameter.split(',');
+          for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
+            param = _ref2[_j];
+            splitParam = param.split('[');
+            this.selectedItem.push({
+              id: splitParam[0],
+              text: splitParam[1].replace(/\]/g, '')
+            });
+          }
         }
         return this.updateSelectedCount();
       };
@@ -188,15 +203,21 @@
             return [];
           }
         } else if (this.type === 'typeahead') {
-          return this.items || [];
+          return this.selectedItem || [];
         }
       };
 
       Filter.prototype.getSelectedItemsURL = function() {
         var selectedArray;
-        selectedArray = _.map(this.getSelectedItems(), function(i) {
-          return i.url;
-        });
+        if (this.type === 'typeahead') {
+          selectedArray = _.map(this.getSelectedItems(), function(i) {
+            return i.id + ("[" + i.text + "]");
+          });
+        } else {
+          selectedArray = _.map(this.getSelectedItems(), function(i) {
+            return i.url;
+          });
+        }
         if (selectedArray.length > 0) {
           return selectedArray.join(',');
         } else {
@@ -217,6 +238,8 @@
             }
           }
           return this.updateSelectedCount();
+        } else if (this.type === 'typeahead') {
+          return this.selectedItem = [];
         }
       };
 
@@ -232,23 +255,28 @@
           }
         } else if (this.type === 'single') {
           this.selectedItem = null;
+        } else if (this.type === 'typeahead') {
+          this.selectedItem = [];
         }
         return this.updateSelectedCount();
       };
 
       Filter.prototype.update = function(filterJSON) {
-        var item, updatedItem, _i, _len, _ref, _ref1, _results;
+        var item, updatedItem, _i, _len, _ref, _ref1, _ref2, _results;
         if (filterJSON == null) {
           filterJSON = this;
         }
-        _ref = this.items;
+        if (!((_ref = this.items) != null ? _ref.length : void 0)) {
+          return;
+        }
+        _ref1 = this.items;
         _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          item = _ref[_i];
+        for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+          item = _ref1[_i];
           updatedItem = _.find(filterJSON.items, function(i) {
             return i.name === item.name;
           });
-          if (updatedItem && ((_ref1 = this.getSelectedItems()) != null ? _ref1.length : void 0) === 0) {
+          if (updatedItem && ((_ref2 = this.getSelectedItems()) != null ? _ref2.length : void 0) === 0) {
             _results.push(item.quantity = updatedItem.quantity);
           } else {
             _results.push(item.quantity = 0);
@@ -433,8 +461,8 @@ angular.module("vtexNgFilter").run(function($templateCache) {   'use strict';
     "<div class=\"filters-block\"><h3><span translate=\"\">listing.filters</span> <button translate=\"\" class=\"btn btn-small btn-clean-filters\" ng-if=\"filters.getAppliedFilters().length\" ng-click=\"clearAll()\" ga-event=\"\" ga-label=\"filter-clear-all\">listing.clearAll</button></h3><div ng-repeat=\"group in filters\" ng-if=\"group.length\"><h3 class=\"group-header\"><i ng-class=\"{ 'icon-calendar-empty':  group[0].groupName === 'date',\n" +
     "                        'icon-exchange': group[0].groupName === 'channel',\n" +
     "                         'icon-refresh': group[0].groupName === 'status',\n" +
-    "                          'icon-filter': group[0].groupName === 'other' }\"></i> {{ ('filters.groups.' + group[0].groupName) | translate }}</h3><accordion close-others=\"true\"><accordion-group is-open=\"openFilters[filter.rangeUrlTemplate]\" ng-repeat=\"filter in group\"><accordion-heading><span>{{ 'filters.' + filter.rangeUrlTemplate | translate }}</span> <span ng-if=\"filter.getSelectedItems().length\" class=\"pricing-filter-count-badge\"><span ng-if=\"filter.type === 'multiple' && filter.selectedCount\">{{ filter.selectedCount }}</span> <span ng-if=\"filter.type !== 'multiple'\" class=\"fa fa-dot-circle-o\"></span></span></accordion-heading><!-- DATE --><div ng-if=\"filter.type === 'date'\"><div ng-if=\"!filter.customDateOnly\"><p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates()\" translate=\"\">listing.dates.today</a></p><p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates(-1, -1)\" translate=\"\">listing.dates.yesterday</a></p><p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates(-7)\" translate=\"\">listing.dates.thisWeek</a></p><p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates(0, 0, true)\" translate=\"\">listing.dates.currentMonth</a></p><p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates(-30)\" translate=\"\">listing.dates.thisMonth</a></p><p><a href=\"javascript: void(0)\" ng-click=\"filter.clearSelection()\" translate=\"\">listing.dates.clearFilter</a></p><div class=\"input-append\"><input type=\"text\" ng-click=\"openFilters[filter.rangeUrlTemplate + 'Selector'] = !openFilters[filter.rangeUrlTemplate + 'Selector']\" value=\"{{filter.dateRangeLabel()}}\" readonly><a href=\"javascript:void(0);\" class=\"add-on\" ng-click=\"openFilters[filter.rangeUrlTemplate + 'Selector'] = !openFilters[filter.rangeUrlTemplate + 'Selector']\"><i class=\"icon-calendar\"></i></a></div></div><!-- DATEPICKERS --><div class=\"date-selectors\" ng-hide=\"!openFilters[filter.rangeUrlTemplate + 'Selector'] && !filter.customDateOnly\"><div class=\"row-fluid\"><div class=\"span5 control-group\"><label for=\"date-from-{{ $index }}\" translate=\"\">listing.dates.from</label><input type=\"text\" id=\"date-from-{{ $index }}\" vtex-datepicker=\"\" date-model=\"filter.date.from\"></div><div class=\"span5 offset1 control-group\"><label for=\"date-to-{{ $index }}\" class=\"vtex-datepicker-container\" translate=\"\">listing.dates.to</label><input type=\"text\" id=\"date-to-{{ $index }}\" vtex-datepicker=\"\" date-model=\"filter.date.to\"></div></div><!-- /row-fluid --></div><!-- /datepickers --></div><!-- /DATE --><div ng-if=\"filter.type === 'multiple' || filter.type === 'single'\"><ul class=\"filter-list nav nav-pills nav-stacked\"><!-- If 5 items, show all 5.\n" +
+    "                          'icon-filter': group[0].groupName === 'other' }\"></i> {{ ('filters.groups.' + group[0].groupName) | translate }}</h3><accordion close-others=\"true\"><accordion-group is-open=\"openFilters[filter.rangeUrlTemplate]\" ng-repeat=\"filter in group\"><accordion-heading><span>{{ 'filters.' + filter.rangeUrlTemplate | translate }}</span> <span ng-if=\"filter.getSelectedItems().length\" class=\"pricing-filter-count-badge\"><span ng-if=\"filter.type === 'multiple' && filter.selectedCount\">{{ filter.selectedCount }}</span> <span ng-if=\"filter.type !== 'multiple' && filter.type !== 'typeahead'\" class=\"fa fa-dot-circle-o\"></span> <span ng-if=\"filter.type === 'typeahead'\"><span ng-if=\"filter.queryConfiguration.multiple\">{{ filter.selectedItem.length }}</span> <span ng-if=\"!filter.queryConfiguration.multiple\" class=\"fa fa-dot-circle-o\"></span></span></span></accordion-heading><!-- DATE --><div ng-if=\"filter.type === 'date'\"><div ng-if=\"!filter.customDateOnly\"><p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates()\" translate=\"\">listing.dates.today</a></p><p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates(-1, -1)\" translate=\"\">listing.dates.yesterday</a></p><p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates(-7)\" translate=\"\">listing.dates.thisWeek</a></p><p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates(0, 0, true)\" translate=\"\">listing.dates.currentMonth</a></p><p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates(-30)\" translate=\"\">listing.dates.thisMonth</a></p><p><a href=\"javascript: void(0)\" ng-click=\"filter.clearSelection()\" translate=\"\">listing.dates.clearFilter</a></p><div class=\"input-append\"><input type=\"text\" ng-click=\"openFilters[filter.rangeUrlTemplate + 'Selector'] = !openFilters[filter.rangeUrlTemplate + 'Selector']\" value=\"{{filter.dateRangeLabel()}}\" readonly><a href=\"javascript:void(0);\" class=\"add-on\" ng-click=\"openFilters[filter.rangeUrlTemplate + 'Selector'] = !openFilters[filter.rangeUrlTemplate + 'Selector']\"><i class=\"icon-calendar\"></i></a></div></div><!-- DATEPICKERS --><div class=\"date-selectors\" ng-hide=\"!openFilters[filter.rangeUrlTemplate + 'Selector'] && !filter.customDateOnly\"><div class=\"row-fluid\"><div class=\"span5 control-group\"><label for=\"date-from-{{ $index }}\" translate=\"\">listing.dates.from</label><input type=\"text\" id=\"date-from-{{ $index }}\" vtex-datepicker=\"\" date-model=\"filter.date.from\"></div><div class=\"span5 offset1 control-group\"><label for=\"date-to-{{ $index }}\" class=\"vtex-datepicker-container\" translate=\"\">listing.dates.to</label><input type=\"text\" id=\"date-to-{{ $index }}\" vtex-datepicker=\"\" date-model=\"filter.date.to\"></div></div><!-- /row-fluid --></div><!-- /datepickers --></div><!-- /DATE --><div ng-if=\"filter.type === 'multiple' || filter.type === 'single'\"><ul class=\"filter-list nav nav-pills nav-stacked\"><!-- If 5 items, show all 5.\n" +
     "\t\t\t\t\t\t\t\t If 6 items, show all 6.\n" +
-    "\t\t\t\t\t\t\t\t If 7 items, show 5 and button to show more. --><li ng-repeat=\"item in filter.items\" ng-show=\"(filter.items.length <= 6) || ($index < 5) || moreOptionsShowFilters[filter.rangeUrlTemplate]\"><label class=\"checkbox\" ng-if=\"filter.type == 'multiple'\"><input type=\"checkbox\" name=\"{{filter.name}}\" ng-model=\"item.selected\" ng-change=\"filter.updateSelectedCount()\"><span><span translate=\"\">{{ item.name }}</span> {{ item.quantity ? '(' + item.quantity + ')' : '' }}</span></label><label class=\"radio\" ng-if=\"filter.type == 'single'\"><input type=\"radio\" name=\"{{filter.name}}\" ng-model=\"filter.selectedItem\" ng-value=\"item\"><span><span translate=\"\">{{ item.name }}</span> {{ item.quantity ? '(' + item.quantity + ')' : '' }}</span></label></li></ul><a href=\"javascript:void(0)\" ng-click=\"moreOptionsShowFilters[filter.rangeUrlTemplate] = true\" ng-show=\"filter.items.length > 6 && !moreOptionsShowFilters[filter.rangeUrlTemplate]\" class=\"muted\">{{ 'filters.moreOptionsShow' | translate}} ({{ filter.items.length }})</a> <a href=\"javascript:void(0)\" ng-click=\"moreOptionsShowFilters[filter.rangeUrlTemplate] = false\" ng-show=\"filter.items.length > 6 && moreOptionsShowFilters[filter.rangeUrlTemplate]\" class=\"muted\">{{ 'filters.moreOptionsHide' | translate}}</a> <button translate=\"\" class=\"btn\" ng-click=\"filter.clearSelection()\" ng-show=\"filter.type === 'single' && filter.selectedItem\">search.clear</button></div><div ng-if=\"filter.type === 'typeahead'\"><div class=\"row\"><input type=\"hidden\" style=\"width: 430px; left: 30px\" ui-select2=\"filter.queryConfiguration\" ng-model=\"filter.items\"></div></div></accordion-group></accordion></div></div>"
+    "\t\t\t\t\t\t\t\t If 7 items, show 5 and button to show more. --><li ng-repeat=\"item in filter.items\" ng-show=\"(filter.items.length <= 6) || ($index < 5) || moreOptionsShowFilters[filter.rangeUrlTemplate]\"><label class=\"checkbox\" ng-if=\"filter.type == 'multiple'\"><input type=\"checkbox\" name=\"{{filter.name}}\" ng-model=\"item.selected\" ng-change=\"filter.updateSelectedCount()\"><span><span translate=\"\">{{ item.name }}</span> {{ item.quantity ? '(' + item.quantity + ')' : '' }}</span></label><label class=\"radio\" ng-if=\"filter.type == 'single'\"><input type=\"radio\" name=\"{{filter.name}}\" ng-model=\"filter.selectedItem\" ng-value=\"item\"><span><span translate=\"\">{{ item.name }}</span> {{ item.quantity ? '(' + item.quantity + ')' : '' }}</span></label></li></ul><a href=\"javascript:void(0)\" ng-click=\"moreOptionsShowFilters[filter.rangeUrlTemplate] = true\" ng-show=\"filter.items.length > 6 && !moreOptionsShowFilters[filter.rangeUrlTemplate]\" class=\"muted\">{{ 'filters.moreOptionsShow' | translate}} ({{ filter.items.length }})</a> <a href=\"javascript:void(0)\" ng-click=\"moreOptionsShowFilters[filter.rangeUrlTemplate] = false\" ng-show=\"filter.items.length > 6 && moreOptionsShowFilters[filter.rangeUrlTemplate]\" class=\"muted\">{{ 'filters.moreOptionsHide' | translate}}</a> <button translate=\"\" class=\"btn\" ng-click=\"filter.clearSelection()\" ng-show=\"filter.type === 'single' && filter.selectedItem\">search.clear</button></div><div ng-if=\"filter.type === 'typeahead'\"><div class=\"row\"><input type=\"hidden\" style=\"width: 430px; left: 30px\" ui-select2=\"filter.queryConfiguration\" ng-model=\"filter.selectedItem\"></div></div></accordion-group></accordion></div></div>"
   );
  });
