@@ -190,12 +190,16 @@ angular.module('vtexNgFilter', [])
             searchQuery = $location.search()[filter.rangeUrlTemplate]
             # Se está na URL, está selected
             if searchQuery
-              filter.setSelectedItems(searchQuery)
+              filter.setSelectedItems decodeURIComponent(searchQuery)
               filter.update()
             else filter.clearSelection()
 
         # When initializing the directive, get the selected filters from the url.
         updateFiltersOnLocationSearch()
+
+        $scope.$on '$locationChangeStart', ->
+          for k, v of $location.search()
+            $location.search k, decodeURIComponent v
 
         # If url changes, update filters to match
         $scope.$on '$locationChangeSuccess', ->

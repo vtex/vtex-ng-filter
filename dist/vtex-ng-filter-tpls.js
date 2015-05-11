@@ -1,4 +1,4 @@
-/*! vtex-ng-filter - v0.3.1 - 2015-05-05 */
+/*! vtex-ng-filter - v0.3.1 - 2015-05-11 */
 (function() {
   var config, moreOptionsShowFilters, openFilters,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -340,7 +340,7 @@
             filter = filters[l];
             searchQuery = $location.search()[filter.rangeUrlTemplate];
             if (searchQuery) {
-              filter.setSelectedItems(searchQuery);
+              filter.setSelectedItems(decodeURIComponent(searchQuery));
               results.push(filter.update());
             } else {
               results.push(filter.clearSelection());
@@ -349,6 +349,16 @@
           return results;
         };
         updateFiltersOnLocationSearch();
+        $scope.$on('$locationChangeStart', function() {
+          var k, ref, results, v;
+          ref = $location.search();
+          results = [];
+          for (k in ref) {
+            v = ref[k];
+            results.push($location.search(k, decodeURIComponent(v)));
+          }
+          return results;
+        });
         $scope.$on('$locationChangeSuccess', function() {
           var queryFilters, selectedFilters;
           queryFilters = (_.map(filters, function(f) {
