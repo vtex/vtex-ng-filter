@@ -299,22 +299,22 @@ angular.module("vtexNgFilter", []);(function() {
 angular.module("vtexNgFilter").run(function($templateCache) {   'use strict';
 
   $templateCache.put('vtex-ng-filter-button.html',
-    "<div class=\"uim-btn-filter\" ng-class=\"{ 'uim-filter-checked': activeFilters.list.length > 0 }\"><button class=\"btn\" ng-click=\"sidebar.show('filters')\" ga-event=\"\" ga-label=\"filter-open\"><i class=\"fa fa-filter\"></i> <span class=\"uim-filter-count badge\" data-ng-show=\"activeFilters.list.length > 0\">{{ activeFilters.list.length }}</span></button></div>"
+    "<div class=\"uim-btn-filter\" ng-class=\"{ 'uim-filter-checked': activeFilters.list.length }\"><button class=\"btn\" ng-click=\"sidebar.show('filters')\" ga-event=\"\" ga-label=\"filter-open\"><i class=\"fa fa-filter\"></i> <span class=\"uim-filter-count badge\" ng-show=\"activeFilters.list.length\">{{ activeFilters.list.length }}</span></button></div>"
   );
 
 
   $templateCache.put('vtex-ng-filter-summary.html',
-    "<div class=\"filters-summary\"><span ng-show=\"activeFilters.list.length\" ng-repeat=\"filter in activeFilters.list\" ng-if=\"filter.active\"><button class=\"btn btn-xs btn-info\" ng-click=\"disableFilter(filter)\">{{ ::filter.name | translate }} <i class=\"fa fa-remove\"></i></button>&nbsp;</span></div>"
+    "<div class=\"filters-summary\"><span ng-show=\"activeFilters.list.length\" ng-repeat=\"filter in activeFilters.list\" ng-if=\"filter.active\"><button class=\"btn btn-xs btn-info\" ng-click=\"disableFilter(filter)\"><span translate=\"\">{{ filter.name }}</span> <i class=\"fa fa-remove\"></i></button>&nbsp;</span></div>"
   );
 
 
   $templateCache.put('vtex-ng-filter.html',
-    "<div class=\"filters-block\"><h3>{{ 'listing.filters' | translate }} <button translate=\"\" class=\"btn btn-small btn-clean-filters\" ng-if=\"activeFilters.list.length > 0\" ng-click=\"clearAllFilters()\">listing.clearAll</button></h3><div ng-repeat=\"(name, group) in groups\"><h3 class=\"group-header\"><i class=\"fa\" ng-class=\"{ 'fa-credit-card': name === 'paymentCondition',\n" +
-    "                                 'fa-calendar-o': name === 'date', \n" +
-    "                                   'fa-exchange': name === 'channel',\n" +
-    "                                    'fa-refresh': name === 'status', }\"></i> {{ ('filters.groups.' + name) | translate }}</h3><accordion close-others=\"true\"><accordion-group ng-repeat=\"filter in group\" ng-if=\"filter.options.length\"><accordion-heading>{{ 'filters.' + filter.name | translate }} <span class=\"label label-info pull-right\" ng-if=\"filter.active\"><i class=\"fa fa-dot-circle-o\"></i></span></accordion-heading><ul class=\"filter-list nav nav-pills nav-stacked\"><li ng-repeat=\"option in filter.options\"><!-- <div>\n" +
-    "              <pre>{{ option | json }}</pre>\n" +
-    "            </div> --><div ng-class=\"{'disabled': !option.quantity, 'checkbox': filter.type == 'multiple', 'radio': filter.type == 'date'}\"><label><input ng-disabled=\"!option.quantity\" name=\"{{ ::filter.url }}\" ng-change=\"updateQueryString()\" ng-model=\"option.active\" type=\"checkbox\" ng-if=\"filter.type == 'multiple'\" ng-checked=\"option.active\"><input ng-disabled=\"!option.quantity\" name=\"{{ ::filter.url }}\" ng-change=\"updateQueryString()\" ng-value=\"::option.name\" ng-model=\"option.active\" type=\"radio\" ng-if=\"filter.type == 'date'\">{{ ::option.name | translate }} <span class=\"text-muted\">({{ option.quantity }})</span></label></div></li></ul><button translate=\"\" class=\"btn\" ng-click=\"filter.clearSelection()\" ng-show=\"filter.type === 'single' && filter.selectedItem\">search.clear</button></accordion-group></accordion></div></div>"
+    "<div class=\"filters-block\"><h3>{{ 'listing.filters' | translate }} <button class=\"btn btn-small btn-clean-filters\" ng-if=\"activeFilters.list.length\" ng-click=\"clearAllFilters()\" translate=\"\">listing.clearAll</button></h3><div ng-repeat=\"(name, group) in groups\"><h3 class=\"group-header\"><i class=\"fa\" ng-class=\"{ 'fa-credit-card': name === 'paymentCondition',\n" +
+    "                                'fa-calendar-o': name === 'date',\n" +
+    "                                'fa-exchange': name === 'channel',\n" +
+    "                                'fa-refresh': name === 'status', }\"></i> {{ ('filters.groups.' + name) | translate }}</h3><accordion close-others=\"true\"><accordion-group ng-repeat=\"filter in group\" ng-if=\"filter.options.length\"><accordion-heading>{{ 'filters.' + filter.name | translate }} <span class=\"label label-info pull-right\" ng-if=\"filter.active\"><i class=\"fa fa-dot-circle-o\"></i></span></accordion-heading><ul class=\"filter-list nav nav-pills nav-stacked\"><li ng-repeat=\"option in filter.options\"><div ng-class=\"{ 'disabled': !option.quantity,\n" +
+    "                             'checkbox': filter.type == 'multiple',\n" +
+    "                             'radio': filter.type == 'date' }\"><label><input name=\"{{ filter.url }}\" type=\"checkbox\" ng-if=\"filter.type == 'multiple'\" ng-change=\"updateQueryString()\" ng-model=\"option.active\" ng-checked=\"option.active\" ng-disabled=\"!option.quantity\"><input name=\"{{ filter.url }}\" type=\"radio\" ng-if=\"filter.type == 'date'\" ng-change=\"updateQueryString()\" ng-model=\"option.active\" ng-value=\"option.name\" ng-disabled=\"!option.quantity\">{{ option.name | translate }} <span class=\"text-muted\">({{ option.quantity }})</span></label></div></li></ul><button class=\"btn\" ng-click=\"filter.clearSelection()\" ng-show=\"filter.type === 'single' && filter.selectedItem\" translate=\"\">search.clear</button></accordion-group></accordion></div></div>"
   );
  });
 (function() {

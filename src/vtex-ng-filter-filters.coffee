@@ -1,3 +1,2 @@
 angular.module('vtexNgFilter')
-  .filter 'toBoolean', -> 
-    (input) -> !!input 
+.filter 'toBoolean', -> (input) -> !!input

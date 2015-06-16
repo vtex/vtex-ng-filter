@@ -1,7 +1,14 @@
-<div class="uim-btn-filter" ng-class="{ 'uim-filter-checked': activeFilters.list.length > 0 }">
-  <button class="btn" ng-click="sidebar.show('filters')" ga-event ga-label="filter-open">
-      <i class="fa fa-filter"></i>
-      <span class="uim-filter-count badge"
-            data-ng-show="activeFilters.list.length > 0">{{ activeFilters.list.length }}</span>
+<div class="uim-btn-filter"
+     ng-class="{ 'uim-filter-checked': activeFilters.list.length }">
+
+  <button class="btn"
+          ng-click="sidebar.show('filters')"
+          ga-event ga-label="filter-open">
+
+    <i class="fa fa-filter"></i>
+    <span class="uim-filter-count badge"
+          ng-show="activeFilters.list.length">{{ activeFilters.list.length }}</span>
+
   </button>
+
 </div>
