@@ -146,7 +146,7 @@ angular.module("vtexNgFilter", []);(function() {
 }).call(this);
 
 (function() {
-  angular.module('vtexNgFilter').service("vtFilterService", function($http, $location, TransactionGroup, DefaultIntervalFilter) {
+  angular.module('vtexNgFilter').service('vtFilterService', function($http, $location, TransactionGroup, DefaultIntervalFilter) {
     var baseInterval, getDateRangeFilter, self, setFacetsQuery, transformSearch;
     self = this;
     baseInterval = new DefaultIntervalFilter();
@@ -168,9 +168,9 @@ angular.module("vtexNgFilter", []);(function() {
       queries = [];
       _.each(filters, function(f) {
         switch (f.type) {
-          case "multiple":
+          case 'multiple':
             return queries.push(f.url);
-          case "date":
+          case 'date':
             return queries.push(getDateRangeFilter(f));
         }
       });
@@ -230,8 +230,6 @@ angular.module("vtexNgFilter", []);(function() {
     self.setFilters = function(endpoint, filters, search) {
       var locationActiveFilters;
       locationActiveFilters = self.getQueryStringFilters(search, filters);
-      console.log('-------------');
-      console.log('ACTIVE FILTERS', locationActiveFilters);
       self.activeFilters.list = [];
       return self.getAvailableFacets(endpoint, filters, search).then(function(res) {
         return _.each(res, function(categoryOptions, categoryName) {

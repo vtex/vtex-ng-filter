@@ -1,14 +1,13 @@
 angular.module('vtexNgFilter')
-.service "vtFilterService", ($http, $location, TransactionGroup, DefaultIntervalFilter) ->
+.service 'vtFilterService', ($http, $location, TransactionGroup, DefaultIntervalFilter) ->
 
-  self = @
+  self = this
   baseInterval = new DefaultIntervalFilter()
 
   getDateRangeFilter = (date) ->
     _d = "#{date.url}->"
     arr = []
-    for range in date.range
-      arr.push("#{range.name}#{range.interval}")
+    arr.push("#{range.name}#{range.interval}") for range in date.range
 
     _d += arr.join(';')
     return _d
@@ -20,28 +19,23 @@ angular.module('vtexNgFilter')
 
     _.each filters, (f) ->
       switch f.type
-        when "multiple" then queries.push f.url
-        when "date"  then queries.push getDateRangeFilter f
+        when 'multiple' then queries.push f.url
+        when 'date' then queries.push getDateRangeFilter f
 
-    return querystring += queries.join(',')
+    return querystring += queries.join ','
 
   transformSearch = (searchObj) ->
     basicFilters = new TransactionGroup()
     search = []
-    for k,v of searchObj
-      if basicFilters[k] then search.push "#{k}=#{v}"
-    return search.join('&')
+    search.push "#{k}=#{v}" for k,v of searchObj when basicFilters[k]
+    search.join '&'
 
-  #
-  # PUBLIC
-  #
 
-  # Instância grupo default de filtros
   self.filters = new TransactionGroup()
 
   self.activeFilters = list: []
 
-  self.updateQueryString = () ->
+  self.updateQueryString = ->
     query = {}
 
     for url, filter of self.filters
@@ -63,8 +57,6 @@ angular.module('vtexNgFilter')
   self.setFilters = (endpoint, filters, search) ->
     locationActiveFilters = self.getQueryStringFilters(search, filters)
 
-    console.log '-------------'
-    console.log 'ACTIVE FILTERS', locationActiveFilters
     # Lista de filtros ativos
     self.activeFilters.list = []
 
@@ -103,7 +95,7 @@ angular.module('vtexNgFilter')
         if filters[k].type is 'date'
           interval = _.find baseInterval, (i) -> i.interval is v
           v = interval.name
-        obj[k] = v.split(' OR ')
+        obj[k] = v.split ' OR '
     return obj
 
   # Retorna lista de filtros
