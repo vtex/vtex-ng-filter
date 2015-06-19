@@ -45,7 +45,7 @@
 
           <!-- DATEPICKERS -->
           <div class="date-selectors"
-               ng-show="openFilters[filter.rangeUrlTemplate + 'Selector']">
+               ng-if="openFilters[filter.rangeUrlTemplate + 'Selector']">
 
             <div class="row-fluid">
               <div class="span5 control-group vtex-datepicker-container">
@@ -84,10 +84,10 @@
             </li>
           </ul>
           <a href="javascript:void(0)" ng-click="moreOptionsShowFilters[filter.rangeUrlTemplate] = true"
-             ng-show="filter.items.length > 6 && !moreOptionsShowFilters[filter.rangeUrlTemplate]"
+             ng-if="filter.items.length > 6 && !moreOptionsShowFilters[filter.rangeUrlTemplate]"
              class="muted">{{ 'filters.moreOptionsShow' | translate}} ({{ filter.items.length }})</a>
           <a href="javascript:void(0)" ng-click="moreOptionsShowFilters[filter.rangeUrlTemplate] = false"
-             ng-show="filter.items.length > 6 && moreOptionsShowFilters[filter.rangeUrlTemplate]"
+             ng-if="filter.items.length > 6 && moreOptionsShowFilters[filter.rangeUrlTemplate]"
              class="muted">{{ 'filters.moreOptionsHide' | translate}}</a>
 
           <button translate class="btn"
