@@ -1,5 +1,5 @@
 <div class="filters-summary">
-    <small ng-show="filters.length" ng-repeat="filter in filters.getAppliedFilters()">
+    <small ng-if="filters.length" ng-repeat="filter in filters.getAppliedFilters()">
 			<span ng-repeat="item in filter.getSelectedItems()">
 				<span class="label label-info">
 					<span translate>{{ item.name }}</span>&nbsp;
