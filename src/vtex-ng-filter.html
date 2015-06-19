@@ -72,7 +72,7 @@
 								 If 6 items, show all 6.
 								 If 7 items, show 5 and button to show more. -->
             <li ng-repeat="item in filter.items"
-                ng-show="(filter.items.length <= 6) || ($index < 5) || moreOptionsShowFilters[filter.rangeUrlTemplate]" >
+                ng-if="(filter.items.length <= 6) || ($index < 5) || moreOptionsShowFilters[filter.rangeUrlTemplate]" >
               <label class="checkbox" ng-if="filter.type == 'multiple'">
                 <input type="checkbox" name="{{filter.name}}" ng-model="item.selected" ng-change="filter.updateSelectedCount()">
                 <span><span translate>{{ item.name }}</span> {{ item.quantity ? '(' + item.quantity + ')' : '' }}</span>
