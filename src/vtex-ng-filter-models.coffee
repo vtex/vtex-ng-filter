@@ -56,7 +56,9 @@ angular.module('vtexNgFilter')
         active: status
 
       if type isnt 'date'
-        option.value = name
+        option.value = do (name) ->
+          name = '"' + name  + '"' if typeof name is 'string' and name.indexOf(' ') >= 0
+          return name
       else
         intervals = new DefaultIntervalFilter()
         for range in intervals

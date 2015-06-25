@@ -73,7 +73,7 @@ angular.module('vtexNgFilter')
           # e altera o status dele para ativo
           if locationActiveFilters[categoryName]
             for activeFilterName in locationActiveFilters[categoryName]
-              status = if activeFilterName is filterName then activeFilterName
+              status = if activeFilterName.indexOf(filterName) >= 0 then activeFilterName
               break if status
 
           # Transforma Value do option em booleano caso seja um checkbox
