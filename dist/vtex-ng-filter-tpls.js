@@ -318,7 +318,7 @@ angular.module("vtexNgFilter").run(function($templateCache) {   'use strict';
 
 
   $templateCache.put('vtex-ng-filter-summary.html',
-    "<div class=\"filters-summary\"><span ng-show=\"activeFilters.list.length\" ng-repeat=\"filter in activeFilters.list\" ng-if=\"filter.active\"><button class=\"btn btn-xs btn-info\" ng-click=\"disableFilter(filter)\"><span translate=\"\">{{ filter.name }}</span> <i class=\"fa fa-remove\"></i></button>&nbsp;</span></div>"
+    "<div class=\"filters-summary\"><span ng-if=\"activeFilters.list.length\" ng-repeat=\"filter in activeFilters.list\" ng-if=\"filter.active\"><button class=\"btn btn-xs btn-info\" ng-click=\"disableFilter(filter)\"><span>{{ ::('filters.groups.'+ filter.group) | translate }} : {{ ::filter.name | translate }}</span> <i class=\"fa fa-remove\"></i></button>&nbsp;</span></div>"
   );
 
 
