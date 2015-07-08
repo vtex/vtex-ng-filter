@@ -3,7 +3,9 @@
     {{ 'listing.filters' | translate }}
     <button class="btn btn-small btn-clean-filters"
             ng-if="activeFilters.list.length"
-            ng-click="clearAllFilters()" translate>listing.clearAll</button>
+            ng-click="clearAllFilters()"
+            ga-event ga-category="transaction list" ga-action="clear filters" ga-label="transaction filters"
+            translate>listing.clearAll</button>
   </h3>
 
   <div ng-repeat="(name, group) in groups">

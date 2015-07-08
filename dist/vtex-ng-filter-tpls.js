@@ -323,7 +323,7 @@ angular.module("vtexNgFilter").run(function($templateCache) {   'use strict';
 
 
   $templateCache.put('vtex-ng-filter.html',
-    "<div class=\"filters-block\"><h3>{{ 'listing.filters' | translate }} <button class=\"btn btn-small btn-clean-filters\" ng-if=\"activeFilters.list.length\" ng-click=\"clearAllFilters()\" translate=\"\">listing.clearAll</button></h3><div ng-repeat=\"(name, group) in groups\"><h3 class=\"group-header\"><i class=\"fa\" ng-class=\"{ 'fa-credit-card': name === 'paymentCondition',\n" +
+    "<div class=\"filters-block\"><h3>{{ 'listing.filters' | translate }} <button class=\"btn btn-small btn-clean-filters\" ng-if=\"activeFilters.list.length\" ng-click=\"clearAllFilters()\" ga-event=\"\" ga-category=\"transaction list\" ga-action=\"clear filters\" ga-label=\"transaction filters\" translate=\"\">listing.clearAll</button></h3><div ng-repeat=\"(name, group) in groups\"><h3 class=\"group-header\"><i class=\"fa\" ng-class=\"{ 'fa-credit-card': name === 'paymentCondition',\n" +
     "                                'fa-calendar-o': name === 'date',\n" +
     "                                'fa-exchange': name === 'channel',\n" +
     "                                'fa-refresh': name === 'status', }\"></i> {{ ('filters.groups.' + name) | translate }}</h3><accordion close-others=\"true\"><accordion-group ng-repeat=\"filter in group\" ng-if=\"filter.options.length\"><accordion-heading>{{ 'filters.' + filter.name | translate }} <span class=\"label label-info pull-right\" ng-if=\"filter.active\"><i class=\"fa fa-dot-circle-o\"></i></span></accordion-heading><ul class=\"filter-list nav nav-pills nav-stacked\"><li ng-repeat=\"option in filter.options\"><div ng-class=\"{ 'disabled': !option.quantity,\n" +
