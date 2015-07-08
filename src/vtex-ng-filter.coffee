@@ -4,13 +4,13 @@ angular.module('vtexNgFilter')
     scope: endpoint: '=endpoint'
     templateUrl: 'vtex-ng-filter.html'
     link: ($scope) ->
-      
-      services = vtFilterService 
+
+      services = vtFilterService
       filters = services.filters
       endpoint = $scope.endpoint
 
       # Group Filters by group to UI
-      $scope.groups = _.groupBy filters, (_f) -> _f.group 
+      $scope.groups = _.groupBy filters, (_f) -> _f.group
       $scope.activeFilters = services.activeFilters
       $scope.clearAllFilters = ->
         services.clearAllFilters()
@@ -21,7 +21,7 @@ angular.module('vtexNgFilter')
 
       # Start directive
       services.setFilters(endpoint, filters).then (data) ->
-        # Checa se existe alguma busca existente 
+        # Checa se existe alguma busca existente
         # e pede novamente os filtros com parametros de busca
         search = $location.search()
         if Object.keys(search).length then services.setFilters(endpoint, filters, search)
@@ -34,7 +34,7 @@ angular.module('vtexNgFilter')
     scope: true
     templateUrl: 'vtex-ng-filter-summary.html'
     link: ($scope) ->
-      services = vtFilterService 
+      services = vtFilterService
 
       $scope.activeFilters = services.activeFilters
       $scope.disableFilter = (filter) ->
@@ -46,3 +46,7 @@ angular.module('vtexNgFilter')
     scope: true
     templateUrl: 'vtex-ng-filter-button.html'
     link: ($scope) ->  $scope.activeFilters = vtFilterService.activeFilters
+    controller: ($scope, $rootScope) ->
+      $scope.openFilterSidebar = ->
+        $rootScope.sidebar.show 'filters'
+        $rootScope.$emit 'filterToggle', status: 'opened'

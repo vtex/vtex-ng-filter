@@ -68,18 +68,23 @@ angular.module("vtexNgFilter", []);(function() {
     var FilterOption, TransactionFilter;
     FilterOption = (function() {
       function FilterOption(name, quantity, type, status) {
-        var intervals, option, range, _i, _len;
+        var i, intervals, len, option, range;
         option = {
           name: name,
           quantity: quantity,
           active: status
         };
         if (type !== 'date') {
-          option.value = name;
+          option.value = (function(name) {
+            if (typeof name === 'string' && name.indexOf(' ') >= 0) {
+              name = '"' + name + '"';
+            }
+            return name;
+          })(name);
         } else {
           intervals = new DefaultIntervalFilter();
-          for (_i = 0, _len = intervals.length; _i < _len; _i++) {
-            range = intervals[_i];
+          for (i = 0, len = intervals.length; i < len; i++) {
+            range = intervals[i];
             if (range.name === name) {
               option.value = range.interval;
             }
@@ -114,12 +119,12 @@ angular.module("vtexNgFilter", []);(function() {
           });
         };
         this.setOptions = function(name, quantity, status) {
-          var newOption, option, updatedOption, _active, _i, _len, _ref;
+          var _active, i, len, newOption, option, ref, updatedOption;
           updatedOption = false;
           _active = false;
-          _ref = self.options;
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            option = _ref[_i];
+          ref = self.options;
+          for (i = 0, len = ref.length; i < len; i++) {
+            option = ref[i];
             _active = _active || option.active;
             if (name === option.name) {
               option.quantity = quantity;
@@ -146,17 +151,17 @@ angular.module("vtexNgFilter", []);(function() {
 }).call(this);
 
 (function() {
-  angular.module('vtexNgFilter').service('vtFilterService', function($http, $location, TransactionGroup, DefaultIntervalFilter) {
+  angular.module('vtexNgFilter').service('vtFilterService', function($http, $location, $rootScope, TransactionGroup, DefaultIntervalFilter) {
     var baseInterval, getDateRangeFilter, self, setFacetsQuery, transformSearch;
     self = this;
     baseInterval = new DefaultIntervalFilter();
     getDateRangeFilter = function(date) {
-      var arr, range, _d, _i, _len, _ref;
-      _d = "" + date.url + "->";
+      var _d, arr, j, len, range, ref;
+      _d = date.url + "->";
       arr = [];
-      _ref = date.range;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        range = _ref[_i];
+      ref = date.range;
+      for (j = 0, len = ref.length; j < len; j++) {
+        range = ref[j];
         arr.push("" + range.name + range.interval);
       }
       _d += arr.join(';');
@@ -183,7 +188,7 @@ angular.module("vtexNgFilter", []);(function() {
       for (k in searchObj) {
         v = searchObj[k];
         if (basicFilters[k]) {
-          search.push("" + k + "=" + v);
+          search.push(k + "=" + v);
         }
       }
       return search.join('&');
@@ -193,15 +198,15 @@ angular.module("vtexNgFilter", []);(function() {
       list: []
     };
     self.updateQueryString = function() {
-      var filter, option, querieName, querieValue, query, url, _i, _len, _ref, _ref1, _results;
+      var availableFilters, filter, j, key, len, option, querieName, querieValue, query, ref, ref1, results, url, value;
       query = {};
-      _ref = self.filters;
-      for (url in _ref) {
-        filter = _ref[url];
+      ref = self.filters;
+      for (url in ref) {
+        filter = ref[url];
         query[url] = query[url] || [];
-        _ref1 = filter.options;
-        for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-          option = _ref1[_i];
+        ref1 = filter.options;
+        for (j = 0, len = ref1.length; j < len; j++) {
+          option = ref1[j];
           if (option.active) {
             query[url].push(option.value);
           }
@@ -212,12 +217,22 @@ angular.module("vtexNgFilter", []);(function() {
           query[url] = null;
         }
       }
-      _results = [];
+      availableFilters = {};
+      for (key in query) {
+        value = query[key];
+        if (value !== null) {
+          availableFilters[key] = value;
+        }
+      }
+      $rootScope.$emit('filterChanged', {
+        filterValues: availableFilters
+      });
+      results = [];
       for (querieName in query) {
         querieValue = query[querieName];
-        _results.push($location.search(querieName, querieValue));
+        results.push($location.search(querieName, querieValue));
       }
-      return _results;
+      return results;
     };
     self.clearAllFilters = function() {
       return self.filters = _.each(self.filters, function(f) {
@@ -233,16 +248,16 @@ angular.module("vtexNgFilter", []);(function() {
       self.activeFilters.list = [];
       return self.getAvailableFacets(endpoint, filters, search).then(function(res) {
         return _.each(res, function(categoryOptions, categoryName) {
-          var activeFilterName, filterName, filterQuantity, option, status, _i, _len, _ref, _results;
+          var activeFilterName, filterName, filterQuantity, j, len, option, ref, results, status;
           filters[categoryName].clearOptions();
-          _results = [];
+          results = [];
           for (filterName in categoryOptions) {
             filterQuantity = categoryOptions[filterName];
             if (locationActiveFilters[categoryName]) {
-              _ref = locationActiveFilters[categoryName];
-              for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                activeFilterName = _ref[_i];
-                status = activeFilterName === filterName ? activeFilterName : void 0;
+              ref = locationActiveFilters[categoryName];
+              for (j = 0, len = ref.length; j < len; j++) {
+                activeFilterName = ref[j];
+                status = activeFilterName.indexOf(filterName) >= 0 ? activeFilterName : void 0;
                 if (status) {
                   break;
                 }
@@ -253,12 +268,12 @@ angular.module("vtexNgFilter", []);(function() {
             }
             option = filters[categoryName].setOptions(filterName, filterQuantity, status);
             if (option.active) {
-              _results.push(self.activeFilters.list.push(option));
+              results.push(self.activeFilters.list.push(option));
             } else {
-              _results.push(void 0);
+              results.push(void 0);
             }
           }
-          return _results;
+          return results;
         });
       });
     };
@@ -281,7 +296,7 @@ angular.module("vtexNgFilter", []);(function() {
     };
     self.getAvailableFacets = function(endpoint, filters, search) {
       var url;
-      url = "" + endpoint + "?" + (setFacetsQuery(filters));
+      url = endpoint + "?" + (setFacetsQuery(filters));
       if (transformSearch(search)) {
         url += "&" + (transformSearch(search));
       }
@@ -297,7 +312,7 @@ angular.module("vtexNgFilter", []);(function() {
 angular.module("vtexNgFilter").run(function($templateCache) {   'use strict';
 
   $templateCache.put('vtex-ng-filter-button.html',
-    "<div class=\"uim-btn-filter\" ng-class=\"{ 'uim-filter-checked': activeFilters.list.length }\"><button class=\"btn\" ng-click=\"sidebar.show('filters')\" ga-event=\"\" ga-label=\"filter-open\"><i class=\"fa fa-filter\"></i> <span class=\"uim-filter-count badge\" ng-show=\"activeFilters.list.length\">{{ activeFilters.list.length }}</span></button></div>"
+    "<div class=\"uim-btn-filter\" ng-class=\"{ 'uim-filter-checked': activeFilters.list.length }\"><button class=\"btn\" ng-click=\"openFilterSidebar()\"><i class=\"fa fa-filter\"></i> <span class=\"uim-filter-count badge\" ng-show=\"activeFilters.list.length\">{{ activeFilters.list.length }}</span></button></div>"
   );
 
 
@@ -372,6 +387,14 @@ angular.module("vtexNgFilter").run(function($templateCache) {   'use strict';
       templateUrl: 'vtex-ng-filter-button.html',
       link: function($scope) {
         return $scope.activeFilters = vtFilterService.activeFilters;
+      },
+      controller: function($scope, $rootScope) {
+        return $scope.openFilterSidebar = function() {
+          $rootScope.sidebar.show('filters');
+          return $rootScope.$emit('filterToggle', {
+            status: 'opened'
+          });
+        };
       }
     };
   });

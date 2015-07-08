@@ -1,5 +1,5 @@
 angular.module('vtexNgFilter')
-.service 'vtFilterService', ($http, $location, TransactionGroup, DefaultIntervalFilter) ->
+.service 'vtFilterService', ($http, $location, $rootScope, TransactionGroup, DefaultIntervalFilter) ->
 
   self = this
   baseInterval = new DefaultIntervalFilter()
@@ -45,6 +45,10 @@ angular.module('vtexNgFilter')
         if option.active then query[url].push option.value
 
       if query[url].length then query[url] = query[url].join(' OR ') else query[url] = null
+
+    availableFilters = {}
+    for key, value of query then availableFilters[key] = value if value != null
+    $rootScope.$emit 'filterChanged', filterValues: availableFilters
 
     for querieName, querieValue of query
       $location.search querieName, querieValue
