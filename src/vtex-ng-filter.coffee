@@ -29,7 +29,7 @@ angular.module('vtexNgFilter')
       # If url changes, update filters to match
       $scope.$on '$locationChangeSuccess', -> services.setFilters(endpoint, filters, $location.search())
 
-  .directive "vtFilterSummary", (vtFilterService) ->
+  .directive "vtFilterSummary", (vtFilterService, $rootScope) ->
     restrict: 'E'
     scope: true
     templateUrl: 'vtex-ng-filter-summary.html'
@@ -39,6 +39,7 @@ angular.module('vtexNgFilter')
       $scope.activeFilters = services.activeFilters
       $scope.disableFilter = (filter) ->
         filter.active = false
+        $rootScope.$emit 'filterRemoved', filter: filter, location: 'summary'
         services.updateQueryString()
 
   .directive "vtFilterButton", (vtFilterService) ->

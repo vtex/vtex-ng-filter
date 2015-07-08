@@ -67,12 +67,13 @@ angular.module("vtexNgFilter", []);(function() {
   }).factory('TransactionFilter', function(DefaultIntervalFilter) {
     var FilterOption, TransactionFilter;
     FilterOption = (function() {
-      function FilterOption(name, quantity, type, status) {
+      function FilterOption(name, quantity, type, status, group) {
         var i, intervals, len, option, range;
         option = {
           name: name,
           quantity: quantity,
-          active: status
+          active: status,
+          group: group
         };
         if (type !== 'date') {
           option.value = (function(name) {
@@ -136,7 +137,7 @@ angular.module("vtexNgFilter", []);(function() {
           if (updatedOption) {
             return updatedOption;
           } else {
-            newOption = new FilterOption(name, quantity, self.type, status);
+            newOption = new FilterOption(name, quantity, self.type, status, group);
             self.options.push(newOption);
             return newOption;
           }
@@ -365,7 +366,7 @@ angular.module("vtexNgFilter").run(function($templateCache) {   'use strict';
         });
       }
     };
-  }).directive("vtFilterSummary", function(vtFilterService) {
+  }).directive("vtFilterSummary", function(vtFilterService, $rootScope) {
     return {
       restrict: 'E',
       scope: true,
@@ -376,6 +377,10 @@ angular.module("vtexNgFilter").run(function($templateCache) {   'use strict';
         $scope.activeFilters = services.activeFilters;
         return $scope.disableFilter = function(filter) {
           filter.active = false;
+          $rootScope.$emit('filterRemoved', {
+            filter: filter,
+            location: 'summary'
+          });
           return services.updateQueryString();
         };
       }
