@@ -49,11 +49,12 @@ angular.module('vtexNgFilter')
 
 .factory 'TransactionFilter', (DefaultIntervalFilter) ->
   class FilterOption
-    constructor: (name, quantity, type, status) ->
+    constructor: (name, quantity, type, status, group) ->
       option =
         name: name
         quantity: quantity
         active: status
+        group: group
 
       if type isnt 'date'
         option.value = do (name) ->
@@ -103,7 +104,7 @@ angular.module('vtexNgFilter')
           return updatedOption
         else
           # Caso não exista opção, instância uma nova
-          newOption = new FilterOption(name, quantity, self.type, status)
+          newOption = new FilterOption(name, quantity, self.type, status, group)
           self.options.push newOption
 
           return newOption
