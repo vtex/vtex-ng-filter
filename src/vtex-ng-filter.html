@@ -30,7 +30,7 @@
             <div ng-class="{ 'disabled': !option.quantity,
                              'checkbox': filter.type == 'multiple',
                              'radio': filter.type == 'date' }">
-              <label>
+              <label ng-switch on="filter.group">
 
                 <input name="{{ filter.url }}" type="checkbox"
                        ng-if="filter.type == 'multiple'"
@@ -45,7 +45,11 @@
                        ng-value="option.name"
                        ng-disabled="!option.quantity">
 
-                {{ option.name | translate }} <span class="text-muted">({{ option.quantity }})</span>
+                <span ng-switch-when="date" translate>{{::("listing.dates." + option.name)}}</span>
+                <span ng-switch-when="status" translate>{{::("transactions.status." + (option.name | capitalize))}}</span>
+                <span ng-switch-default>{{::option.name}}</span>
+
+                <span class="text-muted">({{ option.quantity }})</span>
               </label>
             </div>
           </li>
