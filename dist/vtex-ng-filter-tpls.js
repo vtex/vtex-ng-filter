@@ -318,7 +318,7 @@ angular.module("vtexNgFilter").run(function($templateCache) {   'use strict';
 
 
   $templateCache.put('vtex-ng-filter-summary.html',
-    "<div class=\"filters-summary\"><span ng-if=\"activeFilters.list.length\" ng-repeat=\"filter in activeFilters.list\" ng-if=\"filter.active\"><button class=\"btn btn-xs btn-info\" ng-click=\"disableFilter(filter)\"><span>{{ ::('filters.groups.'+ filter.group) | translate }} : {{ ::filter.name | translate }}</span> <i class=\"fa fa-remove\"></i></button>&nbsp;</span></div>"
+    "<div class=\"filters-summary\"><span ng-if=\"activeFilters.list.length\" ng-repeat=\"filter in activeFilters.list\" ng-if=\"filter.active\"><button class=\"btn btn-xs btn-info\" ng-click=\"disableFilter(filter)\" ng-switch=\"\" on=\"filter.group\"><span ng-switch-when=\"date\">{{ ::('filters.groups.'+ filter.group) | translate }} : {{::((\"listing.dates.\" + filter.name) | translate)}}</span> <span ng-switch-when=\"status\">{{ ::('filters.groups.'+ filter.group) | translate }} : {{::(\"transactions.status.\" + (filter.name | capitalize) | translate)}}</span> <span ng-switch-default=\"\">{{ ::('filters.groups.'+ filter.group) | translate }} : {{::filter.name}}</span> <i class=\"fa fa-remove\"></i></button>&nbsp;</span></div>"
   );
 
 
