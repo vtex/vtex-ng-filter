@@ -38,8 +38,8 @@ angular.module('vtexNgFilter')
   self.updateQueryString = ->
     query = {}
 
-    for url, filter of self.filters
-      query[url] = query[url] || []
+    for url, filter of _.flatten self.filters
+      query[url] = query[url] or []
 
       for option in filter.options
         if option.active then query[url].push option.value
@@ -47,16 +47,17 @@ angular.module('vtexNgFilter')
       if query[url].length then query[url] = query[url].join(' OR ') else query[url] = null
 
     availableFilters = {}
-    for key, value of query then availableFilters[key] = value if value != null
+    console.log query
+    for key, value of query then availableFilters[key] = value if value?
     $rootScope.$emit 'filterChanged', filterValues: availableFilters
 
     for querieName, querieValue of query
       $location.search querieName, querieValue
 
   self.clearAllFilters = ->
-    self.filters = _.each self.filters, (f) ->
+    self.filters = _.map self.filters, (f) ->
       f.active = false
-      _.each f.options, (o) -> o.active = false
+      f.options = _.map f.options, (o) -> o.active = false
 
   self.setFilters = (endpoint, filters, search) ->
     locationActiveFilters = self.getQueryStringFilters(search, filters)
@@ -85,7 +86,7 @@ angular.module('vtexNgFilter')
           if filters[categoryName].type is "multiple" then status = !!status
 
           # Instância os filtros dentro das categorias correspondentes
-          option = filters[categoryName].setOptions(filterName, filterQuantity, status)
+          option = filters[categoryName].setOptions filterName, filterQuantity, status
 
           # Popula array de filtros ativos
           self.activeFilters.list.push option if option.active

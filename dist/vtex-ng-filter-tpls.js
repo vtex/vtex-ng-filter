@@ -8,6 +8,8 @@ angular.module("vtexNgFilter", []);(function() {
 }).call(this);
 
 (function() {
+  var bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
   angular.module('vtexNgFilter').factory('DefaultIntervalFilter', function() {
     var DefaultIntervalFilter;
     return DefaultIntervalFilter = (function() {
@@ -45,20 +47,19 @@ angular.module("vtexNgFilter", []);(function() {
     var TransactionGroup;
     return TransactionGroup = (function() {
       function TransactionGroup() {
-        var arr;
-        arr = {};
-        arr["startDate"] = new TransactionFilter("startDate", "startDate", "date", "date");
-        arr["authorizationDate"] = new TransactionFilter("authorizationDate", "authorizationDate", "date", "date");
-        arr["commitmentDate"] = new TransactionFilter("commitmentDate", "commitmentDate", "date", "date");
-        arr["cancelationDate"] = new TransactionFilter("cancelationDate", "cancelationDate", "date", "date");
-        arr["payments.paymentSystemName"] = new TransactionFilter("paymentSystem", "payments.paymentSystemName", "multiple", "paymentCondition");
-        arr["payments.installments"] = new TransactionFilter("installments", "payments.installments", "multiple", "paymentCondition");
-        arr["payments.connectorName"] = new TransactionFilter("connectorName", "payments.connectorName", "multiple", "channel");
-        arr["payments.antifraudImplementation"] = new TransactionFilter("antifraudImplementation", "payments.antifraudImplementation", "multiple", "channel");
-        arr["salesChannel"] = new TransactionFilter("salesChannel", "salesChannel", "multiple", "channel");
-        arr["status"] = new TransactionFilter("status", "status", "multiple", "status");
-        arr["payments.refunds"] = new TransactionFilter("refunds", "payments.refunds", "multiple", "status");
-        return arr;
+        this.startDate = new TransactionFilter('startDate', 'startDate', 'date', 'date');
+        this.authorizationDate = new TransactionFilter('authorizationDate', 'authorizationDate', 'date', 'date');
+        this.commitmentDate = new TransactionFilter('commitmentDate', 'commitmentDate', 'date', 'date');
+        this.cancelationDate = new TransactionFilter('cancelationDate', 'cancelationDate', 'date', 'date');
+        this.salesChannel = new TransactionFilter('salesChannel', 'salesChannel', 'multiple', 'channel');
+        this.status = new TransactionFilter('status', 'status', 'multiple', 'status');
+        this.payments = {
+          paymentSystemName: new TransactionFilter('paymentSystem', 'payments.paymentSystemName', 'multiple', 'paymentCondition'),
+          installments: new TransactionFilter('installments', 'payments.installments', 'multiple', 'paymentCondition'),
+          connectorName: new TransactionFilter('connectorName', 'payments.connectorName', 'multiple', 'channel'),
+          antifraudImplementation: new TransactionFilter('antifraudImplementation', 'payments.antifraudImplementation', 'multiple', 'channel'),
+          refunds: new TransactionFilter('refunds', 'payments.refunds', 'multiple', 'status')
+        };
       }
 
       return TransactionGroup;
@@ -68,8 +69,8 @@ angular.module("vtexNgFilter", []);(function() {
     var FilterOption, TransactionFilter;
     FilterOption = (function() {
       function FilterOption(name, quantity, type, status, group, filterName) {
-        var i, intervals, len, option, range;
-        option = {
+        var i, len, range, ref;
+        this.option = {
           name: name,
           quantity: quantity,
           active: status,
@@ -77,22 +78,23 @@ angular.module("vtexNgFilter", []);(function() {
           filterName: filterName
         };
         if (type !== 'date') {
-          option.value = (function(name) {
+          this.option.value = (function(name) {
             if (typeof name === 'string' && name.indexOf(' ') >= 0) {
-              name = '"' + name + '"';
+              return "'" + name + "'";
+            } else {
+              return name;
             }
-            return name;
           })(name);
         } else {
-          intervals = new DefaultIntervalFilter();
-          for (i = 0, len = intervals.length; i < len; i++) {
-            range = intervals[i];
+          ref = new DefaultIntervalFilter();
+          for (i = 0, len = ref.length; i < len; i++) {
+            range = ref[i];
             if (range.name === name) {
-              option.value = range.interval;
+              this.option.value = range.interval;
             }
           }
         }
-        return option;
+        return this.option;
       }
 
       return FilterOption;
@@ -100,50 +102,57 @@ angular.module("vtexNgFilter", []);(function() {
     })();
     return TransactionFilter = (function() {
       function TransactionFilter(name, url, type, group, range) {
-        var self;
-        self = this;
+        this.setOptions = bind(this.setOptions, this);
+        this.clearOptions = bind(this.clearOptions, this);
         this.name = name;
         this.url = url;
         this.type = type;
         this.group = group;
         this.active = false;
-        this.options = [];
-        if (type === "date" && !range) {
+        if (type === 'date' && !this.range) {
           this.range = new DefaultIntervalFilter();
-        } else {
-          this.range = range;
         }
-        this.clearOptions = function() {
-          return self.options = _.map(self.options, function(o) {
-            o.active = false;
-            o.quantity = 0;
-            return o;
-          });
-        };
-        this.setOptions = function(name, quantity, status) {
-          var _active, i, len, newOption, option, ref, updatedOption;
-          updatedOption = false;
-          _active = false;
-          ref = self.options;
-          for (i = 0, len = ref.length; i < len; i++) {
-            option = ref[i];
-            _active = _active || option.active;
-            if (name === option.name) {
-              option.quantity = quantity;
-              option.active = status;
-              updatedOption = option;
-            }
-          }
-          self.active = status || _active;
-          if (updatedOption) {
-            return updatedOption;
-          } else {
-            newOption = new FilterOption(name, quantity, self.type, status, group, self.name);
-            self.options.push(newOption);
-            return newOption;
-          }
-        };
+        this.options = [];
       }
+
+      TransactionFilter.prototype.clearOptions = function() {
+        var i, len, option, ref, results;
+        ref = this.options;
+        results = [];
+        for (i = 0, len = ref.length; i < len; i++) {
+          option = ref[i];
+          option.active = false;
+          results.push(option.quantity = 0);
+        }
+        return results;
+      };
+
+      TransactionFilter.prototype.setOptions = function(name, quantity, status, group) {
+        var i, isActive, len, newOption, option, ref, updatedOption;
+        if (group == null) {
+          group = this.group;
+        }
+        updatedOption = false;
+        isActive = false;
+        ref = this.options;
+        for (i = 0, len = ref.length; i < len; i++) {
+          option = ref[i];
+          if (!(name === option.name)) {
+            continue;
+          }
+          isActive || (isActive = option.active);
+          option.quantity = quantity;
+          option.active = status;
+          updatedOption = option;
+        }
+        this.active = status || isActive;
+        if (updatedOption) {
+          return updatedOption;
+        }
+        newOption = new FilterOption(name, quantity, this.type, status, group, this.name);
+        this.options.push(newOption);
+        return newOption;
+      };
 
       return TransactionFilter;
 
@@ -202,7 +211,7 @@ angular.module("vtexNgFilter", []);(function() {
     self.updateQueryString = function() {
       var availableFilters, filter, j, key, len, option, querieName, querieValue, query, ref, ref1, results, url, value;
       query = {};
-      ref = self.filters;
+      ref = _.flatten(self.filters);
       for (url in ref) {
         filter = ref[url];
         query[url] = query[url] || [];
@@ -220,9 +229,10 @@ angular.module("vtexNgFilter", []);(function() {
         }
       }
       availableFilters = {};
+      console.log(query);
       for (key in query) {
         value = query[key];
-        if (value !== null) {
+        if (value != null) {
           availableFilters[key] = value;
         }
       }
@@ -237,9 +247,9 @@ angular.module("vtexNgFilter", []);(function() {
       return results;
     };
     self.clearAllFilters = function() {
-      return self.filters = _.each(self.filters, function(f) {
+      return self.filters = _.map(self.filters, function(f) {
         f.active = false;
-        return _.each(f.options, function(o) {
+        return f.options = _.map(f.options, function(o) {
           return o.active = false;
         });
       });
