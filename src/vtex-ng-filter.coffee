@@ -1,7 +1,8 @@
 angular.module('vtexNgFilter')
-  .directive "vtFilter", ($rootScope, $location, vtFilterService) ->
+  .directive 'vtFilter', ($rootScope, $location, vtFilterService) ->
     restrict: 'E'
-    scope: endpoint: '=endpoint'
+    scope:
+      endpoint: '=endpoint'
     templateUrl: 'vtex-ng-filter.html'
     link: ($scope) ->
 
@@ -9,7 +10,6 @@ angular.module('vtexNgFilter')
       filters = services.filters
       endpoint = $scope.endpoint
 
-      # Group Filters by group to UI
       $scope.groups = _.groupBy filters, (_f) -> _f.group
       $scope.activeFilters = services.activeFilters
       $scope.clearAllFilters = ->
@@ -19,17 +19,13 @@ angular.module('vtexNgFilter')
 
       $scope.updateQueryString = services.updateQueryString
 
-      # Start directive
       services.setFilters(endpoint, filters).then (data) ->
-        # Checa se existe alguma busca existente
-        # e pede novamente os filtros com parametros de busca
         search = $location.search()
-        if Object.keys(search).length then services.setFilters(endpoint, filters, search)
+        services.setFilters endpoint, filters, search if _.keys(search).length
 
-      # If url changes, update filters to match
-      $scope.$on '$locationChangeSuccess', -> services.setFilters(endpoint, filters, $location.search())
+      $scope.$on '$locationChangeSuccess', -> services.setFilters endpoint, filters, $location.search()
 
-  .directive "vtFilterSummary", (vtFilterService, $rootScope) ->
+  .directive 'vtFilterSummary', (vtFilterService, $rootScope) ->
     restrict: 'E'
     scope: true
     templateUrl: 'vtex-ng-filter-summary.html'
@@ -42,7 +38,7 @@ angular.module('vtexNgFilter')
         $rootScope.$emit 'filterRemoved', filter: filter, location: 'summary'
         services.updateQueryString()
 
-  .directive "vtFilterButton", (vtFilterService) ->
+  .directive 'vtFilterButton', (vtFilterService) ->
     restrict: 'E'
     scope: true
     templateUrl: 'vtex-ng-filter-button.html'

@@ -1,8 +1,11 @@
 angular.module('vtexNgFilter')
 .service 'vtFilterService', ($http, $location, $rootScope, TransactionGroup, DefaultIntervalFilter) ->
 
-  self = this
   baseInterval = new DefaultIntervalFilter()
+
+  @filters = new TransactionGroup()
+  @activeFilters =
+    list: []
 
   getDateRangeFilter = (date) ->
     _d = "#{date.url}->"
@@ -27,88 +30,65 @@ angular.module('vtexNgFilter')
   transformSearch = (searchObj) ->
     basicFilters = new TransactionGroup()
     search = []
-    search.push "#{k}=#{v}" for k,v of searchObj when basicFilters[k]
+    search.push "#{k}=#{v}" for k, v of searchObj when basicFilters[k]
     search.join '&'
 
-
-  self.filters = new TransactionGroup()
-
-  self.activeFilters = list: []
-
-  self.updateQueryString = ->
+  @updateQueryString = =>
+    console.log 'Updating query string...'
     query = {}
 
-    for url, filter of _.flatten self.filters
-      query[url] = query[url] or []
+    for facet, filter of @filters
+      query[facet] = query[facet] or []
 
-      for option in filter.options
-        if option.active then query[url].push option.value
+      if filter?.options?.length
+        query[facet].push option.value for option in filter.options when option.active
 
-      if query[url].length then query[url] = query[url].join(' OR ') else query[url] = null
+      if query[facet].length
+        query[facet] = query[facet].join(' OR ')
+      else query[facet] = null
 
-    availableFilters = {}
-    console.log query
-    for key, value of query then availableFilters[key] = value if value?
-    $rootScope.$emit 'filterChanged', filterValues: availableFilters
+    $rootScope.$emit 'filterChanged', query
+    $location.search query
 
-    for querieName, querieValue of query
-      $location.search querieName, querieValue
-
-  self.clearAllFilters = ->
-    self.filters = _.map self.filters, (f) ->
+  @clearAllFilters = =>
+    @filters = _.map @filters, (f) ->
       f.active = false
       f.options = _.map f.options, (o) -> o.active = false
 
-  self.setFilters = (endpoint, filters, search) ->
-    locationActiveFilters = self.getQueryStringFilters(search, filters)
+  @setFilters = (endpoint, filters, search) =>
+    locationActiveFilters = @getQueryStringFilters search, filters
+    @activeFilters.list = []
 
-    # Lista de filtros ativos
-    self.activeFilters.list = []
-
-    # Com resultado da API, preenche filtros com opcões disponíveis
-    self.getAvailableFacets(endpoint, filters, search).then (res) ->
-      _.each res, (categoryOptions, categoryName) ->
-        # Limpa opções antes de criar novas
-        # Opção usada quando usuário atualiza a lista
-        # removendo filtros não mais existentes
+    @getAvailableFacets(endpoint, filters, search).then (res) =>
+      _.each res, (categoryOptions, categoryName) =>
         filters[categoryName].clearOptions()
 
         for filterName, filterQuantity of categoryOptions
-          # Verifica se o filtro esta presente na querystring
-          # e altera o status dele para ativo
           if locationActiveFilters[categoryName]
             for activeFilterName in locationActiveFilters[categoryName]
               status = if activeFilterName.indexOf(filterName) >= 0 then activeFilterName
               break if status
 
-          # Transforma Value do option em booleano caso seja um checkbox
-          # necessário por conta do angular boboca
-          if filters[categoryName].type is "multiple" then status = !!status
+          if filters[categoryName].type is 'multiple'
+            status = true if status is 'true'
+            status = false if status is 'false'
 
-          # Instância os filtros dentro das categorias correspondentes
           option = filters[categoryName].setOptions filterName, filterQuantity, status
+          @activeFilters.list.push option if option.active
 
-          # Popula array de filtros ativos
-          self.activeFilters.list.push option if option.active
-
-  # Retorna filtros ativos na querystring que sejam válidos
-  self.getQueryStringFilters = (search, filters) ->
+  @getQueryStringFilters = (search, filters) ->
     obj = {}
-    for k, v of search
-      if filters[k]
-        # Caso seja uma data, retorna o name correspondente ao intervalo
-        if filters[k].type is 'date'
-          interval = _.find baseInterval, (i) -> i.interval is v
-          v = interval.name
-        obj[k] = v.split ' OR '
+    for k, v of search when filters[k]
+      if filters[k].type is 'date'
+        interval = _.find baseInterval, (i) -> i.interval is v
+        v = interval.name
+      obj[k] = v.split ' OR '
     return obj
 
-  # Retorna lista de filtros
-  self.getAvailableFacets = (endpoint, filters, search) ->
+  @getAvailableFacets = (endpoint, filters, search) ->
     url = "#{endpoint}?#{ setFacetsQuery( filters ) }"
-    # Caso tenha uma busca, adiciona ela a URL e trás o resultado filtrado por ela
-    if transformSearch(search) then url += "&#{transformSearch(search)}"
+    url += "&#{transformSearch(search)}" if transformSearch search
     $http.get(url).then (res) -> res.data
 
 
-  return self
+  return this

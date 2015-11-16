@@ -163,9 +163,12 @@ angular.module("vtexNgFilter", []);(function() {
 
 (function() {
   angular.module('vtexNgFilter').service('vtFilterService', function($http, $location, $rootScope, TransactionGroup, DefaultIntervalFilter) {
-    var baseInterval, getDateRangeFilter, self, setFacetsQuery, transformSearch;
-    self = this;
+    var baseInterval, getDateRangeFilter, setFacetsQuery, transformSearch;
     baseInterval = new DefaultIntervalFilter();
+    this.filters = new TransactionGroup();
+    this.activeFilters = {
+      list: []
+    };
     getDateRangeFilter = function(date) {
       var _d, arr, j, len, range, ref;
       _d = date.url + "->";
@@ -204,109 +207,105 @@ angular.module("vtexNgFilter", []);(function() {
       }
       return search.join('&');
     };
-    self.filters = new TransactionGroup();
-    self.activeFilters = {
-      list: []
-    };
-    self.updateQueryString = function() {
-      var availableFilters, filter, j, key, len, option, querieName, querieValue, query, ref, ref1, results, url, value;
-      query = {};
-      ref = _.flatten(self.filters);
-      for (url in ref) {
-        filter = ref[url];
-        query[url] = query[url] || [];
-        ref1 = filter.options;
-        for (j = 0, len = ref1.length; j < len; j++) {
-          option = ref1[j];
-          if (option.active) {
-            query[url].push(option.value);
-          }
-        }
-        if (query[url].length) {
-          query[url] = query[url].join(' OR ');
-        } else {
-          query[url] = null;
-        }
-      }
-      availableFilters = {};
-      console.log(query);
-      for (key in query) {
-        value = query[key];
-        if (value != null) {
-          availableFilters[key] = value;
-        }
-      }
-      $rootScope.$emit('filterChanged', {
-        filterValues: availableFilters
-      });
-      results = [];
-      for (querieName in query) {
-        querieValue = query[querieName];
-        results.push($location.search(querieName, querieValue));
-      }
-      return results;
-    };
-    self.clearAllFilters = function() {
-      return self.filters = _.map(self.filters, function(f) {
-        f.active = false;
-        return f.options = _.map(f.options, function(o) {
-          return o.active = false;
-        });
-      });
-    };
-    self.setFilters = function(endpoint, filters, search) {
-      var locationActiveFilters;
-      locationActiveFilters = self.getQueryStringFilters(search, filters);
-      self.activeFilters.list = [];
-      return self.getAvailableFacets(endpoint, filters, search).then(function(res) {
-        return _.each(res, function(categoryOptions, categoryName) {
-          var activeFilterName, filterName, filterQuantity, j, len, option, ref, results, status;
-          filters[categoryName].clearOptions();
-          results = [];
-          for (filterName in categoryOptions) {
-            filterQuantity = categoryOptions[filterName];
-            if (locationActiveFilters[categoryName]) {
-              ref = locationActiveFilters[categoryName];
-              for (j = 0, len = ref.length; j < len; j++) {
-                activeFilterName = ref[j];
-                status = activeFilterName.indexOf(filterName) >= 0 ? activeFilterName : void 0;
-                if (status) {
-                  break;
-                }
+    this.updateQueryString = (function(_this) {
+      return function() {
+        var facet, filter, j, len, option, query, ref, ref1, ref2;
+        console.log('Updating query string...');
+        query = {};
+        ref = _this.filters;
+        for (facet in ref) {
+          filter = ref[facet];
+          query[facet] = query[facet] || [];
+          if (filter != null ? (ref1 = filter.options) != null ? ref1.length : void 0 : void 0) {
+            ref2 = filter.options;
+            for (j = 0, len = ref2.length; j < len; j++) {
+              option = ref2[j];
+              if (option.active) {
+                query[facet].push(option.value);
               }
             }
-            if (filters[categoryName].type === "multiple") {
-              status = !!status;
-            }
-            option = filters[categoryName].setOptions(filterName, filterQuantity, status);
-            if (option.active) {
-              results.push(self.activeFilters.list.push(option));
-            } else {
-              results.push(void 0);
-            }
           }
-          return results;
+          if (query[facet].length) {
+            query[facet] = query[facet].join(' OR ');
+          } else {
+            query[facet] = null;
+          }
+        }
+        $rootScope.$emit('filterChanged', query);
+        return $location.search(query);
+      };
+    })(this);
+    this.clearAllFilters = (function(_this) {
+      return function() {
+        return _this.filters = _.map(_this.filters, function(f) {
+          f.active = false;
+          return f.options = _.map(f.options, function(o) {
+            return o.active = false;
+          });
         });
-      });
-    };
-    self.getQueryStringFilters = function(search, filters) {
+      };
+    })(this);
+    this.setFilters = (function(_this) {
+      return function(endpoint, filters, search) {
+        var locationActiveFilters;
+        locationActiveFilters = _this.getQueryStringFilters(search, filters);
+        _this.activeFilters.list = [];
+        return _this.getAvailableFacets(endpoint, filters, search).then(function(res) {
+          return _.each(res, function(categoryOptions, categoryName) {
+            var activeFilterName, filterName, filterQuantity, j, len, option, ref, results, status;
+            filters[categoryName].clearOptions();
+            results = [];
+            for (filterName in categoryOptions) {
+              filterQuantity = categoryOptions[filterName];
+              if (locationActiveFilters[categoryName]) {
+                ref = locationActiveFilters[categoryName];
+                for (j = 0, len = ref.length; j < len; j++) {
+                  activeFilterName = ref[j];
+                  status = activeFilterName.indexOf(filterName) >= 0 ? activeFilterName : void 0;
+                  if (status) {
+                    break;
+                  }
+                }
+              }
+              if (filters[categoryName].type === 'multiple') {
+                if (status === 'true') {
+                  status = true;
+                }
+                if (status === 'false') {
+                  status = false;
+                }
+              }
+              option = filters[categoryName].setOptions(filterName, filterQuantity, status);
+              if (option.active) {
+                results.push(_this.activeFilters.list.push(option));
+              } else {
+                results.push(void 0);
+              }
+            }
+            return results;
+          });
+        });
+      };
+    })(this);
+    this.getQueryStringFilters = function(search, filters) {
       var interval, k, obj, v;
       obj = {};
       for (k in search) {
         v = search[k];
-        if (filters[k]) {
-          if (filters[k].type === 'date') {
-            interval = _.find(baseInterval, function(i) {
-              return i.interval === v;
-            });
-            v = interval.name;
-          }
-          obj[k] = v.split(' OR ');
+        if (!filters[k]) {
+          continue;
         }
+        if (filters[k].type === 'date') {
+          interval = _.find(baseInterval, function(i) {
+            return i.interval === v;
+          });
+          v = interval.name;
+        }
+        obj[k] = v.split(' OR ');
       }
       return obj;
     };
-    self.getAvailableFacets = function(endpoint, filters, search) {
+    this.getAvailableFacets = function(endpoint, filters, search) {
       var url;
       url = endpoint + "?" + (setFacetsQuery(filters));
       if (transformSearch(search)) {
@@ -316,7 +315,7 @@ angular.module("vtexNgFilter", []);(function() {
         return res.data;
       });
     };
-    return self;
+    return this;
   });
 
 }).call(this);
@@ -329,7 +328,7 @@ angular.module("vtexNgFilter").run(function($templateCache) {   'use strict';
 
 
   $templateCache.put('vtex-ng-filter-summary.html',
-    "<div class=\"filters-summary\"><span ng-if=\"activeFilters.list.length\" ng-repeat=\"filter in activeFilters.list\" ng-if=\"filter.active\"><button class=\"btn btn-xs btn-info\" ng-click=\"disableFilter(filter)\" ng-switch=\"\" on=\"filter.group\"><span ng-switch-when=\"date\">{{ ::('filters.' + filter.filterName) | translate }} : {{::((\"listing.dates.\" + filter.name) | translate)}}</span> <span ng-switch-when=\"status\">{{ ::('filters.' + filter.filterName) | translate }} : {{::(\"transactions.status.\" + (filter.name | capitalize) | translate)}}</span> <span ng-switch-default=\"\">{{ ::('filters.' + filter.filterName) | translate }} : {{::filter.name}}</span> <i class=\"fa fa-remove\"></i></button>&nbsp;</span></div>"
+    "<div class=\"filters-summary\"><span ng-if=\"activeFilters.list.length\" ng-repeat=\"filter in activeFilters.list\" ng-if=\"filter.active\"><button class=\"btn btn-xs btn-info\" ng-click=\"disableFilter(filter)\" ng-switch=\"\" on=\"filter.group\"><span ng-switch-when=\"date\">{{ ::('filters.' + filter.filterName) | translate }} : {{::((\"listing.dates.\" + filter.name) | translate)}}</span> <span ng-switch-when=\"status\">{{ ::('filters.' + filter.filterName) | translate }} : {{::(\"transactions.status.\" + (filter.name | capitalize) | translate)}}</span> <span ng-switch-default=\"\">{{ ::('filters.' + filter.filterName) | translate }} : {{::filter.name}}</span> &nbsp; <i class=\"fa fa-remove\"></i></button>&nbsp;</span></div>"
   );
 
 
@@ -343,7 +342,7 @@ angular.module("vtexNgFilter").run(function($templateCache) {   'use strict';
   );
  });
 (function() {
-  angular.module('vtexNgFilter').directive("vtFilter", function($rootScope, $location, vtFilterService) {
+  angular.module('vtexNgFilter').directive('vtFilter', function($rootScope, $location, vtFilterService) {
     return {
       restrict: 'E',
       scope: {
@@ -368,7 +367,7 @@ angular.module("vtexNgFilter").run(function($templateCache) {   'use strict';
         services.setFilters(endpoint, filters).then(function(data) {
           var search;
           search = $location.search();
-          if (Object.keys(search).length) {
+          if (_.keys(search).length) {
             return services.setFilters(endpoint, filters, search);
           }
         });
@@ -377,7 +376,7 @@ angular.module("vtexNgFilter").run(function($templateCache) {   'use strict';
         });
       }
     };
-  }).directive("vtFilterSummary", function(vtFilterService, $rootScope) {
+  }).directive('vtFilterSummary', function(vtFilterService, $rootScope) {
     return {
       restrict: 'E',
       scope: true,
@@ -396,7 +395,7 @@ angular.module("vtexNgFilter").run(function($templateCache) {   'use strict';
         };
       }
     };
-  }).directive("vtFilterButton", function(vtFilterService) {
+  }).directive('vtFilterButton', function(vtFilterService) {
     return {
       restrict: 'E',
       scope: true,
