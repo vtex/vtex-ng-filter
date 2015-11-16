@@ -64,6 +64,7 @@ angular.module('vtexNgFilter')
     setOptions: (name, quantity, status, group = @group) =>
       updatedOption = false
       isActive = false
+      status = if status then true else false
 
       for option in @options when name is option.name
         isActive or= option.active

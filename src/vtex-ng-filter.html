@@ -42,12 +42,11 @@
                        ng-if="filter.type == 'date'"
                        ng-change="updateQueryString()"
                        ng-model="option.active"
-                       ng-value="option.name"
-                       ng-disabled="!option.quantity">
+                       ng-value="true">
 
-                <span ng-switch-when="date" translate>{{::("listing.dates." + option.name)}}</span>
-                <span ng-switch-when="status" translate>{{::("transactions.status." + (option.name | capitalize))}}</span>
-                <span ng-switch-default>{{::option.name}}</span>
+                <span ng-switch-when="date" translate>{{("listing.dates." + option.name)}}</span>
+                <span ng-switch-when="status" translate>{{("transactions.status." + (option.name | capitalize))}}</span>
+                <span ng-switch-default>{{ option.name }}</span>
 
                 <span class="text-muted">({{ option.quantity }})</span>
               </label>

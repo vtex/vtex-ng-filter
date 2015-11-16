@@ -34,7 +34,6 @@ angular.module('vtexNgFilter')
     search.join '&'
 
   @updateQueryString = =>
-    console.log 'Updating query string...'
     query = {}
 
     for facet, filter of @filters
@@ -51,9 +50,10 @@ angular.module('vtexNgFilter')
     $location.search query
 
   @clearAllFilters = =>
-    @filters = _.map @filters, (f) ->
-      f.active = false
-      f.options = _.map f.options, (o) -> o.active = false
+    for name, filter of @filters
+      console.log 'offing', name
+      @filters[name].active = false
+      option.active = false for option in filter.options if filter.options?.length
 
   @setFilters = (endpoint, filters, search) =>
     locationActiveFilters = @getQueryStringFilters search, filters
@@ -69,11 +69,11 @@ angular.module('vtexNgFilter')
               status = if activeFilterName.indexOf(filterName) >= 0 then activeFilterName
               break if status
 
-          if filters[categoryName].type is 'multiple'
-            status = true if status is 'true'
-            status = false if status is 'false'
+          status = true if status is 'true'
+          status = false if status is 'false'
 
           option = filters[categoryName].setOptions filterName, filterQuantity, status
+          console.log filters[categoryName] if option.active
           @activeFilters.list.push option if option.active
 
   @getQueryStringFilters = (search, filters) ->
@@ -88,7 +88,7 @@ angular.module('vtexNgFilter')
   @getAvailableFacets = (endpoint, filters, search) ->
     url = "#{endpoint}?#{ setFacetsQuery( filters ) }"
     url += "&#{transformSearch(search)}" if transformSearch search
-    $http.get(url).then (res) -> res.data
+    $http.get( url, cache: true ).then (res) -> res.data
 
 
   return this

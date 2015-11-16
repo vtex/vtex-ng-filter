@@ -134,6 +134,7 @@ angular.module("vtexNgFilter", []);(function() {
         }
         updatedOption = false;
         isActive = false;
+        status = status ? true : false;
         ref = this.options;
         for (i = 0, len = ref.length; i < len; i++) {
           option = ref[i];
@@ -210,7 +211,6 @@ angular.module("vtexNgFilter", []);(function() {
     this.updateQueryString = (function(_this) {
       return function() {
         var facet, filter, j, len, option, query, ref, ref1, ref2;
-        console.log('Updating query string...');
         query = {};
         ref = _this.filters;
         for (facet in ref) {
@@ -237,12 +237,29 @@ angular.module("vtexNgFilter", []);(function() {
     })(this);
     this.clearAllFilters = (function(_this) {
       return function() {
-        return _this.filters = _.map(_this.filters, function(f) {
-          f.active = false;
-          return f.options = _.map(f.options, function(o) {
-            return o.active = false;
-          });
-        });
+        var filter, name, option, ref, ref1, results;
+        ref = _this.filters;
+        results = [];
+        for (name in ref) {
+          filter = ref[name];
+          console.log('offing', name);
+          _this.filters[name].active = false;
+          if ((ref1 = filter.options) != null ? ref1.length : void 0) {
+            results.push((function() {
+              var j, len, ref2, results1;
+              ref2 = filter.options;
+              results1 = [];
+              for (j = 0, len = ref2.length; j < len; j++) {
+                option = ref2[j];
+                results1.push(option.active = false);
+              }
+              return results1;
+            })());
+          } else {
+            results.push(void 0);
+          }
+        }
+        return results;
       };
     })(this);
     this.setFilters = (function(_this) {
@@ -267,15 +284,16 @@ angular.module("vtexNgFilter", []);(function() {
                   }
                 }
               }
-              if (filters[categoryName].type === 'multiple') {
-                if (status === 'true') {
-                  status = true;
-                }
-                if (status === 'false') {
-                  status = false;
-                }
+              if (status === 'true') {
+                status = true;
+              }
+              if (status === 'false') {
+                status = false;
               }
               option = filters[categoryName].setOptions(filterName, filterQuantity, status);
+              if (option.active) {
+                console.log(filters[categoryName]);
+              }
               if (option.active) {
                 results.push(_this.activeFilters.list.push(option));
               } else {
@@ -311,7 +329,9 @@ angular.module("vtexNgFilter", []);(function() {
       if (transformSearch(search)) {
         url += "&" + (transformSearch(search));
       }
-      return $http.get(url).then(function(res) {
+      return $http.get(url, {
+        cache: true
+      }).then(function(res) {
         return res.data;
       });
     };
@@ -338,7 +358,7 @@ angular.module("vtexNgFilter").run(function($templateCache) {   'use strict';
     "                                'fa-exchange': name === 'channel',\n" +
     "                                'fa-refresh': name === 'status', }\"></i> {{ ('filters.groups.' + name) | translate }}</h3><accordion close-others=\"true\"><accordion-group ng-repeat=\"filter in group\" ng-if=\"filter.options.length\"><accordion-heading>{{ 'filters.' + filter.name | translate }} <span class=\"label label-info pull-right\" ng-if=\"filter.active\"><i class=\"fa fa-dot-circle-o\"></i></span></accordion-heading><ul class=\"filter-list nav nav-pills nav-stacked\"><li ng-repeat=\"option in filter.options\"><div ng-class=\"{ 'disabled': !option.quantity,\n" +
     "                             'checkbox': filter.type == 'multiple',\n" +
-    "                             'radio': filter.type == 'date' }\"><label ng-switch=\"\" on=\"filter.group\"><input name=\"{{ filter.url }}\" type=\"checkbox\" ng-if=\"filter.type == 'multiple'\" ng-change=\"updateQueryString()\" ng-model=\"option.active\" ng-checked=\"option.active\" ng-disabled=\"!option.quantity\"><input name=\"{{ filter.url }}\" type=\"radio\" ng-if=\"filter.type == 'date'\" ng-change=\"updateQueryString()\" ng-model=\"option.active\" ng-value=\"option.name\" ng-disabled=\"!option.quantity\"><span ng-switch-when=\"date\" translate=\"\">{{::(\"listing.dates.\" + option.name)}}</span> <span ng-switch-when=\"status\" translate=\"\">{{::(\"transactions.status.\" + (option.name | capitalize))}}</span> <span ng-switch-default=\"\">{{::option.name}}</span> <span class=\"text-muted\">({{ option.quantity }})</span></label></div></li></ul><button class=\"btn\" ng-click=\"filter.clearSelection()\" ng-show=\"filter.type === 'single' && filter.selectedItem\" translate=\"\">search.clear</button></accordion-group></accordion></div></div>"
+    "                             'radio': filter.type == 'date' }\"><label ng-switch=\"\" on=\"filter.group\"><input name=\"{{ filter.url }}\" type=\"checkbox\" ng-if=\"filter.type == 'multiple'\" ng-change=\"updateQueryString()\" ng-model=\"option.active\" ng-checked=\"option.active\" ng-disabled=\"!option.quantity\"><input name=\"{{ filter.url }}\" type=\"radio\" ng-if=\"filter.type == 'date'\" ng-change=\"updateQueryString()\" ng-model=\"option.active\" ng-value=\"true\"><span ng-switch-when=\"date\" translate=\"\">{{(\"listing.dates.\" + option.name)}}</span> <span ng-switch-when=\"status\" translate=\"\">{{(\"transactions.status.\" + (option.name | capitalize))}}</span> <span ng-switch-default=\"\">{{ option.name }}</span> <span class=\"text-muted\">({{ option.quantity }})</span></label></div></li></ul><button class=\"btn\" ng-click=\"filter.clearSelection()\" ng-show=\"filter.type === 'single' && filter.selectedItem\" translate=\"\">search.clear</button></accordion-group></accordion></div></div>"
   );
  });
 (function() {
