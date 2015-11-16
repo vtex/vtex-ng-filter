@@ -242,7 +242,6 @@ angular.module("vtexNgFilter", []);(function() {
         results = [];
         for (name in ref) {
           filter = ref[name];
-          console.log('offing', name);
           _this.filters[name].active = false;
           if ((ref1 = filter.options) != null ? ref1.length : void 0) {
             results.push((function() {
@@ -269,7 +268,7 @@ angular.module("vtexNgFilter", []);(function() {
         _this.activeFilters.list = [];
         return _this.getAvailableFacets(endpoint, filters, search).then(function(res) {
           return _.each(res, function(categoryOptions, categoryName) {
-            var activeFilterName, filterName, filterQuantity, j, len, option, ref, results, status;
+            var activeFilterName, existing, filterName, filterQuantity, j, len, option, ref, results, status;
             filters[categoryName].clearOptions();
             results = [];
             for (filterName in categoryOptions) {
@@ -292,10 +291,17 @@ angular.module("vtexNgFilter", []);(function() {
               }
               option = filters[categoryName].setOptions(filterName, filterQuantity, status);
               if (option.active) {
-                console.log(filters[categoryName]);
-              }
-              if (option.active) {
-                results.push(_this.activeFilters.list.push(option));
+                existing = _.find(_this.activeFilters.list, function(o) {
+                  return o.filterName === option.filterName;
+                });
+                if (!existing) {
+                  _this.activeFilters.list.push(option);
+                }
+                if (existing) {
+                  results.push(_this.activeFilters.list[categoryName] = option);
+                } else {
+                  results.push(void 0);
+                }
               } else {
                 results.push(void 0);
               }
@@ -384,13 +390,7 @@ angular.module("vtexNgFilter").run(function($templateCache) {   'use strict';
           return true;
         };
         $scope.updateQueryString = services.updateQueryString;
-        services.setFilters(endpoint, filters).then(function(data) {
-          var search;
-          search = $location.search();
-          if (_.keys(search).length) {
-            return services.setFilters(endpoint, filters, search);
-          }
-        });
+        services.setFilters(endpoint, filters, $location.search());
         return $scope.$on('$locationChangeSuccess', function() {
           return services.setFilters(endpoint, filters, $location.search());
         });

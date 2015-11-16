@@ -19,10 +19,8 @@ angular.module('vtexNgFilter')
 
       $scope.updateQueryString = services.updateQueryString
 
-      services.setFilters(endpoint, filters).then (data) ->
-        search = $location.search()
-        services.setFilters endpoint, filters, search if _.keys(search).length
-
+      services.setFilters endpoint, filters, $location.search()
+      
       $scope.$on '$locationChangeSuccess', -> services.setFilters endpoint, filters, $location.search()
 
   .directive 'vtFilterSummary', (vtFilterService, $rootScope) ->

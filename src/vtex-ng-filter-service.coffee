@@ -51,7 +51,6 @@ angular.module('vtexNgFilter')
 
   @clearAllFilters = =>
     for name, filter of @filters
-      console.log 'offing', name
       @filters[name].active = false
       option.active = false for option in filter.options if filter.options?.length
 
@@ -73,8 +72,10 @@ angular.module('vtexNgFilter')
           status = false if status is 'false'
 
           option = filters[categoryName].setOptions filterName, filterQuantity, status
-          console.log filters[categoryName] if option.active
-          @activeFilters.list.push option if option.active
+          if option.active
+            existing = _.find @activeFilters.list, (o) -> o.filterName is option.filterName
+            @activeFilters.list.push option if not existing
+            @activeFilters.list[categoryName] = option if existing
 
   @getQueryStringFilters = (search, filters) ->
     obj = {}
