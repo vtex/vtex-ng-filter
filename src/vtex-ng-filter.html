@@ -8,10 +8,10 @@
 
   <div ng-repeat="group in filters">
     <h3 class="group-header">
-      <i ng-class="{ 'icon-calendar-empty':  group[0].groupName === 'date',
-                        'icon-exchange': group[0].groupName === 'channel',
-                         'icon-refresh': group[0].groupName === 'status',
-                          'icon-filter': group[0].groupName === 'other' }"></i>
+      <i ng-class="{ 'icon-calendar-empty': group[0].groupName === 'date',
+                           'icon-exchange': group[0].groupName === 'channel',
+                            'icon-refresh': group[0].groupName === 'status',
+                             'icon-filter': group[0].groupName === 'other' }"></i>
       {{ ('filters.groups.' + group[0].groupName) | translate }}
     </h3>
 
@@ -28,6 +28,16 @@
 
         <!-- DATE -->
         <div ng-if="filter.type === 'date'">
+          <div class="pull-right">
+            <label class="checkbox">
+              <span translate>filters.useMyTimezone</span>
+              <input type="checkbox" ng-model="filter.useTimezoneOffset" name="filter{{$index}}-use-timezone-offset">&nbsp;
+              <small class="label label-info">
+                {{ ::filter.currentTimezoneOffset.label }}
+              </small>
+            </label>
+          </div>
+
           <p><a href="javascript: void(0)" ng-click="filter.setDates()" translate>listing.dates.today</a></p>
           <p><a href="javascript: void(0)" ng-click="filter.setDates(-1, -1)" translate>listing.dates.yesterday</a></p>
           <p><a href="javascript: void(0)" ng-click="filter.setDates(-7)" translate>listing.dates.thisWeek</a></p>
