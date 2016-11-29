@@ -5,16 +5,19 @@ openFilters = {}
 moreOptionsShowFilters = {}
 
 angular.module('vtexNgFilter', [])
-.factory 'Filter', (DateTransform, $filter) ->
+.factory 'Filter', (DateTransform, $location, $filter) ->
   class Filter
     constructor: (filter = {}) ->
       @[k] = v for k, v of filter
 
-      @useTimezoneOffset = true
+      @useTimezoneOffset = $location.search()['p_f_useUserTimezone'] or true
       @currentTimezoneOffset = do ->
         offset = (new Date().getTimezoneOffset() / 60)
         symbol = if parseInt(offset) >= 0 then '+' else ''
         label: (symbol + offset + 'h'), value: offset
+
+      @onUseTimezoneOffsetChange = =>
+        $location.search 'p_f_useUserTimezone', @useTimezoneOffset
 
       @setGroup()
       @selectedCount = 0

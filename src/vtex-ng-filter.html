@@ -31,7 +31,9 @@
           <div class="pull-right">
             <label class="checkbox">
               <span translate>filters.useMyTimezone</span>
-              <input type="checkbox" ng-model="filter.useTimezoneOffset" name="filter{{$index}}-use-timezone-offset">&nbsp;
+              <input type="checkbox"
+                     ng-model="filter.useTimezoneOffset" ng-change="filter.onUseTimezoneOffsetChange()"
+                     name="filter{{$index}}-use-timezone-offset">&nbsp;
               <small class="label label-info">
                 {{ ::filter.currentTimezoneOffset.label }}
               </small>
