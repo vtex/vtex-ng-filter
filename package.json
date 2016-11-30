@@ -1,6 +1,6 @@
 {
   "name": "vtex-ng-filter",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "readmeFilename": "README.md",
   "description": "VTEX Angular Filter directive",
   "main": "dist/vtex-ng-filter-tpls.js",
