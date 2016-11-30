@@ -5,12 +5,14 @@ openFilters = {}
 moreOptionsShowFilters = {}
 
 angular.module('vtexNgFilter', [])
-.factory 'Filter', (DateTransform, $location, $filter) ->
+.factory 'Filter', ($rootScope, $location, $filter, DateTransform) ->
   class Filter
     constructor: (filter = {}) ->
       @[k] = v for k, v of filter
 
-      @useTimezoneOffset = $location.search()['p_f_useUserTimezone'] or true
+      querystring = $location.search()
+
+      @useTimezoneOffset = if querystring['p_f_useUserTimezone'] in [false, 'false'] then false else true
       @currentTimezoneOffset = do ->
         offset = (new Date().getTimezoneOffset() / 60)
         symbol = if parseInt(offset) >= 0 then '+' else ''
