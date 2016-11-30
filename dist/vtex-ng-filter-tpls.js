@@ -1,4 +1,4 @@
-/*! vtex-ng-filter - v0.3.5 - 2016-11-29 */
+/*! vtex-ng-filter - v0.3.6 - 2016-11-30 */
 (function() {
   var config, moreOptionsShowFilters, openFilters,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -12,11 +12,11 @@
 
   moreOptionsShowFilters = {};
 
-  angular.module('vtexNgFilter', []).factory('Filter', function(DateTransform, $location, $filter) {
+  angular.module('vtexNgFilter', []).factory('Filter', function($rootScope, $location, $filter, DateTransform) {
     var Filter;
     return Filter = (function() {
       function Filter(filter) {
-        var dateGetterSetter, k, v;
+        var dateGetterSetter, k, querystring, ref, v;
         if (filter == null) {
           filter = {};
         }
@@ -31,7 +31,8 @@
           v = filter[k];
           this[k] = v;
         }
-        this.useTimezoneOffset = $location.search()['p_f_useUserTimezone'] || true;
+        querystring = $location.search();
+        this.useTimezoneOffset = (ref = querystring['p_f_useUserTimezone']) === false || ref === 'false' ? false : true;
         this.currentTimezoneOffset = (function() {
           var offset, symbol;
           offset = new Date().getTimezoneOffset() / 60;
@@ -52,11 +53,11 @@
           this.dateObjectCache = {};
           dateGetterSetter = (function(_this) {
             return function(date, propertyName) {
-              var ref;
+              var ref1;
               if (angular.isDefined(date)) {
                 return _this[propertyName] = date;
               } else {
-                return (ref = _this[propertyName]) != null ? ref : false;
+                return (ref1 = _this[propertyName]) != null ? ref1 : false;
               }
             };
           })(this);
