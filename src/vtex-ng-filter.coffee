@@ -152,16 +152,18 @@ angular.module('vtexNgFilter', [])
 
 # To use instead of moment's due to weird date bug
 .service 'DateTransform', ->
-  @startOfDay = (dateStr, useTimezoneOffset = true) ->
+  @startOfDay = (dateStr, useTimezoneOffset) ->
+    useTimezoneOffset = true if not useTimezoneOffset?
     date = new Date dateStr
-    date.setHours 0, 0, 0, 0
-    date.setHours 0, -date.getTimezoneOffset() if not useTimezoneOffset
+    currentHour = date.getHours()
+    date.setHours (currentHour - (date.getTimezoneOffset() / 60)) if not useTimezoneOffset
     return date
 
-  @endOfDay = (dateStr, useTimezoneOffset = true) ->
+  @endOfDay = (dateStr, useTimezoneOffset) ->
+    useTimezoneOffset = true if not useTimezoneOffset?
     date = new Date dateStr
-    date.setHours 23, 59, 59, 999
-    date.setHours 23, -(date.getTimezoneOffset() - 59) if not useTimezoneOffset
+    currentHour = date.getHours()
+    date.setHours (23 - (date.getTimezoneOffset() / 60)), 59, 59, 999
     return date
 
   @validate = (date) ->

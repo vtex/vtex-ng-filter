@@ -1,4 +1,4 @@
-/*! vtex-ng-filter - v0.3.7 - 2016-11-30 */
+/*! vtex-ng-filter - v0.3.8 - 2016-12-05 */
 (function() {
   var config, moreOptionsShowFilters, openFilters,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -290,27 +290,25 @@
     })();
   }).service('DateTransform', function() {
     this.startOfDay = function(dateStr, useTimezoneOffset) {
-      var date;
+      var currentHour, date;
       if (useTimezoneOffset == null) {
         useTimezoneOffset = true;
       }
       date = new Date(dateStr);
-      date.setHours(0, 0, 0, 0);
+      currentHour = date.getHours();
       if (!useTimezoneOffset) {
-        date.setHours(0, -date.getTimezoneOffset());
+        date.setHours(currentHour - (date.getTimezoneOffset() / 60));
       }
       return date;
     };
     this.endOfDay = function(dateStr, useTimezoneOffset) {
-      var date;
+      var currentHour, date;
       if (useTimezoneOffset == null) {
         useTimezoneOffset = true;
       }
       date = new Date(dateStr);
-      date.setHours(23, 59, 59, 999);
-      if (!useTimezoneOffset) {
-        date.setHours(23, -(date.getTimezoneOffset() - 59));
-      }
+      currentHour = date.getHours();
+      date.setHours(23 - (date.getTimezoneOffset() / 60), 59, 59, 999);
       return date;
     };
     this.validate = function(date) {
