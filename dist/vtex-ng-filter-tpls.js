@@ -77,8 +77,8 @@
               }
               if ((currentMonth == null) || currentMonth === false) {
                 date = {
-                  from: moment().add('d', offsetFrom).toDate(),
-                  to: moment().add('d', offsetTo).toDate()
+                  from: moment().add(offsetFrom, 'd').toDate(),
+                  to: moment().add(offsetTo, 'd').toDate()
                 };
               } else {
                 date = {
@@ -97,14 +97,14 @@
               if (_this.date.from && _this.date.to) {
                 if (DateTransform.startOfDay(_this.date.from, _this.useTimezoneOffset).toString() === DateTransform.startOfDay(new Date(), _this.useTimezoneOffset).toString()) {
                   return $filter('translate')('listing.dates.today');
-                } else if (moment(_this.date.from) === DateTransform.startOfDay(moment().add('d', -1), _this.useTimezoneOffset) && moment(_this.date.to).toISOString() === DateTransform.endOfDay(moment().add('d', -1), _this.useTimezoneOffset).toISOString()) {
+                } else if (moment(_this.date.from) === DateTransform.startOfDay(moment().add(-1, 'd'), _this.useTimezoneOffset) && moment(_this.date.to).toISOString() === DateTransform.endOfDay(moment().add(-1, 'd'), _this.useTimezoneOffset).toISOString()) {
                   return $filter('translate')('listing.dates.yesterday');
                 } else if (moment(_this.date.from).isSame(moment().startOf('month').toDate()) && moment(_this.date.to).isSame(moment().endOf('month').toDate())) {
                   return $filter('translate')('listing.dates.currentMonth');
                 } else if (DateTransform.startOfDay(_this.date.to, _this.useTimezoneOffset).toISOString() === DateTransform.startOfDay(new Date(), _this.useTimezoneOffset).toISOString()) {
-                  return (moment(_this.date.from).add('hours', moment().hours()).fromNow()) + " " + ($filter('translate')('listing.dates.untilToday'));
+                  return (moment(_this.date.from).add(moment().hours(), 'hours').fromNow()) + " " + ($filter('translate')('listing.dates.untilToday'));
                 } else {
-                  return (moment(_this.date.from).add('hours', moment().hours()).fromNow()) + " " + ($filter('translate')('listing.dates.until')) + " " + (moment(_this.date.to).add('hours', moment().hours()).fromNow());
+                  return (moment(_this.date.from).add(moment().hours(), 'hours').fromNow()) + " " + ($filter('translate')('listing.dates.until')) + " " + (moment(_this.date.to).add('hours', moment().hours()).fromNow());
                 }
               } else {
                 return $filter('translate')('listing.dates.noRangeSelected');
