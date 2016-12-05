@@ -45,7 +45,7 @@ angular.module('vtexNgFilter', [])
 
           @date =
             from: DateTransform.startOfDay(date.from, @useTimezoneOffset)
-            to: DateTransform.startOfDay(date.to, @useTimezoneOffset)
+            to: DateTransform.endOfDay(date.to, @useTimezoneOffset)
 
         @dateRangeLabel = =>
           if @date.from and @date.to

@@ -88,7 +88,7 @@
               }
               return _this.date = {
                 from: DateTransform.startOfDay(date.from, _this.useTimezoneOffset),
-                to: DateTransform.startOfDay(date.to, _this.useTimezoneOffset)
+                to: DateTransform.endOfDay(date.to, _this.useTimezoneOffset)
               };
             };
           })(this);
