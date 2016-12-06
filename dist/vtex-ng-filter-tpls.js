@@ -16,7 +16,7 @@
     var Filter;
     return Filter = (function() {
       function Filter(filter) {
-        var dateGetterSetter, k, querystring, ref, v;
+        var dateGetterSetter, k, v;
         if (filter == null) {
           filter = {};
         }
@@ -31,8 +31,7 @@
           v = filter[k];
           this[k] = v;
         }
-        querystring = $location.search();
-        this.useTimezoneOffset = (ref = querystring['p_f_useUserTimezone']) === false || ref === 'false' ? false : true;
+        this.useTimezoneOffset = false;
         this.currentTimezoneOffset = (function() {
           var offset, symbol;
           offset = new Date().getTimezoneOffset() / 60;
@@ -43,9 +42,7 @@
           };
         })();
         this.onUseTimezoneOffsetChange = (function(_this) {
-          return function() {
-            return $location.search('p_f_useUserTimezone', _this.useTimezoneOffset);
-          };
+          return function() {};
         })(this);
         this.setGroup();
         this.selectedCount = 0;
@@ -53,11 +50,11 @@
           this.dateObjectCache = {};
           dateGetterSetter = (function(_this) {
             return function(date, propertyName) {
-              var ref1;
+              var ref;
               if (angular.isDefined(date)) {
                 return _this[propertyName] = date;
               } else {
-                return (ref1 = _this[propertyName]) != null ? ref1 : false;
+                return (ref = _this[propertyName]) != null ? ref : false;
               }
             };
           })(this);

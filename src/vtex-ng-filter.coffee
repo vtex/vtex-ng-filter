@@ -10,16 +10,16 @@ angular.module('vtexNgFilter', [])
     constructor: (filter = {}) ->
       @[k] = v for k, v of filter
 
-      querystring = $location.search()
-
-      @useTimezoneOffset = if querystring['p_f_useUserTimezone'] in [false, 'false'] then false else true
+      # querystring = $location.search()
+      # @useTimezoneOffset = if querystring['p_f_useUserTimezone'] in [false, 'false'] then false else true
+      @useTimezoneOffset = false
       @currentTimezoneOffset = do ->
         offset = (new Date().getTimezoneOffset() / 60)
         symbol = if parseInt(offset) >= 0 then '+' else ''
         label: (symbol + offset + 'h'), value: offset
 
       @onUseTimezoneOffsetChange = =>
-        $location.search 'p_f_useUserTimezone', @useTimezoneOffset
+        # $location.search 'p_f_useUserTimezone', @useTimezoneOffset
 
       @setGroup()
       @selectedCount = 0
@@ -152,13 +152,15 @@ angular.module('vtexNgFilter', [])
 
 # To use instead of moment's due to weird date bug
 .service 'DateTransform', ->
-  @startOfDay = (dateStr, useTimezoneOffset = true) ->
+  @startOfDay = (dateStr, useTimezoneOffset) ->
+    useTimezoneOffset = true if not useTimezoneOffset?
     date = new Date dateStr
     date.setHours 0, 0, 0, 0
     date.setHours 0, -date.getTimezoneOffset() if not useTimezoneOffset
     return date
 
-  @endOfDay = (dateStr, useTimezoneOffset = true) ->
+  @endOfDay = (dateStr, useTimezoneOffset) ->
+    useTimezoneOffset = true if not useTimezoneOffset?
     date = new Date dateStr
     date.setHours 23, 59, 59, 999
     date.setHours 23, -(date.getTimezoneOffset() - 59) if not useTimezoneOffset
