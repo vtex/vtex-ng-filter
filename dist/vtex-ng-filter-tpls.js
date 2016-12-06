@@ -1,4 +1,4 @@
-/*! vtex-ng-filter - v0.4.1 - 2016-12-06 */
+/*! vtex-ng-filter - v0.4.2 - 2016-12-06 */
 (function() {
   var config, moreOptionsShowFilters, openFilters,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -16,7 +16,7 @@
     var Filter;
     return Filter = (function() {
       function Filter(filter) {
-        var dateGetterSetter, k, v;
+        var dateGetterSetter, k, querystring, ref, v;
         if (filter == null) {
           filter = {};
         }
@@ -31,7 +31,8 @@
           v = filter[k];
           this[k] = v;
         }
-        this.useTimezoneOffset = false;
+        querystring = $location.search();
+        this.useTimezoneOffset = (ref = querystring['p_f_useUserTimezone']) === false || ref === 'false' ? false : true;
         this.currentTimezoneOffset = (function() {
           var offset, symbol;
           offset = new Date().getTimezoneOffset() / 60;
@@ -42,7 +43,9 @@
           };
         })();
         this.onUseTimezoneOffsetChange = (function(_this) {
-          return function() {};
+          return function() {
+            return $location.search('p_f_useUserTimezone', _this.useTimezoneOffset);
+          };
         })(this);
         this.setGroup();
         this.selectedCount = 0;
@@ -50,11 +53,11 @@
           this.dateObjectCache = {};
           dateGetterSetter = (function(_this) {
             return function(date, propertyName) {
-              var ref;
+              var ref1;
               if (angular.isDefined(date)) {
                 return _this[propertyName] = date;
               } else {
-                return (ref = _this[propertyName]) != null ? ref : false;
+                return (ref1 = _this[propertyName]) != null ? ref1 : false;
               }
             };
           })(this);

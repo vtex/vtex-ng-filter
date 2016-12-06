@@ -10,16 +10,15 @@ angular.module('vtexNgFilter', [])
     constructor: (filter = {}) ->
       @[k] = v for k, v of filter
 
-      # querystring = $location.search()
-      # @useTimezoneOffset = if querystring['p_f_useUserTimezone'] in [false, 'false'] then false else true
-      @useTimezoneOffset = false
+      querystring = $location.search()
+      @useTimezoneOffset = if querystring['p_f_useUserTimezone'] in [false, 'false'] then false else true
       @currentTimezoneOffset = do ->
         offset = (new Date().getTimezoneOffset() / 60)
         symbol = if parseInt(offset) >= 0 then '+' else ''
         label: (symbol + offset + 'h'), value: offset
 
       @onUseTimezoneOffsetChange = =>
-        # $location.search 'p_f_useUserTimezone', @useTimezoneOffset
+        $location.search 'p_f_useUserTimezone', @useTimezoneOffset
 
       @setGroup()
       @selectedCount = 0
