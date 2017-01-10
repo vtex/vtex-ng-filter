@@ -14,6 +14,6 @@ module.exports = (config) ->
     ]
     client:
       mocha:
-        ui: 'tdd'
+        ui: 'bdd'
     preprocessors:
       '**/*.coffee': ['coffee']

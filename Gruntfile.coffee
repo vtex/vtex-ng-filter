@@ -60,9 +60,11 @@ module.exports = (grunt) ->
     karma:
       unit:
         configFile: 'karma.conf.coffee'
+        singleRun: true
 
   grunt.loadNpmTasks name for name of pkg.devDependencies when name[0..5] is 'grunt-'
 
   grunt.registerTask 'default', ['clean', 'coffee', 'ngtemplates', 'concat:main', 'uglify']
+  grunt.registerTask 'test', ['default', 'karma:unit']
   grunt.registerTask 'oms', ['default', 'copy:oms', 'watch:oms']
   grunt.registerTask 'pci', ['default', 'copy:pci', 'watch:pci']
