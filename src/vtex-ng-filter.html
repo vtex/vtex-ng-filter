@@ -65,6 +65,7 @@
                 <input type="text" id="date-from-{{ $index }}"
                        use-timezone-offset="filter.useTimezoneOffset"
                        date-model="filter.date.from"
+                       period-of-day="start"
                        vtex-datepicker>
               </div>
 
@@ -73,6 +74,7 @@
                 <input type="text" id="date-to-{{ $index }}"
                        use-timezone-offset="filter.useTimezoneOffset"
                        date-model="filter.date.to"
+                       period-of-day="end"
                        vtex-datepicker>
               </div>
             </div><!-- /row-fluid -->
