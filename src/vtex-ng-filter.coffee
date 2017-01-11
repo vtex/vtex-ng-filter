@@ -84,8 +84,8 @@ angular.module('vtexNgFilter', [])
       if @type is 'date'
         items = itemsAsSearchParameter.replace(@name + ':[', '').replace(']', '').split(' TO ')
         date =
-          from: new Date(items[0])
-          to: new Date(items[1])
+          from: items[0]
+          to: items[1]
         @date = date
       else if @type is 'multiple'
         for item in @items
@@ -138,6 +138,7 @@ angular.module('vtexNgFilter', [])
           item.quantity = updatedItem.quantity
         else
           item.quantity = 0
+      return
 
     setGroup: =>
       if @name in ['creationDate', 'authorizedDate', 'ShippingEstimatedDate', 'invoicedDate']
@@ -152,24 +153,46 @@ angular.module('vtexNgFilter', [])
 # To use instead of moment's due to weird date bug
 .service 'DateTransform', ->
   @startOfDay = (dateStr, useTimezoneOffset) ->
-    useTimezoneOffset = true if not useTimezoneOffset?
+    if not useTimezoneOffset?
+      useTimezoneOffset = true
+
     date = new Date dateStr
+
+    isAlreadyStartOfDay = dateStr and (
+      (dateStr.indexOf and dateStr.indexOf('00:00:00.000Z') isnt -1) or
+      dateStr.toISOString and dateStr.toISOString().indexOf('00:00:00.000Z') isnt -1)
+
+    if isAlreadyStartOfDay
+      return date
+
     date.setHours 0, 0, 0, 0
-    date.setHours 0, -date.getTimezoneOffset() if not useTimezoneOffset
-    return date
+
+    if useTimezoneOffset
+      return date
+    else
+      dateInUTC = new Date(date.valueOf() - (date.getTimezoneOffset() * 60000))
+      return dateInUTC
 
   @endOfDay = (dateStr, useTimezoneOffset) ->
-    useTimezoneOffset = true if not useTimezoneOffset?
-    date = new Date dateStr
-    date.setHours 23, 59, 59, 999
-    date.setHours 23, -(date.getTimezoneOffset() - 59) if not useTimezoneOffset
-    return date
+    if not useTimezoneOffset?
+      useTimezoneOffset = true
 
-  @validate = (date) ->
-    return unless date?
-    date = new Date date
-    date.setDate(date.getUTCDate()) if date.getUTCDate() isnt date.getDate()
-    return date
+    date = new Date dateStr
+
+    isAlreadyEndOfDay = dateStr and (
+      (dateStr.indexOf and dateStr.indexOf('23:59:59.999Z') isnt -1) or
+      dateStr.toISOString and dateStr.toISOString().indexOf('23:59:59.999Z') isnt -1)
+
+    if isAlreadyEndOfDay
+      return date
+
+    date.setHours 23, 59, 59, 999
+
+    if useTimezoneOffset
+      return date
+    else
+      dateInUTC = new Date(date.valueOf() - (date.getTimezoneOffset() * 60000))
+      return dateInUTC
 
   return this
 
@@ -225,8 +248,8 @@ angular.module('vtexNgFilter', [])
       $scope.$watch ((scope) -> _.flatten(scope.filters)[i].getSelectedItemsURL()), (newValue, oldValue) ->
         return if newValue is oldValue
         if filter.type is 'date' and filter.date?
-          filters[i].date.from = DateTransform.validate(filter.date.from)
-          filters[i].date.to = DateTransform.validate(filter.date.to)
+          filters[i].date.from = filter.date.from
+          filters[i].date.to = filter.date.to
           $rootScope.$digest() unless $rootScope.$$phase
         for filter in filters
           $location.search filter.rangeUrlTemplate, filter.getSelectedItemsURL()

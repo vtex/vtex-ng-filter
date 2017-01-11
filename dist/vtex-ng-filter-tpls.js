@@ -1,4 +1,4 @@
-/*! vtex-ng-filter - v0.4.2 - 2016-12-06 */
+/*! vtex-ng-filter - v0.4.2 - 2017-01-11 */
 (function() {
   var config, moreOptionsShowFilters, openFilters,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -157,8 +157,8 @@
         if (this.type === 'date') {
           items = itemsAsSearchParameter.replace(this.name + ':[', '').replace(']', '').split(' TO ');
           date = {
-            from: new Date(items[0]),
-            to: new Date(items[1])
+            from: items[0],
+            to: items[1]
           };
           this.date = date;
         } else if (this.type === 'multiple') {
@@ -252,24 +252,22 @@
       };
 
       Filter.prototype.update = function(filterJSON) {
-        var item, j, len, ref, ref1, results, updatedItem;
+        var item, j, len, ref, ref1, updatedItem;
         if (filterJSON == null) {
           filterJSON = this;
         }
         ref = this.items;
-        results = [];
         for (j = 0, len = ref.length; j < len; j++) {
           item = ref[j];
           updatedItem = _.find(filterJSON.items, function(i) {
             return i.name === item.name;
           });
           if (updatedItem && ((ref1 = this.getSelectedItems()) != null ? ref1.length : void 0) === 0) {
-            results.push(item.quantity = updatedItem.quantity);
+            item.quantity = updatedItem.quantity;
           } else {
-            results.push(item.quantity = 0);
+            item.quantity = 0;
           }
         }
-        return results;
       };
 
       Filter.prototype.setGroup = function() {
@@ -290,38 +288,40 @@
     })();
   }).service('DateTransform', function() {
     this.startOfDay = function(dateStr, useTimezoneOffset) {
-      var date;
+      var date, dateInUTC, isAlreadyStartOfDay;
       if (useTimezoneOffset == null) {
         useTimezoneOffset = true;
       }
       date = new Date(dateStr);
-      date.setHours(0, 0, 0, 0);
-      if (!useTimezoneOffset) {
-        date.setHours(0, -date.getTimezoneOffset());
+      isAlreadyStartOfDay = dateStr && ((dateStr.indexOf && dateStr.indexOf('00:00:00.000Z') !== -1) || dateStr.toISOString && dateStr.toISOString().indexOf('00:00:00.000Z') !== -1);
+      if (isAlreadyStartOfDay) {
+        return date;
       }
-      return date;
+      date.setHours(0, 0, 0, 0);
+      if (useTimezoneOffset) {
+        return date;
+      } else {
+        dateInUTC = new Date(date.valueOf() - (date.getTimezoneOffset() * 60000));
+        return dateInUTC;
+      }
     };
     this.endOfDay = function(dateStr, useTimezoneOffset) {
-      var date;
+      var date, dateInUTC, isAlreadyEndOfDay;
       if (useTimezoneOffset == null) {
         useTimezoneOffset = true;
       }
       date = new Date(dateStr);
+      isAlreadyEndOfDay = dateStr && ((dateStr.indexOf && dateStr.indexOf('23:59:59.999Z') !== -1) || dateStr.toISOString && dateStr.toISOString().indexOf('23:59:59.999Z') !== -1);
+      if (isAlreadyEndOfDay) {
+        return date;
+      }
       date.setHours(23, 59, 59, 999);
-      if (!useTimezoneOffset) {
-        date.setHours(23, -(date.getTimezoneOffset() - 59));
+      if (useTimezoneOffset) {
+        return date;
+      } else {
+        dateInUTC = new Date(date.valueOf() - (date.getTimezoneOffset() * 60000));
+        return dateInUTC;
       }
-      return date;
-    };
-    this.validate = function(date) {
-      if (date == null) {
-        return;
-      }
-      date = new Date(date);
-      if (date.getUTCDate() !== date.getDate()) {
-        date.setDate(date.getUTCDate());
-      }
-      return date;
     };
     return this;
   }).directive('vtFilter', function($rootScope, $location, DateTransform) {
@@ -412,8 +412,8 @@
               return;
             }
             if (filter.type === 'date' && (filter.date != null)) {
-              filters[i].date.from = DateTransform.validate(filter.date.from);
-              filters[i].date.to = DateTransform.validate(filter.date.to);
+              filters[i].date.from = filter.date.from;
+              filters[i].date.to = filter.date.to;
               if (!$rootScope.$$phase) {
                 $rootScope.$digest();
               }
@@ -469,7 +469,7 @@ angular.module("vtexNgFilter").run(function($templateCache) {   'use strict';
     "<div class=\"filters-block\"><h3><span translate=\"\">listing.filters</span> <button translate=\"\" class=\"btn btn-small btn-clean-filters\" ng-if=\"filters.getAppliedFilters().length\" ng-click=\"clearAll()\" ga-event=\"\" ga-label=\"filter-clear-all\">listing.clearAll</button></h3><div ng-repeat=\"group in filters track by group[0].groupName\"><h3 class=\"group-header\"><i ng-class=\"{ 'icon-calendar-empty': group[0].groupName === 'date',\n" +
     "                           'icon-exchange': group[0].groupName === 'channel',\n" +
     "                            'icon-refresh': group[0].groupName === 'status',\n" +
-    "                             'icon-filter': group[0].groupName === 'other' }\"></i> {{ ('filters.groups.' + group[0].groupName) | translate }}</h3><accordion close-others=\"true\"><accordion-group is-open=\"openFilters[filter.rangeUrlTemplate]\" ng-repeat=\"filter in group track by filter.name\"><accordion-heading><span>{{ 'filters.' + filter.rangeUrlTemplate | translate }}</span> <span ng-if=\"filter.getSelectedItems().length\" class=\"badge badge-lightblue pull-right\"><span ng-if=\"filter.type === 'multiple' && filter.selectedCount\">{{ filter.selectedCount }}</span> <span ng-if=\"filter.type !== 'multiple'\" class=\"fa fa-dot-circle-o\"></span></span></accordion-heading><!-- DATE --><div ng-if=\"filter.type === 'date'\"><div class=\"pull-right\"><label class=\"checkbox\"><span translate=\"\">filters.useMyTimezone</span><input type=\"checkbox\" ng-model=\"filter.useTimezoneOffset\" ng-change=\"filter.onUseTimezoneOffsetChange()\" name=\"filter{{$index}}-use-timezone-offset\">&nbsp; <small class=\"label label-info\">{{ ::filter.currentTimezoneOffset.label }}</small></label></div><p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates()\" translate=\"\">listing.dates.today</a></p><p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates(-1, -1)\" translate=\"\">listing.dates.yesterday</a></p><p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates(-7)\" translate=\"\">listing.dates.thisWeek</a></p><p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates(0, 0, true)\" translate=\"\">listing.dates.currentMonth</a></p><p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates(-30)\" translate=\"\">listing.dates.thisMonth</a></p><p><a href=\"javascript: void(0)\" ng-click=\"filter.clearSelection()\" translate=\"\">listing.dates.clearFilter</a></p><div class=\"input-append\"><input type=\"text\" ng-click=\"openFilters[filter.rangeUrlTemplate + 'Selector'] = !openFilters[filter.rangeUrlTemplate + 'Selector']\" value=\"{{filter.dateRangeLabel()}}\" readonly><a href=\"javascript:void(0);\" class=\"add-on\" ng-click=\"openFilters[filter.rangeUrlTemplate + 'Selector'] = !openFilters[filter.rangeUrlTemplate + 'Selector']\"><i class=\"icon-calendar\"></i></a></div><!-- DATEPICKERS --><div class=\"date-selectors\" ng-if=\"openFilters[filter.rangeUrlTemplate + 'Selector']\"><div class=\"row-fluid\"><div class=\"span5 control-group vtex-datepicker-container\"><label for=\"date-from-{{ $index }}\" translate=\"\">listing.dates.from</label><input type=\"text\" id=\"date-from-{{ $index }}\" vtex-datepicker=\"\" date-model=\"filter.date.from\"></div><div class=\"span5 offset1 control-group vtex-datepicker-container\"><label for=\"date-to-{{ $index }}\" translate=\"\">listing.dates.to</label><input type=\"text\" id=\"date-to-{{ $index }}\" vtex-datepicker=\"\" date-model=\"filter.date.to\"></div></div><!-- /row-fluid --></div><!-- /datepickers --></div><!-- /DATE --><div ng-if=\"filter.type !== 'date'\"><ul class=\"filter-list nav nav-pills nav-stacked\"><!-- If 5 items, show all 5.\n" +
+    "                             'icon-filter': group[0].groupName === 'other' }\"></i> {{ ('filters.groups.' + group[0].groupName) | translate }}</h3><accordion close-others=\"true\"><accordion-group is-open=\"openFilters[filter.rangeUrlTemplate]\" ng-repeat=\"filter in group track by filter.name\"><accordion-heading><span>{{ 'filters.' + filter.rangeUrlTemplate | translate }}</span> <span ng-if=\"filter.getSelectedItems().length\" class=\"badge badge-lightblue pull-right\"><span ng-if=\"filter.type === 'multiple' && filter.selectedCount\">{{ filter.selectedCount }}</span> <span ng-if=\"filter.type !== 'multiple'\" class=\"fa fa-dot-circle-o\"></span></span></accordion-heading><!-- DATE --><div ng-if=\"filter.type === 'date'\"><div class=\"pull-right\"><label class=\"checkbox\"><span translate=\"\">filters.useMyTimezone</span><input type=\"checkbox\" ng-model=\"filter.useTimezoneOffset\" ng-change=\"filter.onUseTimezoneOffsetChange()\" name=\"filter{{$index}}-use-timezone-offset\">&nbsp; <small class=\"label label-info\">{{ ::filter.currentTimezoneOffset.label }}</small></label></div><p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates()\" translate=\"\">listing.dates.today</a></p><p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates(-1, -1)\" translate=\"\">listing.dates.yesterday</a></p><p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates(-7)\" translate=\"\">listing.dates.thisWeek</a></p><p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates(0, 0, true)\" translate=\"\">listing.dates.currentMonth</a></p><p><a href=\"javascript: void(0)\" ng-click=\"filter.setDates(-30)\" translate=\"\">listing.dates.thisMonth</a></p><p><a href=\"javascript: void(0)\" ng-click=\"filter.clearSelection()\" translate=\"\">listing.dates.clearFilter</a></p><div class=\"input-append\"><input type=\"text\" ng-click=\"openFilters[filter.rangeUrlTemplate + 'Selector'] = !openFilters[filter.rangeUrlTemplate + 'Selector']\" value=\"{{filter.dateRangeLabel()}}\" readonly><a href=\"javascript:void(0);\" class=\"add-on\" ng-click=\"openFilters[filter.rangeUrlTemplate + 'Selector'] = !openFilters[filter.rangeUrlTemplate + 'Selector']\"><i class=\"icon-calendar\"></i></a></div><!-- DATEPICKERS --><div class=\"date-selectors\" ng-if=\"openFilters[filter.rangeUrlTemplate + 'Selector']\"><div class=\"row-fluid\"><div class=\"span5 control-group vtex-datepicker-container\"><label for=\"date-from-{{ $index }}\" translate=\"\">listing.dates.from</label><input type=\"text\" id=\"date-from-{{ $index }}\" use-timezone-offset=\"filter.useTimezoneOffset\" date-model=\"filter.date.from\" period-of-day=\"start\" vtex-datepicker=\"\"></div><div class=\"span5 offset1 control-group vtex-datepicker-container\"><label for=\"date-to-{{ $index }}\" translate=\"\">listing.dates.to</label><input type=\"text\" id=\"date-to-{{ $index }}\" use-timezone-offset=\"filter.useTimezoneOffset\" date-model=\"filter.date.to\" period-of-day=\"end\" vtex-datepicker=\"\"></div></div><!-- /row-fluid --></div><!-- /datepickers --></div><!-- /DATE --><div ng-if=\"filter.type !== 'date'\"><ul class=\"filter-list nav nav-pills nav-stacked\"><!-- If 5 items, show all 5.\n" +
     "\t\t\t\t\t\t\t\t If 6 items, show all 6.\n" +
     "\t\t\t\t\t\t\t\t If 7 items, show 5 and button to show more. --><li ng-repeat=\"item in filter.items track by item.name\" ng-if=\"(filter.items.length <= 6) || ($index < 5) || moreOptionsShowFilters[filter.rangeUrlTemplate]\"><label class=\"checkbox\" ng-if=\"filter.type == 'multiple'\"><input type=\"checkbox\" name=\"{{filter.name}}\" ng-model=\"item.selected\" ng-change=\"filter.updateSelectedCount()\"><span><span translate=\"\">{{ item.name }}</span> {{ item.quantity ? '(' + item.quantity + ')' : '' }}</span></label><label class=\"radio\" ng-if=\"filter.type == 'single'\"><input type=\"radio\" name=\"{{filter.name}}\" ng-model=\"filter.selectedItem\" ng-value=\"item\"><span><span translate=\"\">{{ item.name }}</span> {{ item.quantity ? '(' + item.quantity + ')' : '' }}</span></label></li></ul><a href=\"javascript:void(0)\" ng-click=\"moreOptionsShowFilters[filter.rangeUrlTemplate] = true\" ng-if=\"filter.items.length > 6 && !moreOptionsShowFilters[filter.rangeUrlTemplate]\" class=\"muted\">{{ 'filters.moreOptionsShow' | translate}} ({{ filter.items.length }})</a> <a href=\"javascript:void(0)\" ng-click=\"moreOptionsShowFilters[filter.rangeUrlTemplate] = false\" ng-if=\"filter.items.length > 6 && moreOptionsShowFilters[filter.rangeUrlTemplate]\" class=\"muted\">{{ 'filters.moreOptionsHide' | translate}}</a> <button translate=\"\" class=\"btn\" ng-click=\"filter.clearSelection()\" ng-show=\"filter.type === 'single' && filter.selectedItem\">search.clear</button></div></accordion-group></accordion></div></div>"
   );
