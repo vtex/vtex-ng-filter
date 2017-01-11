@@ -180,8 +180,8 @@ angular.module('vtexNgFilter', [])
     date = new Date dateStr
 
     isAlreadyEndOfDay = dateStr and (
-      (dateStr.indexOf and dateStr.indexOf('23:59:59:999Z') isnt -1) or
-      dateStr.toISOString and dateStr.toISOString().indexOf('23:59:59:999Z') isnt -1)
+      (dateStr.indexOf and dateStr.indexOf('23:59:59.999Z') isnt -1) or
+      dateStr.toISOString and dateStr.toISOString().indexOf('23:59:59.999Z') isnt -1)
 
     if isAlreadyEndOfDay
       return date

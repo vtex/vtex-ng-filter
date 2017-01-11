@@ -50,6 +50,30 @@ describe 'Filter Factory', ->
       expect(date).to.be.a('date')
       expect(date.toUTCString()).to.equal('Tue, 10 Jan 2017 23:59:59 GMT')
 
+    it '#dateStartOfDay should return the same date if it\'s already start of day', () ->
+      # Arrange
+      inputDate = new Date('Tue Jan 10 2017 22:00:00 GMT-0200 (BRST)')
+      useTimezoneOffset = false
+
+      # Act
+      date = DateTransform.startOfDay(inputDate, useTimezoneOffset)
+
+      # Assert
+      expect(date).to.be.a('date')
+      expect(date.toISOString()).to.equal(inputDate.toISOString())
+
+    it '#dateEndOfDay should return the same date if it\'s already end of day', () ->
+      # Arrange
+      inputDate = new Date(2017, 0, 10, 21, 59, 59, 999)
+      useTimezoneOffset = false
+
+      # Act
+      date = DateTransform.endOfDay(inputDate, useTimezoneOffset)
+
+      # Assert
+      expect(date).to.be.a('date')
+      expect(date.toISOString()).to.equal(inputDate.toISOString())
+
   describe 'Date Filter', ->
 
     beforeEach (done) -> inject (Filter) ->
