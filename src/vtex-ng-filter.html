@@ -63,13 +63,17 @@
               <div class="span5 control-group vtex-datepicker-container">
                 <label for="date-from-{{ $index }}" translate>listing.dates.from</label>
                 <input type="text" id="date-from-{{ $index }}"
-                       vtex-datepicker date-model="filter.date.from">
+                       use-timezone-offset="filter.useTimezoneOffset"
+                       date-model="filter.date.from"
+                       vtex-datepicker>
               </div>
 
               <div class="span5 offset1 control-group vtex-datepicker-container">
                 <label for="date-to-{{ $index }}" translate>listing.dates.to</label>
                 <input type="text" id="date-to-{{ $index }}"
-                       vtex-datepicker date-model="filter.date.to">
+                       use-timezone-offset="filter.useTimezoneOffset"
+                       date-model="filter.date.to"
+                       vtex-datepicker>
               </div>
             </div><!-- /row-fluid -->
 
