@@ -293,7 +293,7 @@
         useTimezoneOffset = true;
       }
       date = new Date(dateStr);
-      isAlreadyStartOfDay = dateStr && ((dateStr.indexOf && dateStr.indexOf('00:00:00.000Z') !== -1) || dateStr.toISOString().indexOf('00:00:00.000Z') !== -1);
+      isAlreadyStartOfDay = dateStr && ((dateStr.indexOf && dateStr.indexOf('00:00:00.000Z') !== -1) || dateStr.toISOString && dateStr.toISOString().indexOf('00:00:00.000Z') !== -1);
       if (isAlreadyStartOfDay) {
         return date;
       }
@@ -311,7 +311,7 @@
         useTimezoneOffset = true;
       }
       date = new Date(dateStr);
-      isAlreadyEndOfDay = dateStr && ((dateStr.indexOf && dateStr.indexOf('23:59:59:999Z') !== -1) || dateStr.toISOString().indexOf('23:59:59:999Z') !== -1);
+      isAlreadyEndOfDay = dateStr && ((dateStr.indexOf && dateStr.indexOf('23:59:59:999Z') !== -1) || dateStr.toISOString && dateStr.toISOString().indexOf('23:59:59:999Z') !== -1);
       if (isAlreadyEndOfDay) {
         return date;
       }
