@@ -40,7 +40,7 @@ module.exports = (grunt) ->
     copy:
       oms:
         cwd: 'dist/'
-        src: ['vtex-ng-filter-tpls.min.js']
+        src: ['vtex-ng-filter-tpls.js', 'vtex-ng-filter-tpls.min.js']
         dest: '../vcs.order-management-ui/src/lib/vtex-ng-filter/'
         expand: true
       pci:
