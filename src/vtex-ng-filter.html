@@ -93,7 +93,8 @@
                 ng-if="(filter.items.length <= 6) || ($index < 5) || moreOptionsShowFilters[filter.rangeUrlTemplate]" >
               <label class="checkbox" ng-if="filter.type == 'multiple'">
                 <input type="checkbox" name="{{filter.name}}" ng-model="item.selected" ng-change="filter.updateSelectedCount()">
-                <span><span translate>{{ item.name }}</span> {{ item.quantity ? '(' + item.quantity + ')' : '' }}</span>
+                <span ng-if="filter.name == 'StatusDescription'"><span translate>{{ 'detail.state.' + item.name }}</span> {{ item.quantity ? '(' + item.quantity + ')' : '' }}</span>
+                <span ng-if="filter.name != 'StatusDescription'"><span translate>{{ item.name }}</span> {{ item.quantity ? '(' + item.quantity + ')' : '' }}</span>
               </label>
               <label class="radio" ng-if="filter.type == 'single'">
                 <input type="radio" name="{{filter.name}}" ng-model="filter.selectedItem" ng-value="item">
