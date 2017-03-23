@@ -45,7 +45,12 @@
           <p><a href="javascript: void(0)" ng-click="filter.setDates(-7)" translate>listing.dates.thisWeek</a></p>
           <p><a href="javascript: void(0)" ng-click="filter.setDates(0, 0, true)" translate>listing.dates.currentMonth</a></p>
           <p><a href="javascript: void(0)" ng-click="filter.setDates(-30)" translate>listing.dates.thisMonth</a></p>
-          <p><a href="javascript: void(0)" ng-click="filter.clearSelection()" translate>listing.dates.clearFilter</a></p>
+          <p><button 
+            class="btn" 
+            ng-click="filter.clearSelection()" 
+            ng-show="filter.selectedCount" 
+            translate>search.clear</a>
+          </p>
           <div class="input-append">
             <input type="text"
                    ng-click="openFilters[filter.rangeUrlTemplate + 'Selector'] = !openFilters[filter.rangeUrlTemplate + 'Selector']"
@@ -109,9 +114,11 @@
              ng-if="filter.items.length > 6 && moreOptionsShowFilters[filter.rangeUrlTemplate]"
              class="muted">{{ 'filters.moreOptionsHide' | translate}}</a>
 
-          <button translate class="btn"
-                  ng-click="filter.clearSelection()"
-                  ng-show="filter.type === 'single' && filter.selectedItem">search.clear</button>
+          <p>
+            <button translate class="btn"
+                    ng-click="filter.clearSelection()"
+                    ng-show="filter.selectedItem || filter.selectedCount">search.clear</button>
+          </p>
         </div>
 
       </accordion-group>
