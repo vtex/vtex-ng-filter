@@ -23,6 +23,9 @@ angular.module('vtexNgFilter', [])
       @setGroup()
       @selectedCount = 0
 
+      @setDelivery = (item) =>
+        $location.search 'f_shippingEstimate', item.url
+
       if @type is 'date'
         @dateObjectCache = {}
 
