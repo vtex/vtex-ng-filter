@@ -103,7 +103,12 @@
               </label>
               <label class="radio" ng-if="filter.type == 'single'">
                 <input type="radio" name="{{filter.name}}" ng-model="filter.selectedItem" ng-value="item">
-                <span><span translate>{{ item.name }}</span> {{ item.quantity ? '(' + item.quantity + ')' : '' }}</span>
+                <span>
+                  <span ng-show="filter.name === 'ShippingEstimatedDate'" 
+                      translate>{{ 'filters.group-date-deliver.' + item.name }}</span>
+                  <span ng-hide="filter.name === 'ShippingEstimatedDate'" 
+                      translate>{{ item.name }}</span>
+                   {{ item.quantity ? '(' + item.quantity + ')' : '' }}</span>
               </label>
             </li>
           </ul>
