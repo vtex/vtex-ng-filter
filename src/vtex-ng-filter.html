@@ -17,9 +17,10 @@
 
     <accordion close-others="true">
       <accordion-group is-open="openFilters[filter.rangeUrlTemplate]" ng-repeat="filter in group track by filter.name">
-
+        
         <accordion-heading>
-          <span>{{ 'filters.' + filter.rangeUrlTemplate | translate }}</span>
+          <span ng-show="filter.rangeUrlTemplate">{{ 'filters.' + filter.rangeUrlTemplate | translate }}</span>
+          <span ng-hide="filter.rangeUrlTemplate">{{ 'filters.f_statusDescription' | translate }}</span>
           <span ng-if="filter.getSelectedItems().length" class="badge badge-lightblue pull-right">
             <span ng-if="filter.type === 'multiple' && filter.selectedCount">{{ filter.selectedCount }}</span>
             <span ng-if="filter.type !== 'multiple'" class="fa fa-dot-circle-o"></span>
@@ -88,7 +89,7 @@
           <!-- /datepickers -->
         </div>
         <!-- /DATE -->
-
+        
         <div ng-if="filter.type !== 'date'">
           <ul class="filter-list nav nav-pills nav-stacked">
             <!-- If 5 items, show all 5.
@@ -99,7 +100,8 @@
               <label class="checkbox" ng-if="filter.type == 'multiple'">
                 <input type="checkbox" name="{{filter.name}}" ng-model="item.selected" ng-change="filter.updateSelectedCount()">
                 <span ng-if="filter.name == 'StatusDescription'"><span translate>{{ 'detail.state.' + item.name }}</span> {{ item.quantity ? '(' + item.quantity + ')' : '' }}</span>
-                <span ng-if="filter.name != 'StatusDescription'"><span translate>{{ item.name }}</span> {{ item.quantity ? '(' + item.quantity + ')' : '' }}</span>
+                <span ng-if="filter.name != 'StatusDescription' && filter.name != 'status'"><span translate>{{ item.name }}</span> {{ item.quantity ? '(' + item.quantity + ')' : '' }}</span>
+                <span ng-if="filter.name == 'status'"><span translate>{{ 'detail.state.' + item.name }}</span> {{ item.quantity ? '(' + item.quantity + ')' : '' }}</span>
               </label>
 
               <p ng-if="filter.type == 'single'">
