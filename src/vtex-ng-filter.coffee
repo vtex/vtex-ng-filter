@@ -23,6 +23,9 @@ angular.module('vtexNgFilter', [])
       @setGroup()
       @selectedCount = 0
 
+      @setDelivery = (filter, item) =>
+        $location.search filter.rangeUrlTemplate, item.url
+
       if @type is 'date'
         @dateObjectCache = {}
 
@@ -49,19 +52,25 @@ angular.module('vtexNgFilter', [])
         @dateRangeLabel = =>
           if @date.from and @date.to
             if DateTransform.startOfDay(@date.from, @useTimezoneOffset).toString() is DateTransform.startOfDay(new Date(), @useTimezoneOffset).toString()
-                $filter('translate')('listing.dates.today')
+                'listing.dates.today'
             else if moment(@date.from) is DateTransform.startOfDay(moment().add('d', -1), @useTimezoneOffset) and
               moment(@date.to).toISOString() is DateTransform.endOfDay(moment().add('d', -1), @useTimezoneOffset).toISOString()
-                $filter('translate')('listing.dates.yesterday')
+                'listing.dates.yesterday'
             else if moment(@date.from).isSame(moment().startOf('month').toDate()) and
               moment(@date.to).isSame(moment().endOf('month').toDate())
-                $filter('translate')('listing.dates.currentMonth')
+                'listing.dates.currentMonth'
             else if DateTransform.startOfDay(@date.to, @useTimezoneOffset).toISOString() is DateTransform.startOfDay(new Date(), @useTimezoneOffset).toISOString()
-              "#{moment(@date.from).add('hours', moment().hours()).fromNow()} #{$filter('translate')('listing.dates.untilToday')}"
+              diffInDays = moment(@date.from).diff(moment(@date.to), 'days')
+              if diffInDays is -7
+                'listing.dates.thisWeek'
+              else if diffInDays is -30
+                'listing.dates.thisMonth'
+              else
+                "#{moment(@date.from).add('hours', moment().hours()).fromNow()} #{$filter('translate')('listing.dates.untilToday')}"
             else
               "#{moment(@date.from).add('hours', moment().hours()).fromNow()} #{$filter('translate')('listing.dates.until')} #{moment(@date.to).add('hours', moment().hours()).fromNow()}"
           else
-            $filter('translate')('listing.dates.noRangeSelected')
+            'listing.dates.noRangeSelected'
 
       @updateSelectedCount()
 
