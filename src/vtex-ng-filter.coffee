@@ -3,6 +3,7 @@ config =
 
 openFilters = {}
 moreOptionsShowFilters = {}
+loadInitialFilter = true
 
 angular.module('vtexNgFilter', [])
 .factory 'Filter', ($rootScope, $location, $filter, DateTransform) ->
@@ -11,6 +12,10 @@ angular.module('vtexNgFilter', [])
       @[k] = v for k, v of filter
 
       querystring = $location.search()
+
+      if loadInitialFilter and querystring.orderBy == 'creationDate,desc' and Object.keys(querystring).length == 1
+        @setInitialFilter()
+
       @useTimezoneOffset = if querystring['p_f_useUserTimezone'] in [false, 'false'] then false else true
       @currentTimezoneOffset = do ->
         offset = (new Date().getTimezoneOffset() / 60)
@@ -74,6 +79,20 @@ angular.module('vtexNgFilter', [])
 
       @updateSelectedCount()
 
+    setInitialFilter: (useTimezoneOffset) =>
+      loadInitialFilter = false
+      useTimezoneOffset = true unless useTimezoneOffset?
+      today = moment().add('d', 0).toDate()
+
+      range =
+        from: DateTransform.startOfDay today, useTimezoneOffset
+        to: DateTransform.endOfDay today, useTimezoneOffset
+
+      $location.search(
+        'f_creationDate',
+        "creationDate:[#{range.from.toISOString()} TO #{range.to.toISOString()}]"
+      )
+    
     updateSelectedCount: =>
       if @type is 'date'
         @selectedCount = if @date.from and @date.to then 1 else 0

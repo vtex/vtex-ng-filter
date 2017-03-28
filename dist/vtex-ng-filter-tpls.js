@@ -1,6 +1,6 @@
-/*! vtex-ng-filter - v0.4.3 - 2017-03-27 */
+/*! vtex-ng-filter - v0.4.3 - 2017-03-28 */
 (function() {
-  var config, moreOptionsShowFilters, openFilters,
+  var config, loadInitialFilter, moreOptionsShowFilters, openFilters,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
@@ -11,6 +11,8 @@
   openFilters = {};
 
   moreOptionsShowFilters = {};
+
+  loadInitialFilter = true;
 
   angular.module('vtexNgFilter', []).factory('Filter', function($rootScope, $location, $filter, DateTransform) {
     var Filter;
@@ -27,11 +29,15 @@
         this.getSelectedItems = bind(this.getSelectedItems, this);
         this.setSelectedItems = bind(this.setSelectedItems, this);
         this.updateSelectedCount = bind(this.updateSelectedCount, this);
+        this.setInitialFilter = bind(this.setInitialFilter, this);
         for (k in filter) {
           v = filter[k];
           this[k] = v;
         }
         querystring = $location.search();
+        if (loadInitialFilter && querystring.orderBy === 'creationDate,desc' && Object.keys(querystring).length === 1) {
+          this.setInitialFilter();
+        }
         this.useTimezoneOffset = (ref = querystring['p_f_useUserTimezone']) === false || ref === 'false' ? false : true;
         this.currentTimezoneOffset = (function() {
           var offset, symbol;
@@ -127,6 +133,20 @@
         }
         this.updateSelectedCount();
       }
+
+      Filter.prototype.setInitialFilter = function(useTimezoneOffset) {
+        var range, today;
+        loadInitialFilter = false;
+        if (useTimezoneOffset == null) {
+          useTimezoneOffset = true;
+        }
+        today = moment().add('d', 0).toDate();
+        range = {
+          from: DateTransform.startOfDay(today, useTimezoneOffset),
+          to: DateTransform.endOfDay(today, useTimezoneOffset)
+        };
+        return $location.search('f_creationDate', "creationDate:[" + (range.from.toISOString()) + " TO " + (range.to.toISOString()) + "]");
+      };
 
       Filter.prototype.updateSelectedCount = function() {
         var i, item, j, l, lastSelectedItemIndex, len, len1, ref, ref1, selectedItemIndex;
