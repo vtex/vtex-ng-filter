@@ -3,7 +3,7 @@ config =
 
 openFilters = {}
 moreOptionsShowFilters = {}
-loadInitialFilter = true
+loadInitialFilter = false
 
 angular.module('vtexNgFilter', [])
 .factory 'Filter', ($rootScope, $location, $filter, DateTransform) ->
