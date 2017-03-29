@@ -1,4 +1,4 @@
-/*! vtex-ng-filter - v0.4.3 - 2017-03-28 */
+/*! vtex-ng-filter - v0.4.4 - 2017-03-29 */
 (function() {
   var config, loadInitialFilter, moreOptionsShowFilters, openFilters,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -307,7 +307,7 @@
         var ref, ref1, ref2;
         if ((ref = this.name) === 'creationDate' || ref === 'authorizedDate' || ref === 'ShippingEstimatedDate' || ref === 'invoicedDate') {
           return this.groupName = 'date';
-        } else if ((ref1 = this.name) === 'SalesChannelName' || ref1 === 'CallCenterOperatorName' || ref1 === 'SellerNames' || ref1 === 'UtmSource' || ref1 === 'affiliateId') {
+        } else if ((ref1 = this.name) === 'SalesChannelName' || ref1 === 'CallCenterOperatorName' || ref1 === 'SellerNames' || ref1 === 'UtmSource' || ref1 === 'affiliateId' || ref1 === 'MarketingTags') {
           return this.groupName = 'channel';
         } else if ((ref2 = this.name) === 'StatusDescription' || ref2 === 'orderSituation' || ref2 === 'errorStatus') {
           return this.groupName = 'status';
