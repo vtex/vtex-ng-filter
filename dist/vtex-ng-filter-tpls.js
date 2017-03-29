@@ -12,7 +12,7 @@
 
   moreOptionsShowFilters = {};
 
-  loadInitialFilter = false;
+  loadInitialFilter = true;
 
   angular.module('vtexNgFilter', []).factory('Filter', function($rootScope, $location, $filter, DateTransform) {
     var Filter;
