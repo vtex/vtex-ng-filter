@@ -171,7 +171,7 @@ angular.module('vtexNgFilter', [])
     setGroup: =>
       if @name in ['creationDate', 'authorizedDate', 'ShippingEstimatedDate', 'invoicedDate']
         @groupName = 'date'
-      else if @name in ['SalesChannelName', 'CallCenterOperatorName', 'SellerNames', 'UtmSource', 'affiliateId']
+      else if @name in ['SalesChannelName', 'CallCenterOperatorName', 'SellerNames', 'UtmSource', 'affiliateId', 'MarketingTags']
         @groupName = 'channel'
       else if @name in ['StatusDescription', 'orderSituation', 'errorStatus']
         @groupName = 'status'
