@@ -1,4 +1,4 @@
-/*! vtex-ng-filter - v0.4.5 - 2017-03-29 */
+/*! vtex-ng-filter - v0.4.6 - 2017-03-30 */
 (function() {
   var config, loadInitialFilter, moreOptionsShowFilters, openFilters,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -12,7 +12,7 @@
 
   moreOptionsShowFilters = {};
 
-  loadInitialFilter = false;
+  loadInitialFilter = true;
 
   angular.module('vtexNgFilter', []).factory('Filter', function($rootScope, $location, $filter, DateTransform) {
     var Filter;
