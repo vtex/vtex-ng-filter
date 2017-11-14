@@ -92,7 +92,7 @@ angular.module('vtexNgFilter', [])
         'f_creationDate',
         "creationDate:[#{range.from.toISOString()} TO #{range.to.toISOString()}]"
       )
-    
+
     updateSelectedCount: =>
       if @type is 'date'
         @selectedCount = if @date.from and @date.to then 1 else 0
@@ -224,8 +224,7 @@ angular.module('vtexNgFilter', [])
 
   return this
 
-
-.directive 'vtFilter', ($rootScope, $location, DateTransform) ->
+.directive 'vtFilter', ($rootScope, $location, DateTransform, filterTimeLimit) ->
   restrict: 'E'
   scope:
     filters: '=filters'
@@ -240,6 +239,7 @@ angular.module('vtexNgFilter', [])
       unless moreOptionsShowFilters.hasOwnProperty(filter.rangeUrlTemplate)
         moreOptionsShowFilters[filter.rangeUrlTemplate] = false
 
+    $scope.filterTimeLimit = true if filterTimeLimit and filterTimeLimit.value
     $scope.openFilters = openFilters
     $scope.moreOptionsShowFilters = moreOptionsShowFilters
 

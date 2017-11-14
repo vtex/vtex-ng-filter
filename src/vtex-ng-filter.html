@@ -17,7 +17,7 @@
 
     <accordion close-others="true">
       <accordion-group is-open="openFilters[filter.rangeUrlTemplate]" ng-repeat="filter in group track by filter.name">
-        
+
         <accordion-heading>
           <span>{{ 'filters.' + filter.rangeUrlTemplate | translate }}</span>
           <span ng-if="filter.getSelectedItems().length" class="badge badge-lightblue pull-right">
@@ -75,6 +75,11 @@
                ng-if="openFilters[filter.rangeUrlTemplate + 'Selector']">
 
             <div class="row-fluid">
+              <!-- Message used in OMS -->
+              <div ng-if="filterTimeLimit">
+                <i class="icon-info-sign icon-blue"></i>&nbsp;
+                <i translate>search.date-range-limit</i>
+              </div>
               <div class="span5 control-group vtex-datepicker-container">
                 <label for="date-from-{{ $index }}" translate>listing.dates.from</label>
                 <input type="text" id="date-from-{{ $index }}"
