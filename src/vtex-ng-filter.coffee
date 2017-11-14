@@ -224,7 +224,7 @@ angular.module('vtexNgFilter', [])
 
   return this
 
-.directive 'vtFilter', ($rootScope, $location, DateTransform, filterTimeLimit) ->
+.directive 'vtFilter', ($rootScope, $location, DateTransform, $injector) ->
   restrict: 'E'
   scope:
     filters: '=filters'
@@ -239,7 +239,10 @@ angular.module('vtexNgFilter', [])
       unless moreOptionsShowFilters.hasOwnProperty(filter.rangeUrlTemplate)
         moreOptionsShowFilters[filter.rangeUrlTemplate] = false
 
-    $scope.filterTimeLimit = true if filterTimeLimit and filterTimeLimit.value
+    if $injector.has 'filterTimeLimit'
+      filterTimeLimit = $injector.get 'filterTimeLimit'
+      $scope.filterTimeLimitValue = true if filterTimeLimit and filterTimeLimit.value
+
     $scope.openFilters = openFilters
     $scope.moreOptionsShowFilters = moreOptionsShowFilters
 
