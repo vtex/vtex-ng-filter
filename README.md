@@ -15,4 +15,13 @@ The compiled files can be found in the `/dist` folder.
 
 ------
 
-VTEX - 2013
+### Local dev with OMS-Ui
+_within ng-filters:_
+
+    grunt oms
+
+_within oms-ui:_
+
+    grunt
+
+Compiled files of ng-filters will be used automatically by the local oms.
