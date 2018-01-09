@@ -69,23 +69,22 @@
 
           <!-- DATEPICKERS -->
           <div class="date-selectors" ng-if="openFilters[filter.rangeUrlTemplate + 'Selector']">
+            <div class="row-fluid" ng-if="filterTimeLimitValue">
+              <i class="icon-info-sign icon-blue"></i>&nbsp;
+              <span class="filter-time-limit" translate>search.date-range-limit</i>
+            </div>
 
             <div class="row-fluid">
-              <!-- Message used in OMS -->
-              <div ng-if="filterTimeLimitValue">
-                <i class="icon-info-sign icon-blue"></i>&nbsp;
-                <span class="filter-time-limit" translate>search.date-range-limit</i>
-              </div>
               <div class="span5 control-group vtex-datepicker-container">
                 <label for="date-from-{{ $index }}" translate>listing.dates.from</label>
-                <input type="text" id="date-from-{{ $index }}" use-timezone-offset="filter.useTimezoneOffset" date-model="filter.date.from"
-                  period-of-day="start" vtex-datepicker>
+                <input type="text" class="date-selector-input" id="date-from-{{ $index }}" use-timezone-offset="filter.useTimezoneOffset"
+                  date-model="filter.date.from" period-of-day="start" vtex-datepicker>
               </div>
 
               <div class="span5 offset1 control-group vtex-datepicker-container">
                 <label for="date-to-{{ $index }}" translate>listing.dates.to</label>
-                <input type="text" id="date-to-{{ $index }}" use-timezone-offset="filter.useTimezoneOffset" date-model="filter.date.to" period-of-day="end"
-                  vtex-datepicker>
+                <input type="text" class="date-selector-input" id="date-to-{{ $index }}" use-timezone-offset="filter.useTimezoneOffset" date-model="filter.date.to"
+                  period-of-day="end" vtex-datepicker>
               </div>
             </div>
             <!-- /row-fluid -->
@@ -93,9 +92,17 @@
           </div>
           <!-- /datepickers -->
 
-          <p>
-            <button class="btn" ng-click="filter.clearSelection()" ng-show="filter.selectedCount" translate>search.clear</a>
-          </p>
+          <div class="row-fluid row-selectors-actions">
+            <div class="span5 action-container">
+              <button class="btn left" ng-click="filter.clearSelection()" ng-show="filter.selectedCount" translate>search.clear</button>
+            </div>
+
+            <div class="span5 action-container offset1">
+              <button class="btn pull-right btn-primary" ng-click="filter.confirmSelection()" ng-show="openFilters[filter.rangeUrlTemplate + 'Selector']"
+                translate>search.confirm</button>
+            </div>
+
+          </div>
         </div>
         <!-- /DATE -->
 

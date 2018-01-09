@@ -105,7 +105,7 @@ angular.module('vtexNgFilter', [])
         moreOptionsShowFilters[@rangeUrlTemplate] = true if selectedItemIndex > 4
         @selectedCount = if @selectedItem then 1 else 0
 
-      openFilters[@rangeUrlTemplate] = true if @selectedCount > 0
+      openFilters[@rangeUrlTemplate] = if @selectedCount > 0 then true else false
       @selectedCountLabel = if @selectedCount then "(#{@selectedCount})" else ""
 
     setSelectedItems: (itemsAsSearchParameter) =>
@@ -158,6 +158,9 @@ angular.module('vtexNgFilter', [])
         @selectedItem = null
 
       @updateSelectedCount()
+
+    confirmSelection: (e) ->
+      $rootScope.$broadcast 'confirmChangeDate'
 
     update: (filterJSON = @) =>
       for item in @items
