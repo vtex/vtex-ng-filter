@@ -105,7 +105,6 @@ angular.module('vtexNgFilter', [])
         moreOptionsShowFilters[@rangeUrlTemplate] = true if selectedItemIndex > 4
         @selectedCount = if @selectedItem then 1 else 0
 
-      openFilters[@rangeUrlTemplate] = if @selectedCount > 0 then true else false
       @selectedCountLabel = if @selectedCount then "(#{@selectedCount})" else ""
 
     setSelectedItems: (itemsAsSearchParameter) =>
@@ -236,9 +235,6 @@ angular.module('vtexNgFilter', [])
     filters = _.flatten $scope.filters
     # Initialize open filters if needed
     for filter in filters
-      unless openFilters.hasOwnProperty(filter.rangeUrlTemplate)
-        openFilters[filter.rangeUrlTemplate] = false
-
       unless moreOptionsShowFilters.hasOwnProperty(filter.rangeUrlTemplate)
         moreOptionsShowFilters[filter.rangeUrlTemplate] = false
 
