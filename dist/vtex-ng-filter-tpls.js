@@ -1,4 +1,4 @@
-/*! vtex-ng-filter - v0.4.7 - 2018-01-09 */
+/*! vtex-ng-filter - v0.4.8 - 2018-01-10 */
 (function() {
   var config, loadInitialFilter, moreOptionsShowFilters, openFilters,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -179,7 +179,6 @@
           }
           this.selectedCount = this.selectedItem ? 1 : 0;
         }
-        openFilters[this.rangeUrlTemplate] = this.selectedCount > 0 ? true : false;
         return this.selectedCountLabel = this.selectedCount ? "(" + this.selectedCount + ")" : "";
       };
 
@@ -371,9 +370,6 @@
         filters = _.flatten($scope.filters);
         for (j = 0, len = filters.length; j < len; j++) {
           filter = filters[j];
-          if (!openFilters.hasOwnProperty(filter.rangeUrlTemplate)) {
-            openFilters[filter.rangeUrlTemplate] = false;
-          }
           if (!moreOptionsShowFilters.hasOwnProperty(filter.rangeUrlTemplate)) {
             moreOptionsShowFilters[filter.rangeUrlTemplate] = false;
           }
