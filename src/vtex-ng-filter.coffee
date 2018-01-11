@@ -158,6 +158,11 @@ angular.module('vtexNgFilter', [])
 
       @updateSelectedCount()
 
+    selectAll: =>
+      if @type is 'multiple'
+        item.selected = true for item in @items
+      @updateSelectedCount()
+
     confirmDateSelection: () ->
       $rootScope.$broadcast 'confirmChangeDate'
 

@@ -199,7 +199,7 @@
 
             <div class="span5 action-container offset1">
               <button
-                class="btn pull-right btn-primary"
+                class="btn pull-right btn-success"
                 ng-click="filter.confirmDateSelection()"
                 ng-show="openFilters[filter.rangeUrlTemplate + 'Selector']"
                 translate
@@ -309,8 +309,17 @@
             >
               search.clear
             </button>
+
             <button
-              class="btn pull-right btn-primary"
+              class="btn left btn-primary"
+              ng-click="filter.selectAll()"
+              translate
+            >
+              search.selectall
+            </button>
+
+            <button
+              class="btn pull-right btn-success"
               ng-if="(filter.selectedItem || filter.selectedCount) && filter.type == 'multiple'"
               ng-click="filter.confirmCheckboxesSelection()"
               translate
