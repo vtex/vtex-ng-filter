@@ -158,8 +158,16 @@ angular.module('vtexNgFilter', [])
 
       @updateSelectedCount()
 
-    confirmSelection: (e) ->
+    selectAll: =>
+      if @type is 'multiple'
+        item.selected = true for item in @items
+      @updateSelectedCount()
+
+    confirmDateSelection: () ->
       $rootScope.$broadcast 'confirmChangeDate'
+
+    confirmCheckboxesSelection: =>
+      $rootScope.$broadcast 'confirmCheckboxesSelection'
 
     update: (filterJSON = @) =>
       for item in @items
@@ -273,16 +281,25 @@ angular.module('vtexNgFilter', [])
       return if decodeURIComponent(queryFilters) is selectedFilters
       updateFiltersOnLocationSearch()
 
+    # Listen for checkboxes confirmation
+    $scope.$on 'confirmCheckboxesSelection', ->
+      _.each filters, (filter, i) ->
+        $location.search filter.rangeUrlTemplate, filter.getSelectedItemsURL()
+
     # Watch filters to modify search query
     _.each filters, (filter, i) ->
       $scope.$watch ((scope) -> _.flatten(scope.filters)[i].getSelectedItemsURL()), (newValue, oldValue) ->
         return if newValue is oldValue
+
         if filter.type is 'date' and filter.date?
           filters[i].date.from = filter.date.from
           filters[i].date.to = filter.date.to
           $rootScope.$digest() unless $rootScope.$$phase
+
         for filter in filters
-          $location.search filter.rangeUrlTemplate, filter.getSelectedItemsURL()
+          if filter.type isnt 'multiple' or (filter.type is 'multiple' and newValue == null)
+            $location.search filter.rangeUrlTemplate, filter.getSelectedItemsURL()
+
         # Sets paging to 1 on modified filters
         $location.search 'page', 1
 
