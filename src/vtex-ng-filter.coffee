@@ -263,7 +263,8 @@ angular.module('vtexNgFilter', [])
         searchQuery = $location.search()[filter.rangeUrlTemplate]
         # Se está na URL, está selected
         if searchQuery
-          filter.setSelectedItems decodeURIComponent(searchQuery)
+          encodedURI = encodeURIComponent searchQuery
+          filter.setSelectedItems decodeURIComponent encodedURI
           filter.update()
         else filter.clearSelection()
 
@@ -272,13 +273,15 @@ angular.module('vtexNgFilter', [])
 
     $scope.$on '$locationChangeStart', ->
       for k, v of $location.search()
-        $location.search k, decodeURIComponent v
+        encodedURI = encodeURIComponent v
+        $location.search k, decodeURIComponent encodedURI
 
     # If url changes, update filters to match
     $scope.$on '$locationChangeSuccess', ->
       queryFilters = (_.map filters, (f) -> $location.search()[f.rangeUrlTemplate]).join() # filters on search
       selectedFilters = (_.map filters, (f) -> f.getSelectedItemsURL()).join() # filters selected
-      return if decodeURIComponent(queryFilters) is selectedFilters
+      encodedURI = encodeURIComponent queryFilters
+      return if decodeURIComponent(encodedURI) is selectedFilters
       updateFiltersOnLocationSearch()
 
     # Listen for checkboxes confirmation
