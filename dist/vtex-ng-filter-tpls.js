@@ -1,4 +1,4 @@
-/*! vtex-ng-filter - v0.4.10-0 - 2018-01-15 */
+/*! vtex-ng-filter - v0.4.10 - 2018-02-05 */
 (function() {
   var config, loadInitialFilter, moreOptionsShowFilters, openFilters,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -420,13 +420,14 @@
           }).flatten().value();
         };
         updateFiltersOnLocationSearch = function() {
-          var l, len1, results, searchQuery;
+          var encodedURI, l, len1, results, searchQuery;
           results = [];
           for (l = 0, len1 = filters.length; l < len1; l++) {
             filter = filters[l];
             searchQuery = $location.search()[filter.rangeUrlTemplate];
             if (searchQuery) {
-              filter.setSelectedItems(decodeURIComponent(searchQuery));
+              encodedURI = encodeURIComponent(searchQuery);
+              filter.setSelectedItems(decodeURIComponent(encodedURI));
               results.push(filter.update());
             } else {
               results.push(filter.clearSelection());
@@ -436,24 +437,26 @@
         };
         updateFiltersOnLocationSearch();
         $scope.$on('$locationChangeStart', function() {
-          var k, ref, results, v;
+          var encodedURI, k, ref, results, v;
           ref = $location.search();
           results = [];
           for (k in ref) {
             v = ref[k];
-            results.push($location.search(k, decodeURIComponent(v)));
+            encodedURI = encodeURIComponent(v);
+            results.push($location.search(k, decodeURIComponent(encodedURI)));
           }
           return results;
         });
         $scope.$on('$locationChangeSuccess', function() {
-          var queryFilters, selectedFilters;
+          var encodedURI, queryFilters, selectedFilters;
           queryFilters = (_.map(filters, function(f) {
             return $location.search()[f.rangeUrlTemplate];
           })).join();
           selectedFilters = (_.map(filters, function(f) {
             return f.getSelectedItemsURL();
           })).join();
-          if (decodeURIComponent(queryFilters) === selectedFilters) {
+          encodedURI = encodeURIComponent(queryFilters);
+          if (decodeURIComponent(encodedURI) === selectedFilters) {
             return;
           }
           return updateFiltersOnLocationSearch();
