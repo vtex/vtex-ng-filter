@@ -16,3 +16,8 @@ module.exports = (config) ->
         ui: 'bdd'
     preprocessors:
       '**/*.coffee': ['coffee']
+    reporters:
+      ['mocha']
+    mochaReporter:
+      showDiff: true
+      maxLogLines: 1
