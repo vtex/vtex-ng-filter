@@ -190,10 +190,7 @@ angular.module('vtexNgFilter', [])
 
 # To use instead of moment's due to weird date bug
 .service 'DateTransform', ->
-  @startOfDay = (dateStr, useTimezoneOffset) ->
-    if not useTimezoneOffset?
-      useTimezoneOffset = true
-
+  @startOfDay = (dateStr, useTimezoneOffset = true) ->
     date = new Date dateStr
 
     isAlreadyStartOfDay = dateStr and (
@@ -211,10 +208,7 @@ angular.module('vtexNgFilter', [])
       dateInUTC = new Date(date.valueOf() - (date.getTimezoneOffset() * 60000))
       return dateInUTC
 
-  @endOfDay = (dateStr, useTimezoneOffset) ->
-    if not useTimezoneOffset?
-      useTimezoneOffset = true
-
+  @endOfDay = (dateStr, useTimezoneOffset = true) ->
     date = new Date dateStr
 
     isAlreadyEndOfDay = dateStr and (
