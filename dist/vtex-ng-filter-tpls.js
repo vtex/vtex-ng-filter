@@ -1,4 +1,4 @@
-/*! vtex-ng-filter - v0.4.11 - 2018-03-05 */
+/*! vtex-ng-filter - v0.4.11 - 2018-04-04 */
 (function() {
   var config, loadInitialFilter, moreOptionsShowFilters, openFilters,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -442,6 +442,9 @@
           results = [];
           for (k in ref) {
             v = ref[k];
+            if (v.toString().indexOf('%') !== -1) {
+              v = decodeURIComponent(v);
+            }
             encodedURI = encodeURIComponent(v);
             results.push($location.search(k, decodeURIComponent(encodedURI)));
           }
