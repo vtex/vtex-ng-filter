@@ -437,12 +437,13 @@
         };
         updateFiltersOnLocationSearch();
         $scope.$on('$locationChangeStart', function() {
-          var encodedURI, k, ref, results, v;
+          var encodedURI, isLocationAlreadyEncoded, k, ref, results, v;
           ref = $location.search();
           results = [];
           for (k in ref) {
             v = ref[k];
-            if (v.toString().indexOf('%') !== -1) {
+            isLocationAlreadyEncoded = v.toString().indexOf('%') !== -1;
+            if (isLocationAlreadyEncoded) {
               v = decodeURIComponent(v);
             }
             encodedURI = encodeURIComponent(v);

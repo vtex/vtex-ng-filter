@@ -267,8 +267,9 @@ angular.module('vtexNgFilter', [])
 
     $scope.$on '$locationChangeStart', ->
       for k, v of $location.search()
-        if v.toString().indexOf('%') isnt -1
-            v = decodeURIComponent v
+        isLocationAlreadyEncoded = v.toString().indexOf('%') isnt -1
+        if isLocationAlreadyEncoded
+          v = decodeURIComponent v
         encodedURI = encodeURIComponent v
         $location.search k, decodeURIComponent encodedURI
 
