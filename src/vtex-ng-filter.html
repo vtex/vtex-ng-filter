@@ -210,11 +210,11 @@
                 >
                 <span ng-if="filter.name == 'status'">
                   <span translate>{{ 'detail.state.' + item.name }}</span>
-                  {{ item.quantity ? '(' + item.quantity + ')' : '' }}
+                  {{ item.quantity ? ' (' + item.quantity + ')' : '' }}
                 </span>
                 <span ng-if="filter.name != 'status'">
                   <span translate>{{ item.name }}</span>
-                  {{ item.quantity ? '(' + item.quantity + ')' : '' }}
+                  {{ item.quantity ? ' (' + item.quantity + ')' : '' }}
                 </span>
               </label>
 
@@ -230,7 +230,7 @@
                 >
                 <span>
                   <span translate>{{ item.name }}</span>
-                  {{ item.quantity ? '(' + item.quantity + ')' : '' }}
+                  {{ item.quantity ? ' (' + item.quantity + ')' : '' }}
                 </span>
               </label>
 
@@ -254,7 +254,7 @@
                     >
                       {{ item.name }}
                     </span>
-                    {{ item.quantity ? '(' + item.quantity + ')' : '' }}
+                    {{ item.quantity ? ' (' + item.quantity + ')' : '' }}
                   </span>
                 </a>
               </p>
