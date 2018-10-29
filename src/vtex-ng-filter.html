@@ -14,7 +14,7 @@
   </h3>
 
   <div ng-repeat="group in filters track by group[0].groupName">
-    <h3 class="group-header">
+    <h3 class="group-header" ng-if="group && group.length > 0">
       <i ng-class="{ 'icon-calendar-empty': group[0].groupName === 'date',
                            'icon-exchange': group[0].groupName === 'channel',
                             'icon-refresh': group[0].groupName === 'status',
