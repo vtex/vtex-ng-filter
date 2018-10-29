@@ -250,9 +250,17 @@ angular.module('vtexNgFilter', [])
     $scope.openFilters = openFilters
     $scope.moreOptionsShowFilters = moreOptionsShowFilters
 
-    $scope.clearAll = -> filter.clearSelection() for filter in filters
-    $scope.filters.getAppliedFilters = -> _.filter filters, (f) -> f.getSelectedItems().length > 0
-    $scope.filters.getAppliedItems = -> _.chain($scope.filters.getAppliedFilters()).map((f) -> f.getSelectedItems()).flatten().value()
+    $scope.clearAll = ->
+      filter.clearSelection() for filter in filters
+
+    $scope.filters.getAppliedFilters = ->
+      _.filter filters, (f) -> f.getSelectedItems().length > 0
+
+    $scope.filters.getAppliedItems = ->
+      _.chain($scope.filters.getAppliedFilters())
+       .map((f) -> f.getSelectedItems())
+       .flatten()
+       .value()
 
     # Handle search query
     updateFiltersOnLocationSearch = ->
