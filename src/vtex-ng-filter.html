@@ -14,7 +14,7 @@
   </h3>
 
   <div ng-repeat="group in filters track by group[0].groupName">
-    <h3 class="group-header">
+    <h3 class="group-header" ng-if="group && group.length > 0">
       <i ng-class="{ 'icon-calendar-empty': group[0].groupName === 'date',
                            'icon-exchange': group[0].groupName === 'channel',
                             'icon-refresh': group[0].groupName === 'status',
@@ -132,55 +132,32 @@
           <div
             class="date-selectors"
             ng-if="openFilters[filter.rangeUrlTemplate + 'Selector']"
+            ng-controller="DateTimePickerController"
           >
-            <div class="row-fluid">
-              <div class="span5 control-group vtex-datepicker-container">
-                <label
-                  for="date-from-{{ $index }}"
-                  translate
-                >
-                  listing.dates.from
-                </label>
-                <input
-                  type="text"
-                  class="date-selector-input"
-                  id="date-from-{{ $index }}"
-                  use-timezone-offset="filter.useTimezoneOffset"
-                  date-model="filter.date.from"
-                  period-of-day="start"
-                  vtex-datepicker
-                >
-              </div>
-
-              <div class="span5 offset1 control-group vtex-datepicker-container">
-                <label
-                  for="date-to-{{ $index }}"
-                  translate
-                >
-                  listing.dates.to
-                </label>
-                <input
-                  type="text"
-                  class="date-selector-input"
-                  id="date-to-{{ $index }}"
-                  use-timezone-offset="filter.useTimezoneOffset"
-                  date-model="filter.date.to"
-                  period-of-day="end"
-                  vtex-datepicker
-                >
+            <div class="row-fluid control-group vtex-datepicker-container">
+              <div class="span8">
+                <datetime-range
+                  on-close="onCloseDateRange()"
+                  min-date="date.minDate"
+                  max-date="date.maxDate"
+                  start="date.tempFrom"
+                  end="date.tempTo">
+                </datetime-range>
               </div>
             </div>
+
             <div
               class="row-fluid row-info-range-limit"
               ng-if="filterTimeLimitValue"
             >
-              <i class="icon-info-sign icon-blue"></i> 
-              <span
-                class="filter-time-limit"
-                translate
-              >
-                search.date-range-limit
-              </span>
+              <div ng-if="!exceedRangeLimit">
+                <i class="icon-info-sign icon-blue"></i> 
+                <span class="filter-time-limit" translate>search.date-range-limit</span>
+              </div>
+              <div ng-if="exceedRangeLimit" class="alert alert-error">
+                <i class="icon-exclamation-sign"></i> 
+                <span translate>search.exceed-date-range-limit</span>
+              </div>
             </div>
           </div>
           <!-- /DATEPICKERS -->
@@ -233,11 +210,11 @@
                 >
                 <span ng-if="filter.name == 'status'">
                   <span translate>{{ 'detail.state.' + item.name }}</span>
-                  {{ item.quantity ? '(' + item.quantity + ')' : '' }}
+                  {{ item.quantity ? ' (' + item.quantity + ')' : '' }}
                 </span>
                 <span ng-if="filter.name != 'status'">
                   <span translate>{{ item.name }}</span>
-                  {{ item.quantity ? '(' + item.quantity + ')' : '' }}
+                  {{ item.quantity ? ' (' + item.quantity + ')' : '' }}
                 </span>
               </label>
 
@@ -253,7 +230,7 @@
                 >
                 <span>
                   <span translate>{{ item.name }}</span>
-                  {{ item.quantity ? '(' + item.quantity + ')' : '' }}
+                  {{ item.quantity ? ' (' + item.quantity + ')' : '' }}
                 </span>
               </label>
 
@@ -277,7 +254,7 @@
                     >
                       {{ item.name }}
                     </span>
-                    {{ item.quantity ? '(' + item.quantity + ')' : '' }}
+                    {{ item.quantity ? ' (' + item.quantity + ')' : '' }}
                   </span>
                 </a>
               </p>

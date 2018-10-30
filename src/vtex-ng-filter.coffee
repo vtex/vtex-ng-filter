@@ -51,8 +51,8 @@ angular.module('vtexNgFilter', [])
               to: moment().endOf('month').toDate()
 
           @date =
-            from: DateTransform.startOfDay(date.from, @useTimezoneOffset)
-            to: DateTransform.startOfDay(date.to, @useTimezoneOffset)
+            from: date.from,
+            to: date.to
 
         @dateRangeLabel = =>
           if @date.from and @date.to
@@ -125,7 +125,10 @@ angular.module('vtexNgFilter', [])
     getSelectedItems: =>
       if @type is 'date'
         if @date.from and @date.to
-          url = @name + ":[" + DateTransform.startOfDay(@date.from, @useTimezoneOffset).toISOString() + " TO " + DateTransform.endOfDay(@date.to, @useTimezoneOffset).toISOString() + "]"
+          dateFrom = if typeof @date.from is 'string' then @date.from else @date.from.toISOString()
+          dateTo = if typeof @date.to is 'string' then @date.to else @date.to.toISOString()
+
+          url = @name + ":[" + dateFrom + " TO " + dateTo + "]"
           @dateObjectCache[url] or=
             name: @dateRangeLabel()
             url: url
@@ -247,9 +250,17 @@ angular.module('vtexNgFilter', [])
     $scope.openFilters = openFilters
     $scope.moreOptionsShowFilters = moreOptionsShowFilters
 
-    $scope.clearAll = -> filter.clearSelection() for filter in filters
-    $scope.filters.getAppliedFilters = -> _.filter filters, (f) -> f.getSelectedItems().length > 0
-    $scope.filters.getAppliedItems = -> _.chain($scope.filters.getAppliedFilters()).map((f) -> f.getSelectedItems()).flatten().value()
+    $scope.clearAll = ->
+      filter.clearSelection() for filter in filters
+
+    $scope.filters.getAppliedFilters = ->
+      _.filter filters, (f) -> f.getSelectedItems().length > 0
+
+    $scope.filters.getAppliedItems = ->
+      _.chain($scope.filters.getAppliedFilters())
+       .map((f) -> f.getSelectedItems())
+       .flatten()
+       .value()
 
     # Handle search query
     updateFiltersOnLocationSearch = ->
