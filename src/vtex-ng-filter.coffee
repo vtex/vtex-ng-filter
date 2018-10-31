@@ -40,19 +40,34 @@ angular.module('vtexNgFilter', [])
         @date = {}
         @today = DateTransform.endOfDay(new Date(), @useTimezoneOffset)
 
-        @setDates = (offsetFrom = 0, offsetTo = 0, currentMonth = false) =>
-          if !currentMonth? or currentMonth is false
-            date =
-              from: moment().add('d', offsetFrom).toDate()
-              to: moment().add('d', offsetTo).toDate()
+        @setDates = (option) =>
+          if @useTimezoneOffset
+            baseFrom = moment()
+            baseTo = moment()
           else
-            date =
-              from: moment().startOf('month').toDate()
-              to: moment().endOf('month').toDate()
+            baseFrom = moment.utc()
+            baseTo = moment.utc()
+
+          switch option
+            when 'today'
+              dateFrom = baseFrom.startOf('day')
+              dateTo = baseTo.endOf('day')
+            when 'yesterday'
+              dateFrom = baseFrom.subtract(1, 'day').startOf('day')
+              dateTo = baseTo.subtract(1, 'day').endOf('day')
+            when 'week'
+              dateFrom = baseFrom.subtract(7, 'day')
+              dateTo = baseTo
+            when 'current-month'
+              dateFrom = baseFrom.startOf('month').startOf('day')
+              dateTo = baseTo.endOf('month').endOf('day')
+            when 'month'
+              dateFrom = baseFrom.subtract(1, 'month')
+              dateTo = baseTo
 
           @date =
-            from: date.from,
-            to: date.to
+            from: dateFrom.toDate(),
+            to: dateTo.toDate()
 
         @dateRangeLabel = =>
           if @date.from and @date.to
