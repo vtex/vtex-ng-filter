@@ -65,7 +65,7 @@
             <a
               ng-class="{ 'filter-active' : filter.dateRangeLabel() === 'listing.dates.today' }"
               href="javascript: void(0)"
-              ng-click="filter.setDates()"
+              ng-click="filter.setDates('today')"
               translate
             >
               listing.dates.today
@@ -75,7 +75,7 @@
             <a
               ng-class="{ 'filter-active' : filter.dateRangeLabel() === 'listing.dates.yesterday' }"
               href="javascript: void(0)"
-              ng-click="filter.setDates(-1, -1)"
+              ng-click="filter.setDates('yesterday')"
               translate
             >
               listing.dates.yesterday
@@ -85,7 +85,7 @@
             <a
               ng-class="{ 'filter-active' : filter.dateRangeLabel() === 'listing.dates.thisWeek' }"
               href="javascript: void(0)"
-              ng-click="filter.setDates(-7)"
+              ng-click="filter.setDates('week')"
               translate
             >
               listing.dates.thisWeek
@@ -95,7 +95,7 @@
             <a
               ng-class="{ 'filter-active' : filter.dateRangeLabel() === 'listing.dates.currentMonth' }"
               href="javascript: void(0)"
-              ng-click="filter.setDates(0, 0, true)"
+              ng-click="filter.setDates('current-month')"
               translate
             >
               listing.dates.currentMonth
@@ -105,7 +105,7 @@
             <a
               ng-class="{ 'filter-active' : filter.dateRangeLabel() === 'listing.dates.thisMonth' }"
               href="javascript: void(0)"
-              ng-click="filter.setDates(-30)"
+              ng-click="filter.setDates('month')"
               translate
             >
               listing.dates.thisMonth
