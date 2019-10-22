@@ -13,6 +13,8 @@
     </button>
   </h3>
 
+  <span ng-if="infoMessage" translate>{{ infoMessage }}</span>
+
   <div ng-repeat="group in filters track by group[0].groupName">
     <h3 class="group-header" ng-if="group && group.length > 0">
       <i
