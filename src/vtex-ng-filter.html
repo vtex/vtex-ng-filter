@@ -15,11 +15,13 @@
 
   <div ng-repeat="group in filters track by group[0].groupName">
     <h3 class="group-header" ng-if="group && group.length > 0">
-      <i ng-class="{ 'icon-calendar-empty': group[0].groupName === 'date',
+      <i
+        ng-class="{ 'icon-calendar-empty': group[0].groupName === 'date',
                            'icon-exchange': group[0].groupName === 'channel',
                             'icon-refresh': group[0].groupName === 'status',
-                             'icon-filter': group[0].groupName === 'other' }"></i>
-      {{ ('filters.groups.' + group[0].groupName) | translate }}
+                             'icon-filter': group[0].groupName === 'other' }"
+      ></i>
+      {{ 'filters.groups.' + group[0].groupName | translate }}
     </h3>
 
     <accordion close-others="true">
@@ -27,7 +29,6 @@
         is-open="openFilters[filter.rangeUrlTemplate]"
         ng-repeat="filter in group track by filter.name"
       >
-
         <accordion-heading>
           <span>
             {{ 'filters.' + filter.rangeUrlTemplate | translate }}
@@ -36,7 +37,9 @@
             ng-if="filter.getSelectedItems().length"
             class="badge badge-lightblue pull-right"
           >
-            <span ng-if="filter.type === 'multiple' && filter.selectedCount">{{ filter.selectedCount }}</span>
+            <span ng-if="filter.type === 'multiple' && filter.selectedCount">{{
+              filter.selectedCount
+            }}</span>
             <span
               ng-if="filter.type !== 'multiple'"
               class="fa fa-dot-circle-o"
@@ -53,8 +56,8 @@
                 type="checkbox"
                 ng-model="filter.useTimezoneOffset"
                 ng-change="filter.onUseTimezoneOffsetChange()"
-                name="filter{{$index}}-use-timezone-offset"
-              > 
+                name="filter{{ $index }}-use-timezone-offset"
+              />
               <small class="label label-info">
                 {{ ::filter.currentTimezoneOffset.label }}
               </small>
@@ -115,9 +118,9 @@
             <input
               type="text"
               ng-click="openFilters[filter.rangeUrlTemplate + 'Selector'] = !openFilters[filter.rangeUrlTemplate + 'Selector']"
-              value="{{filter.dateRangeLabel() | translate}}"
+              value="{{ filter.dateRangeLabel() | translate }}"
               readonly
-            >
+            />
 
             <a
               href="javascript:void(0);"
@@ -141,7 +144,8 @@
                   min-date="date.minDate"
                   max-date="date.maxDate"
                   start="date.tempFrom"
-                  end="date.tempTo">
+                  end="date.tempTo"
+                >
                 </datetime-range>
               </div>
             </div>
@@ -151,11 +155,13 @@
               ng-if="filterTimeLimitValue"
             >
               <div ng-if="!exceedRangeLimit">
-                <i class="icon-info-sign icon-blue"></i> 
-                <span class="filter-time-limit" translate>search.date-range-limit</span>
+                <i class="icon-info-sign icon-blue"></i>
+                <span class="filter-time-limit" translate
+                  >search.date-range-limit</span
+                >
               </div>
               <div ng-if="exceedRangeLimit" class="alert alert-error">
-                <i class="icon-exclamation-sign"></i> 
+                <i class="icon-exclamation-sign"></i>
                 <span translate>search.exceed-date-range-limit</span>
               </div>
             </div>
@@ -184,7 +190,6 @@
                 search.confirm
               </button>
             </div>
-
           </div>
         </div>
         <!-- /DATE -->
@@ -198,16 +203,13 @@
               ng-repeat="item in filter.items track by item.name"
               ng-if="(filter.items.length <= 6) || ($index < 5) || moreOptionsShowFilters[filter.rangeUrlTemplate]"
             >
-              <label
-                class="checkbox"
-                ng-if="filter.type == 'multiple'"
-              >
+              <label class="checkbox" ng-if="filter.type == 'multiple'">
                 <input
                   type="checkbox"
-                  name="{{filter.name}}"
+                  name="{{ filter.name }}"
                   ng-model="item.selected"
                   ng-change="filter.updateSelectedCount()"
-                >
+                />
                 <span ng-if="filter.name == 'status'">
                   <span translate>{{ 'detail.state.' + item.name }}</span>
                   {{ item.quantity ? ' (' + item.quantity + ')' : '' }}
@@ -224,10 +226,10 @@
               >
                 <input
                   type="radio"
-                  name="{{filter.name}}"
+                  name="{{ filter.name }}"
                   ng-model="filter.selectedItem"
                   ng-value="item"
-                >
+                />
                 <span>
                   <span translate>{{ item.name }}</span>
                   {{ item.quantity ? ' (' + item.quantity + ')' : '' }}
@@ -266,7 +268,9 @@
             ng-if="filter.items.length > 6 && !moreOptionsShowFilters[filter.rangeUrlTemplate]"
             class="muted"
           >
-            {{ 'filters.moreOptionsShow' | translate}} ({{ filter.items.length }})
+            {{ 'filters.moreOptionsShow' | translate }} ({{
+              filter.items.length
+            }})
           </a>
           <a
             href="javascript:void(0)"
@@ -274,7 +278,7 @@
             ng-if="filter.items.length > 6 && moreOptionsShowFilters[filter.rangeUrlTemplate]"
             class="muted"
           >
-            {{ 'filters.moreOptionsHide' | translate}}
+            {{ 'filters.moreOptionsHide' | translate }}
           </a>
 
           <p>
@@ -306,10 +310,7 @@
             </button>
           </p>
         </div>
-
       </accordion-group>
     </accordion>
-
   </div>
-
 </div>
