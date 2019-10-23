@@ -250,6 +250,7 @@ angular.module('vtexNgFilter', [])
   restrict: 'E'
   scope:
     filters: '=filters'
+    infoMessage: '=infoMessage'
   templateUrl: if config.path then config.path + '/vtex-ng-filter.html' else 'vtex-ng-filter.html'
   link: ($scope) ->
     filters = _.flatten $scope.filters

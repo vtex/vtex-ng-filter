@@ -4,3 +4,4 @@ build
 .DS_Store
 .vscode/
 bower_components
+package-lock.json
