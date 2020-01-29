@@ -213,7 +213,7 @@
                   ng-change="filter.updateSelectedCount()"
                 />
                 <span>
-                  <span translate translate-default="{{ item.name }}">{{ translationIdsPrefix[filter.name] + item.name }}</span>
+                  <span translate translate-default="{{ item.name }}">{{ translationIdsPrefix[filter.name] + item.name.toLowerCase() }}</span>
                   {{ item.quantity ? ' (' + item.quantity + ')' : '' }}
                 </span>
               </label>

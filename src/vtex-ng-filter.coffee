@@ -5,6 +5,12 @@ openFilters = {}
 moreOptionsShowFilters = {}
 loadInitialFilter = true
 
+translationIdsPrefix = {
+  status: 'detail.state.',
+  PaymentNames: 'filters.PaymentNames.',
+  ShippingEstimatedDate: 'filters.group-date-deliver.'
+}
+
 angular.module('vtexNgFilter', [])
 .factory 'Filter', ($rootScope, $location, $filter, DateTransform) ->
   class Filter
@@ -253,10 +259,7 @@ angular.module('vtexNgFilter', [])
     infoMessage: '=infoMessage'
   templateUrl: if config.path then config.path + '/vtex-ng-filter.html' else 'vtex-ng-filter.html'
   link: ($scope) ->
-    $scope.translationIdsPrefix = {
-      status: 'detail.state.',
-      PaymentNames: 'filters.PaymentNames.'
-    }
+    $scope.translationIdsPrefix = translationIdsPrefix
     filters = _.flatten $scope.filters
     # Initialize open filters if needed
     for filter in filters
@@ -339,6 +342,8 @@ angular.module('vtexNgFilter', [])
   scope:
     filters: '=filters'
   templateUrl: if config.path then config.path + '/vtex-ng-filter-summary.html' else 'vtex-ng-filter-summary.html'
+  link: ($scope) ->
+    $scope.translationIdsPrefix = translationIdsPrefix
 
 .directive 'vtFilterButton', ->
   restrict: 'E'
