@@ -212,12 +212,8 @@
                   ng-model="item.selected"
                   ng-change="filter.updateSelectedCount()"
                 />
-                <span ng-if="filter.name == 'status'">
-                  <span translate>{{ 'detail.state.' + item.name }}</span>
-                  {{ item.quantity ? ' (' + item.quantity + ')' : '' }}
-                </span>
-                <span ng-if="filter.name != 'status'">
-                  <span translate>{{ item.name }}</span>
+                <span>
+                  <span translate translate-default="{{ item.name }}">{{ translationIdsPrefix[filter.name] + item.name }}</span>
                   {{ item.quantity ? ' (' + item.quantity + ')' : '' }}
                 </span>
               </label>

@@ -253,6 +253,10 @@ angular.module('vtexNgFilter', [])
     infoMessage: '=infoMessage'
   templateUrl: if config.path then config.path + '/vtex-ng-filter.html' else 'vtex-ng-filter.html'
   link: ($scope) ->
+    $scope.translationIdsPrefix = {
+      status: 'detail.state.',
+      PaymentNames: 'filters.PaymentNames.'
+    }
     filters = _.flatten $scope.filters
     # Initialize open filters if needed
     for filter in filters
