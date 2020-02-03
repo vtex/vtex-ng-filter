@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.1] - 2020-02-03
+
 ### Changed
 
 - **item.name** translations id prefix moved to `vtex-ng-filter`.
