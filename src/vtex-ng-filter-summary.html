@@ -2,8 +2,7 @@
   <small ng-if="filters.length" ng-repeat="filter in filters.getAppliedFilters()">
     <span ng-repeat="item in filter.getSelectedItems()">
       <span class="label label-info">
-        <span ng-if="translationIdsPrefix[filter.name]" translate translate-default="{{ item.name }}">{{ translationIdsPrefix[filter.name] + item.name.toLowerCase() }}</span>
-        <span ng-if="!translationIdsPrefix[filter.name]" translate>{{ item.name }}</span>
+        <span translate translate-default="{{ item.name }}">{{ translationIdsPrefix[filter.name] + item.name.toLowerCase() }}</span>
         &nbsp;
         <a href="javascript:void(0);" ng-click="filter.clearItem(item)"><i class="icon-remove-sign"></i></a>
       </span>&nbsp;
