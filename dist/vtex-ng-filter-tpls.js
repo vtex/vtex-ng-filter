@@ -1,4 +1,4 @@
-/*! vtex-ng-filter - v0.6.0 - 2020-01-29 */
+/*! vtex-ng-filter - v0.6.1 - 2020-07-16 */
 (function() {
   var config, loadInitialFilter, moreOptionsShowFilters, openFilters, translationIdsPrefix,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -551,7 +551,7 @@ angular.module("vtexNgFilter").run(function($templateCache) {   'use strict';
 
 
   $templateCache.put('vtex-ng-filter-summary.html',
-    "<div class=\"filters-summary\"><small ng-if=\"filters.length\" ng-repeat=\"filter in filters.getAppliedFilters()\"><span ng-repeat=\"item in filter.getSelectedItems()\"><span class=\"label label-info\"><span translate>{{ translationIdsPrefix[filter.name] + item.name.toLowerCase() }}</span> &nbsp; <a href=\"javascript:void(0);\" ng-click=\"filter.clearItem(item)\"><i class=\"icon-remove-sign\"></i></a> </span>&nbsp;</span></small></div>"
+    "<div class=\"filters-summary\"><small ng-if=\"filters.length\" ng-repeat=\"filter in filters.getAppliedFilters()\"><span ng-repeat=\"item in filter.getSelectedItems()\"><span class=\"label label-info\"><span ng-if=\"translationIdsPrefix[filter.name]\" translate translate-default=\"{{ item.name }}\">{{ translationIdsPrefix[filter.name] + item.name.toLowerCase() }}</span> <span ng-if=\"!translationIdsPrefix[filter.name]\" translate>{{ item.name }}</span> &nbsp; <a href=\"javascript:void(0);\" ng-click=\"filter.clearItem(item)\"><i class=\"icon-remove-sign\"></i></a> </span>&nbsp;</span></small></div>"
   );
 
 
