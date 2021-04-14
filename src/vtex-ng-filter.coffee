@@ -11,6 +11,8 @@ translationIdsPrefix = {
   ShippingEstimatedDate: 'filters.group-date-deliver.'
 }
 
+allValuesSpecialString = '$$ALL_VALUES$$'
+
 angular.module('vtexNgFilter', [])
 .factory 'Filter', ($rootScope, $location, $filter, DateTransform) ->
   class Filter
@@ -137,7 +139,7 @@ angular.module('vtexNgFilter', [])
         @date = date
       else if @type is 'multiple'
         for item in @items
-          item.selected = item.url in itemsAsSearchParameter.split(',')
+          item.selected = item.url in itemsAsSearchParameter.split(',') or itemsAsSearchParameter is allValuesSpecialString
       else if @type is 'single'
         @selectedItem = _.find @items, (i) -> i.url is itemsAsSearchParameter
 
@@ -157,11 +159,28 @@ angular.module('vtexNgFilter', [])
         else
           []
       else if @type is 'multiple'
+        allSelected = true
+        for item in @items
+          if !item.selected
+            allSelected = false
+        
         item for item in @items when item.selected
       else if @type is 'single'
         if @selectedItem then [@selectedItem] else []
 
+    areAllSelected: =>
+      allSelected = true
+      for item in @items
+        if !item.selected
+          allSelected = false
+      allSelected
+
     getSelectedItemsURL: =>
+      selectedItems = @getSelectedItems()
+
+      if (@type is 'multiple' and @areAllSelected())
+        return allValuesSpecialString
+      
       selectedArray = _.map @getSelectedItems(), (i) -> i.url
       if selectedArray.length > 0 then selectedArray.join(',') else null
 

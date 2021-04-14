@@ -1,6 +1,6 @@
-/*! vtex-ng-filter - v0.6.1 - 2020-07-16 */
+/*! vtex-ng-filter - v0.6.2 - 2021-04-07 */
 (function() {
-  var config, loadInitialFilter, moreOptionsShowFilters, openFilters, translationIdsPrefix,
+  var allValuesSpecialString, config, loadInitialFilter, moreOptionsShowFilters, openFilters, translationIdsPrefix,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
@@ -20,6 +20,8 @@
     ShippingEstimatedDate: 'filters.group-date-deliver.'
   };
 
+  allValuesSpecialString = '$$ALL_VALUES$$';
+
   angular.module('vtexNgFilter', []).factory('Filter', function($rootScope, $location, $filter, DateTransform) {
     var Filter;
     return Filter = (function() {
@@ -34,6 +36,7 @@
         this.selectAll = bind(this.selectAll, this);
         this.clearSelection = bind(this.clearSelection, this);
         this.getSelectedItemsURL = bind(this.getSelectedItemsURL, this);
+        this.areAllSelected = bind(this.areAllSelected, this);
         this.getSelectedItems = bind(this.getSelectedItems, this);
         this.setSelectedItems = bind(this.setSelectedItems, this);
         this.updateSelectedCount = bind(this.updateSelectedCount, this);
@@ -211,7 +214,7 @@
           ref = this.items;
           for (j = 0, len = ref.length; j < len; j++) {
             item = ref[j];
-            item.selected = (ref1 = item.url, indexOf.call(itemsAsSearchParameter.split(','), ref1) >= 0);
+            item.selected = (ref1 = item.url, indexOf.call(itemsAsSearchParameter.split(','), ref1) >= 0) || itemsAsSearchParameter === allValuesSpecialString;
           }
         } else if (this.type === 'single') {
           this.selectedItem = _.find(this.items, function(i) {
@@ -222,7 +225,7 @@
       };
 
       Filter.prototype.getSelectedItems = function() {
-        var base, dateFrom, dateTo, item, j, len, ref, results, url;
+        var allSelected, base, dateFrom, dateTo, item, j, l, len, len1, ref, ref1, results, url;
         if (this.type === 'date') {
           if (this.date.from && this.date.to) {
             dateFrom = typeof this.date.from === 'string' ? this.date.from : this.date.from.toISOString();
@@ -237,10 +240,18 @@
             return [];
           }
         } else if (this.type === 'multiple') {
+          allSelected = true;
           ref = this.items;
-          results = [];
           for (j = 0, len = ref.length; j < len; j++) {
             item = ref[j];
+            if (!item.selected) {
+              allSelected = false;
+            }
+          }
+          ref1 = this.items;
+          results = [];
+          for (l = 0, len1 = ref1.length; l < len1; l++) {
+            item = ref1[l];
             if (item.selected) {
               results.push(item);
             }
@@ -255,8 +266,25 @@
         }
       };
 
+      Filter.prototype.areAllSelected = function() {
+        var allSelected, item, j, len, ref;
+        allSelected = true;
+        ref = this.items;
+        for (j = 0, len = ref.length; j < len; j++) {
+          item = ref[j];
+          if (!item.selected) {
+            allSelected = false;
+          }
+        }
+        return allSelected;
+      };
+
       Filter.prototype.getSelectedItemsURL = function() {
-        var selectedArray;
+        var selectedArray, selectedItems;
+        selectedItems = this.getSelectedItems();
+        if (this.type === 'multiple' && this.areAllSelected()) {
+          return allValuesSpecialString;
+        }
         selectedArray = _.map(this.getSelectedItems(), function(i) {
           return i.url;
         });
